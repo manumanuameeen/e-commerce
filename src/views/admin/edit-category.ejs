@@ -1,0 +1,110 @@
+<%- include('../partials/admin/header') %>
+
+
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <h2>Edit Category</h2>
+                </div>
+
+                <!-- Edit Form Section -->
+                <div class="col-md-6 mt-4">
+                    <form method="post" action="/admin/edit-Category/<%= category._id %>">
+                        
+                        <div class="mb-4">
+                            <label for="categoryName" class="form-label">Name</label>
+                            <input 
+                                type="text" 
+                                name="categoryName" 
+                                class="form-control border" 
+                                value="<%= category.name %>"
+                                required
+                            />
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea 
+                                name="description" 
+                                class="form-control border" 
+                                rows="4"
+                                required
+                            ><%= category.description %></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a href="/admin/category" class="btn btn-secondary">Back to Categories</a>
+                            <button type="submit" class="btn btn-primary">Update Category</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="col-md-6 mt-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Category Preview</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <tr>
+                                    <th>Current Name:</th>
+                                    <td><%= category.name %></td>
+                                </tr>
+                                <tr>
+                                    <th>Current Description:</th>
+                                    <td><%= category.description %></td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        <span class="badge <%= category.isListed ? 'bg-success' : 'bg-danger' %>">
+                                            <%= category.isListed ? 'Listed' : 'Unlisted' %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../partials/admin/footer') %>
+
+    <!-- Bootstrap and other scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nameInput = document.querySelector('input[name="categoryName"]');
+            const descInput = document.querySelector('textarea[name="description"]');
+            
+            if (!nameInput.value.trim()) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Category name is required',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            if (!descInput.value.trim()) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Description is required',
+                    icon: 'error'
+                });
+                return;
+            }
+        });
+    </script>
+
+    

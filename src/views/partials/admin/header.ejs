@@ -1,118 +1,682 @@
-<!doctype html>
-<html lang="zxx">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>aranoz</title>
-    <link rel="icon" href="img/favicon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <!-- animate CSS -->
-    <link rel="stylesheet" href="css/animate.css">
-    <!-- owl carousel CSS -->
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <!-- font awesome CSS -->
-    <link rel="stylesheet" href="css/all.css">
-    <!-- flaticon CSS -->
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/themify-icons.css">
-    <!-- font awesome CSS -->
-    <link rel="stylesheet" href="css/magnific-popup.css">
-    <!-- swiper CSS -->
-    <link rel="stylesheet" href="css/slick.css">
-    <!-- style CSS -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+    <style>
+        /* General Reset */
+        body, h1, h2, p, ul, li, a {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<body>
-    <!--::header part start::-->
-    <header class="main_menu home_menu">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-12">
-                    <nav class="navbar navbar-expand-lg navbar-light">
-                        <a class="navbar-brand" href="index.html"> <img src="img/logo.png" alt="logo"> </a>
-                        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="menu_icon"><i class="fas fa-bars"></i></span>
-                        </button>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+        }
 
-                        <div class="collapse navbar-collapse main-menu-item" id="navbarSupportedContent">
-                            <ul class="navbar-nav">
-                                <li class="nav-item">
-                                    <a class="nav-link" href="index.html">Home</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown_1"
-                                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Shop
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown_1">
-                                        <a class="dropdown-item" href="category.html"> shop category</a>
-                                        <a class="dropdown-item" href="single-product.html">product details</a>
-                                        
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown_3"
-                                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        pages
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown_2">
-                                        <a class="dropdown-item" href="login.html"> login</a>
-                                        <a class="dropdown-item" href="tracking.html">tracking</a>
-                                        <a class="dropdown-item" href="checkout.html">product checkout</a>
-                                        <a class="dropdown-item" href="cart.html">shopping cart</a>
-                                        <a class="dropdown-item" href="confirmation.html">confirmation</a>
-                                        <a class="dropdown-item" href="elements.html">elements</a>
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown_2"
-                                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        blog
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown_2">
-                                        <a class="dropdown-item" href="blog.html"> blog</a>
-                                        <a class="dropdown-item" href="single-blog.html">Single blog</a>
-                                    </div>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link" href="contact.html">Contact</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="hearer_icon d-flex">
-                            <a id="search_1" href="javascript:void(0)"><i class="ti-search"></i></a>
-                            <a href=""><i class="ti-heart"></i></a>
-                            <div class="dropdown cart">
-                                <a class="dropdown-toggle" href="#" id="navbarDropdown3" role="button"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-cart-plus"></i>
-                                </a>
-                                <!-- <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <div class="single_product">
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            height: 100vh;
+            position: fixed;
+            padding: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .brand {
+            padding: 20px;
+            background-color: #243242;
+            text-align: center;
+        }
+
+        .brand img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            margin: 5px 0;
+        }
+
+        .menu-link {
+            text-decoration: none;
+            color: #ecf0f1;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .menu-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-link:hover, .menu-link.active {
+            background-color: #2980b9;
+            color: #ffffff;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            height: 60px;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 900;
+        }
+
+        .col-nav {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .nav {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .img-xs {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            z-index: 1000;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-divider {
+            border-top: 1px solid #ddd;
+            margin: 5px 0;
+        }
+
+   
+   
+
+        
+        /* General Reset */
+        body, h1, h2, p, ul, li, a {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* General Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .brand {
+            padding: 20px;
+            background-color: #243242;
+            text-align: center;
+        }
+
+        .sidebar .brand img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .sidebar ul.menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar .menu-item {
+            margin: 5px 0;
+        }
+
+        .sidebar .menu-link {
+            text-decoration: none;
+            color: #ecf0f1;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .menu-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar .menu-link:hover,
+        .sidebar .menu-link.active {
+            background-color: #2980b9;
+            color: #ffffff;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            height: 60px;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 900;
+        }
+
+        /* Updated Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+        }
+
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-info { background-color: #17a2b8; color: white; }
+
+        /* Status Badges */
+        .badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .search-input-group {
+            width: 500px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+        }
+
+        /* Main Content Layout */
+        .content-main {
+            margin-left: 250px;
+            padding: 80px 20px 20px;
+            width: calc(100% - 250px);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .pagination-container a,
+        .pagination-container .current-page {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .pagination-container .current-page {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Form Styles */
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .content-main {/* Content Header Styles */
+.content-header {
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0;
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* Form Section Styles */
+.col-md-3 {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 1px solid #e2e8f0;
+    padding: 10px 15px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+textarea.form-control {
+    min-height: 120px;
+}
+
+/* Table Section Styles */
+.col-md-8 {
+    padding-left: 30px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    background: #f8fafc;
+    padding: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+/* Action Buttons Refinements */
+.action-buttons {
+    gap: 8px;
+}
+
+.btn {
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge Refinements */
+.badge {
+    padding: 6px 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.alert-success {
+    background-color: #c6f6d5;
+    color: #276749;
+}
+
+.alert-danger {
+    background-color: #fed7d7;
+    color: #9b2c2c;
+}
+
+/* Search Bar Refinements */
+.search-container {
+    margin-bottom: 30px;
+}
+
+.search-input-group {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 5px;
+}
+
+.search-input {
+    border: none;
+    padding: 12px 20px;
+    font-size: 15px;
+    width: calc(100% - 100px);
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-input-group .btn {
+    margin-left: 10px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .col-md-3, .col-md-8 {
+        padding: 15px;
+    }
     
-                                    </div>
-                                </div> -->
-                                
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-            </div>
+    .search-input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .search-input {
+        width: 100%;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+
+            .search-input-group {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+  
+        .text-danger {
+            color: #dc3545;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 80px 20px 20px;
+            width: calc(100% - 250px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                transform: translateX(-70px);
+            }
+
+            .brand img {
+                max-width: 40px;
+            }
+
+            .menu-link span {
+                display: none;
+            }
+
+            .menu-link i {
+                margin-right: 0;
+            }
+
+            .navbar {
+                width: calc(100% - 70px);
+                margin-left: 70px;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+
+            .sidebar.collapsed + .navbar,
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <img src="/img/logo.png" alt="Aranoz Logo">
         </div>
-        <div class="search_input" id="search_input_box">
-            <div class="container ">
-                <form class="d-flex justify-content-between search-inner">
-                    <input type="text" class="form-control" id="search_input" placeholder="Search Here">
-                    <button type="submit" class="btn"></button>
-                    <span class="ti-close" id="close_search" title="Close Search"></span>
-                </form>
-            </div>
+        <ul class="menu">
+            <li class="menu-item">
+                <a href="/admin" class="menu-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/users" class="menu-link">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/category" class="menu-link">
+                    <i class="fas fa-list"></i>
+                    <span>Category</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/brand" class="menu-link">
+                    <i class="fas fa-tag"></i>
+                    <span>Brand</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/add-product" class="menu-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/products" class="menu-link">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/coupons" class="menu-link">
+                    <i class="fas fa-gift"></i>
+                    <span>Coupons</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/banners" class="menu-link">
+                    <i class="fas fa-image"></i>
+                    <span>Banners</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/orders" class="menu-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/reports" class="menu-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/settings" class="menu-link">
+                    <i class="fas fa-cogs"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="col-nav">
+            <ul class="nav">
+                <li class="dropdown nav-item">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false">
+                        <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User">
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="/admin/login">
+                            <i class="material-icons fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </div>
-    </header>
+    </div>

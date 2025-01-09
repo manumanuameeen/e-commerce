@@ -1,0 +1,271 @@
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.26/bootstrap-4.min.css">
+<%- include('../partials/users/header') %>
+
+
+<style>
+
+    .error-message{
+        color: red;
+        font-size: 0.75rem;
+        display: none;
+    }
+</style>
+    <!-- breadcrumb start-->
+    <section class="breadcrumb breadcrumb_bg">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="breadcrumb_iner">
+                        <div class="breadcrumb_iner_item">
+                            <h2>Sign Up</h2>
+                            <p>Home <span>-</span> Sign Up</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- breadcrumb end-->
+
+    <!--================Sign Up Part Area =================-->
+    <!-- <section class="login_part padding_top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="login_part_text text-center">
+                        <div class="login_part_text_iner">
+                            <h2>Already have an account?</h2>
+                            <p>Sign in to your account to continue shopping and enjoy our latest offers!</p>
+                            <a href="/login" class="btn_3">Sign In</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="login_part_form">
+                        <div class="login_part_form_iner">
+                            <h3>Welcome! <br>Create Your Account</h3>
+                            <form id="signform" class="row contact_form" action="/signup" method="post"
+                                novalidate="novalidate"   autocomplete="off">
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="text" class="form-control" id="name" name="name" value=""
+                                        placeholder="Full Name" required>
+                                    <div id="error1" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="email" class="form-control" id="email" name="email" value=""
+                                        placeholder="Email Address" required>
+                                    <div id="error2" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="text" class="form-control" id="phone" name="phone" value=""
+                                        placeholder="Phone Number" required>
+                                    <div id="error3" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="password" class="form-control" id="password" name="password" value=""
+                                        placeholder="Password" >
+                                    <div id="error4" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="password" class="form-control" id="cPassword" name="cPassword"
+                                        value="" placeholder="Confirm Password" >
+                                    <div id="error5" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    <button  type="submit" value="submit" class="btn_3">Sign Up</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+
+
+    <section class="login_part padding_top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="login_part_text text-center">
+                        <div class="login_part_text_iner">
+                            <h2>Already have an account?</h2>
+                            <p>Sign in to your account to continue shopping and enjoy our latest offers!</p>
+                            <a href="/login" class="btn_3">Sign In</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="login_part_form">
+                        <div class="login_part_form_iner">
+                            <h3>Welcome! <br>Create Your Account</h3>
+                            <form id="signform" class="row contact_form" action="/signup" method="post" novalidate="novalidate" autocomplete="off">
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="text" class="form-control" id="name" name="name" value="" placeholder="Full Name" required>
+                                    <div id="error1" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="email" class="form-control" id="email" name="email" value="" placeholder="Email Address" required>
+                                    <div id="error2" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="text" class="form-control" id="phone" name="phone" value="" placeholder="Phone Number" required>
+                                    <div id="error3" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="password" class="form-control" id="password" name="password" value="" placeholder="Password">
+                                    <div id="error4" class="error-message"></div>
+                                </div>
+                                <div class="col-md-12 form-group p_star">
+                                    <input type="password" class="form-control" id="cPassword" name="cPassword" value="" placeholder="Confirm Password">
+                                    <div id="error5" class="error-message"></div>
+                                </div>
+                                <% if (locals.message&&message.length>0) { %>
+                                    <div class="alert alert-danger text-center">
+                                            <p><%= message %></p>
+                                    </div>
+                                 <% } %>
+                                <div class="col-md-12 form-group">
+                                    <button type="submit" value="submit" class="btn_3">Sign Up</button>
+                                </div>
+                            </form>
+                           
+                            <div class="google-signup mt-3">
+                                <p>Or sign up with</p>
+                                <a href="/auth/google" class="btn btn-light btn-block d-flex align-items-center justify-content-center" style="border: 1px solid #ddd; text-decoration: none;">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Icon" style="width: 20px; margin-right: 10px;">
+                                    Sign Up with Google
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!--================Sign Up Part End =================-->
+
+    <%- include('../partials/users/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.9/dist/sweetalert2.min.js"></script>
+
+    <!-- <script> href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.26/bootstrap-4.min.css"></script> -->
+    <script>
+
+
+const nameid = document.getElementById('name');
+const emailid = document.getElementById('email');
+const phoneid = document.getElementById('phone');
+const passid = document.getElementById('password');
+const CPassid = document.getElementById('cPassword');
+
+const error1 = document.getElementById('error1');
+const error2 = document.getElementById('error2');
+const error3 = document.getElementById('error3');
+const error4 = document.getElementById('error4');
+const error5 = document.getElementById('error5');
+
+function nameValidateChecking() {
+    const nameVal = nameid.value;
+    const namepattern = /^[A-Za-z\s]+$/;
+    if (nameVal.trim() === "") {
+        error1.style.display = 'block';
+        error1.innerHTML = "Please enter a valid name";
+    } else if (!namepattern.test(nameVal)) {
+        error1.style.display = "block";
+        error1.innerHTML = "Name can only contain alphabets and spaces";
+    } else {
+        error1.style.display = "none";
+        error1.innerHTML = "";
+    }
+}
+
+function emailValidateChecking() {
+    const emailval = emailid.value;
+    const emailpattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (emailval.trim() === "") {
+        error2.style.display = "block";
+        error2.innerHTML = "Please enter an email address";
+    } else if (!emailpattern.test(emailval)) {
+        error2.style.display = 'block';
+        error2.innerHTML = "Please enter a valid email address";
+    } else {
+        error2.style.display = "none";
+        error2.innerHTML = "";
+    }
+}
+
+function phoneValidateChecking() {
+    const phoneVal = phoneid.value;
+    const phonePattern = /^[0-9]{10}$/;
+    if (phoneVal.trim() === "") {
+        error3.style.display = "block";
+        error3.innerHTML = "Please enter your phone number";
+    } else if (!phonePattern.test(phoneVal)) {
+        error3.style.display = "block";
+        error3.innerHTML = "Please enter a valid 10-digit phone number";
+    } else {
+        error3.style.display = "none";
+        error3.innerHTML = "";
+    }
+}
+
+function passwordValidateChecking() {
+    const passVal = passid.value;
+    if (passVal.trim() === "") {
+        error4.style.display = "block";
+        error4.innerHTML = "Password is required";
+    } else if (passVal.length < 8) {
+        error4.style.display = "block";
+        error4.innerHTML = "Password must be at least 6 characters long";
+    } else {
+        error4.style.display = "none";
+        error4.innerHTML = "";
+    }
+}
+
+function confirmPasswordValidateChecking() {
+    const passVal = passid.value;
+    const cPassVal = CPassid.value;
+    if (cPassVal.trim() === "") {
+        error5.style.display = "block";
+        error5.innerHTML = "Please confirm your password";
+    } else if (cPassVal !== passVal) {
+        error5.style.display = "block";
+        error5.innerHTML = "Passwords do not match";
+    } else {
+        error5.style.display = "none";
+        error5.innerHTML = "";
+    }
+}
+
+nameid.addEventListener("blur", nameValidateChecking);
+emailid.addEventListener("blur", emailValidateChecking);
+phoneid.addEventListener("blur", phoneValidateChecking);
+passid.addEventListener("blur", passwordValidateChecking);
+CPassid.addEventListener("blur", confirmPasswordValidateChecking);
+
+const signform = document.getElementById('signform');
+signform.addEventListener("submit", (e) => {
+    nameValidateChecking();
+    emailValidateChecking();
+    phoneValidateChecking();
+    passwordValidateChecking();
+    confirmPasswordValidateChecking();
+
+   
+    if (
+        error1.innerHTML ||
+        error2.innerHTML ||
+        error3.innerHTML ||
+        error4.innerHTML ||
+        error5.innerHTML
+    ) {
+        e.preventDefault();
+    }
+});
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.9/dist/sweetalert2.min.js"></script>
+

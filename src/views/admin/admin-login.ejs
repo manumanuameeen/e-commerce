@@ -1,0 +1,111 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('http://www.google.com/imgres?q=give%20a%20background%20image%20for%20sofa%20website%204k%20&imgurl=https%3A%2F%2Fplus.unsplash.com%2Fpremium_photo-1661765778256-169bf5e561a6%3Ffm%3Djpg%26q%3D60%26w%3D3000%26ixlib%3Drb-4.0.3%26ixid%3DM3wxMjA3fDB8MHxzZWFyY2h8NXx8c29mYXxlbnwwfHwwfHx8MA%253D%253D&imgrefurl=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fsofa&docid=qrnzbGR8zhfyvM&tbnid=rOpTS-3horWx9M&vet=12ahUKEwjK2N-I0eKKAxWT4jgGHYs5AVYQM3oECHsQAA..i&w=3000&h=2000&hcb=2&ved=2ahUKEwjK2N-I0eKKAxWT4jgGHYs5AVYQM3oECHsQAA');
+      background-size: cover;
+      background-position: center;
+      font-family: 'Nunito Sans', sans-serif;
+       color: white;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: hsl(193, 80%, 17%);
+      border-radius: 8px;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.875rem;
+    }
+    .text-center{
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2 class="text-center">Admin Login</h2>
+    <% if (message) { %>
+    <div class="alert alert-danger text-center"><%= message %></div>
+    <% } %>
+    <form id="adminLoginForm" method="post" action="/admin/login">
+      <div class="form-group">
+        <label for="adminEmail">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="adminEmail"
+          name="email"
+          required
+        />
+        <div id="emailError" class="error-message"></div>
+      </div>
+      <div class="form-group">
+        <label for="adminPassword">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="adminPassword"
+          name="password"
+          required
+        />
+        <div id="passwordError" class="error-message"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+  </div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminLoginForm = document.getElementById("adminLoginForm");
+      const emailField = document.getElementById("adminEmail");
+      const passwordField = document.getElementById("adminPassword");
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+
+      adminLoginForm.addEventListener("submit", function (event) {
+        let isValid = true;
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!emailPattern.test(emailField.value)) {
+          emailError.textContent = "Invalid email format";
+          isValid = false;
+        } else {
+          emailError.textContent = "";
+        }
+        if (passwordField.value.length < 8) {
+          passwordError.textContent =
+            "Password should contain at least 8 characters";
+          isValid = false;
+        } else {
+          passwordError.textContent = "";
+        }
+
+        if (!isValid) {
+          event.preventDefault();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
