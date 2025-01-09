@@ -41,10 +41,11 @@ import multer from "multer";
 
 import { storage } from "../helpers/multer.js"
 
-const uploads = multer({ storage: storage });
+const upload = multer({ storage: storage });
 
 import {
     getBrandPage,
+    addBrand,
 
 } from "../controllers/admin/brandController.js";
 
@@ -69,5 +70,6 @@ router.get("/edit-Category", adminAuth, getEditcategory)
 router.post("/edit-Category/:id", adminAuth, editCategory);
 //brand Mangement
 router.get("/brand",adminAuth,getBrandPage)
+router.post("/addBrand",adminAuth,upload.single("image"),addBrand)
 
 export default router;  
