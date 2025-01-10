@@ -39,26 +39,26 @@ const addBrand =async (req,res) => {
     if (!brand ) {
         return res.status(400).json({ message: "All fields are required" });
     }
-    const findBrand = await Brand.findOne({brandName:brand});
+    const findBrand = await Brand.findOne({brand});
     if(!findBrand){
-        // console.log(__dirname(req.file.filename));
+       
         
         const image = req.file.filename;
         const newBrand = new Brand({
             brandName:brand,
-            brandImage:image
+            brandImage:image,
         })
         await newBrand.save();
         
         
-        return res.redirect("/admin/brand")
+        return res.redirect("/admin/brand");
 
     }
 
  } catch (error) {
-    console.log("an error occured  in add bran",error);
-    
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+     
+     res.status(500).json({ message: "Something went wrong", error: error.message });
+     console.log("an error occured  in add bran",error);
 
  }
 }

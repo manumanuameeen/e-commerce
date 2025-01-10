@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const uploadDir = path.join(__dirname, "../public/uploads/re-image");
 
 if (!fs.existsSync(uploadDir)) {
+    console.log("ivide ethunud");
+    
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
@@ -21,6 +23,6 @@ const storage = multer.diskStorage({
   }
 });
 
-export { storage };
+export default storage;
 
 

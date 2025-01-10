@@ -21,7 +21,7 @@
                             <div class="mb-4">
                                 <label for="brandImage" class="form-label">Brand Image</label>
                                 <div class="input-upload">
-                                    <img src="/img/placeholder.png" id="imagePreview" alt="Preview"
+                                    <img src="" id="imagePreview" alt=""
                                         style="max-width: 100px; margin-bottom: 10px;" />
                                     <input class="form-control" type="file" id="brandImage" name="image"
                                         accept="image/*" onchange="previewImage(event)" required />
@@ -51,11 +51,11 @@
                                         <% data.forEach(brand=> { %>
                                             <tr>
                                                 <td>
-                                                    <%= brand.name %>
+                                                    <%= brand.brandName %>
                                                 </td>
                                                 <td>
                                                     <div class="brand-logo">
-                                                        <img src="/upload/re-image<%= brand.brandImage[0] %>"
+                                                        <img src="/upload/re-image/<%= brand.brandImage[0] %>"
                                                             alt="<%= brand.brandName%>"
                                                             style="width: 40px; height: 40px; object-fit: contain;" />
                                                     </div>
