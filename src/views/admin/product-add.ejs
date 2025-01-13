@@ -86,7 +86,7 @@
                     <h4>Basic</h4>
                 </div>
                 <div class="card-body">
-                    <form id="productSubmitForm" method="post" action="/admin/Products" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
+                    <form id="productSubmitForm" method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
                         <input type="hidden" name="croppedImages" id="croppedImagesInput" />
                         <div class="mb-4">
                             <label for="productName" class="form-label">Product title</label>
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <!-- Media Upload Cards -->
+     
         <div class="col-lg-6">
             <div class="row">
                 <% for(let i=1; i<=3; i++) { %>
@@ -264,8 +264,8 @@ async function handleSubmit(event) {
         const form = document.getElementById('productSubmitForm');
         const formData = new FormData(form);
 
-        console.log("ivide  unde",formData)
-        // Add cropped images to formData 
+        // console.log("ivide  unde",formData)
+       
         for (const [index, dataUrl] of Object.entries(croppedImages)) {
             // console.log("inside the ",index,DataUrl);
             
@@ -281,7 +281,7 @@ async function handleSubmit(event) {
         });
 
 
-        // const result = await response.json()
+        const result = await response.json()
 
         console.log("the respose after fetching the data",response);
         

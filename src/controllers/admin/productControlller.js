@@ -11,6 +11,9 @@ import path from "path"
 import sharp from "sharp";
 
 import { fileURLToPath } from 'url';
+import { log } from "console";
+
+// import { renderFile } from "ejs";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,17 +35,19 @@ const getProductAddPage = async (req, res) => {
 };
 
 const addProducts = async (req, res) => {
-    try {
-        console.log("the value from front end ",req.body);
-        
-        const products = req.body;
-console.log("productsINfo:",products);
+    console.log("now in add product");
 
-// Check for duplicate product
-const productExists = await Product.findOne({ productName: products.productName });
-if (productExists) {
-    return res.status(400).json({ success: false, message: "Product already exists" });
-}
+    try {
+        console.log("the value from front end ", req.body);
+
+        const products = req.body;
+        console.log("productsINfo:", products);
+
+        // Check for duplicate product
+        const productExists = await Product.findOne({ productName: products.productName });
+        if (productExists) {
+            return res.status(400).json({ success: false, message: "Product already exists" });
+        }
         // Validation checks
         if (!products.productName || !products.category || !products.regularPrice) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -94,11 +99,11 @@ if (productExists) {
             productImage: images,
             status: "Available"
         });
-console.log("product created :",newProduct);
+        console.log("product created :", newProduct);
 
         await newProduct.save();
         console.log('Product saved  successfully');
-        
+
         // Window.location.reload();
         return res.status(200).json({ success: true, message: "Product added successfully" });
     } catch (error) {
@@ -108,56 +113,96 @@ console.log("product created :",newProduct);
 };
 
 
-const getAllProduct=async (req,res) => {
+const getAllProduct = async (req, res) => {
     try {
         console.log("coming from the products get methods")
         const search = req.query.search || " ";
-        const page = req.query.page  || 1;
-        const limit = 4;
-        
-      
+        const page = req.query.page || 1;
+        const limit = 2;
+
+
         const productData = await Product.find({
-           
-                 productName: { $regex: new RegExp(".*" + search + ".*", "i") } 
-        
+
+            productName: { $regex: new RegExp(".*" + search + ".*", "i") }
+
         })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .populate('category')
-        .exec();
-        
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .populate('category')
+            .exec();
 
 
 
-        const count =  await Product.find({
-           
-                productName:{$regex:new RegExp(".*" + search + ".*", "i")}
-            
-         })
-         .countDocuments();
-// console.log("ivdeem ethunund 2",count);
 
-         const category  = await Category.find({isListed:true})
+        const count = await Product.find({
 
-console.log(productData,category);
+            productName: { $regex: new RegExp(".*" + search + ".*", "i") }
 
-         if(category){
-            console.log("ippo if lopimnte ullil");
-            
-            res.render('adminProduct',{
-                data:productData,
-                currentPage:page,
-                totalPages:Math.ceil(count/limit),
-                cat:category,
+        })
+            .countDocuments();
+
+
+
+        const category = await Category.find({ isListed: true })
+
+        // console.log("this is the Product data:", productData, " and this one is coategories:", category);
+
+        if (category) {
+
+
+            res.render('adminProduct', {
+                data: productData,
+                currentPage: page,
+                totalPages: Math.ceil(count / limit),
+                cat: category,
             })
+            // console.log("renderend successfully");
 
-         }else{
+        } else {
             res.redirect('/pageerror')
             console.log("Error in get prpoduct");
-            
-         }
+
+        }
     } catch (error) {
+
+    }
+}
+
+const blockProduct = async (req,res) => {
+    console.log("now in BlockProduct");
+    try {
+        console.log(req.query.id);
+        const id = req.query.id;
         
+        const blockProduct = await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
+        if (!blockProduct) {
+            return res.status(404).json({ success: false, message: "product not found" })
+        }
+        res.redirect("/admin/products");
+
+    } catch (error) {
+        res.redirect("/pageerror");
+    }
+}
+
+const unBlockProduct = async (req, res) => {
+    console.log("now in unBlockProduct");
+    
+    try {
+        const id = req.query.id;
+        const unBlockProduct = await Product.updateOne({ _id: id }, { isBlocked: false })
+        if (!unBlockProduct) {
+            res.status(404).json({ success: false, message: "unblock product failed" })
+        }
+console.log("product Blocked succefully");
+
+        res.redirect("/admin/products")
+
+    } catch (error) {
+        res.redirect("/pageerror")
+        console.log("Error in Unblock procduct",error);
+        
+
     }
 }
 
@@ -165,6 +210,8 @@ export {
     getProductAddPage,
     addProducts,
     getAllProduct,
+    blockProduct,
+    unBlockProduct
 
 }
 

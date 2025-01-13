@@ -54,9 +54,13 @@ import {
 
     getProductAddPage,
     addProducts,
-    getAllProduct
+    getAllProduct,
+    blockProduct,
+    unBlockProduct,
+
 
 } from "../controllers/admin/productControlller.js"
+
 
 router.get('/pageerror', loadPageerror)
 //Login  management
@@ -78,12 +82,14 @@ router.get('/unListCategory', adminAuth, getunListCategory)
 router.get("/edit-Category", adminAuth, getEditcategory)
 router.post("/edit-Category/:id", adminAuth, editCategory);
 //brand Mangement
-router.get("/brand",adminAuth,getBrandPage)
-router.post("/addBrand",adminAuth,uploads.single("image"),addBrand)
+router.get("/brand", adminAuth, getBrandPage)
+router.post("/addBrand", adminAuth, uploads.single("image"), addBrand)
 
 
 //products management
-router.get("/addProducts",adminAuth,getProductAddPage)
-router.post("/addProducts",uploads.any(),adminAuth,addProducts)
-router.get("/products",adminAuth,getAllProduct)
+router.get("/addProducts", adminAuth, getProductAddPage)
+router.post("/addProducts", uploads.any(), adminAuth, addProducts)
+router.get("/products", adminAuth, getAllProduct)
+router.get("/blockProduct",adminAuth,blockProduct)
+router.get("/unBlockProduct",adminAuth,unBlockProduct)
 export default router;  
