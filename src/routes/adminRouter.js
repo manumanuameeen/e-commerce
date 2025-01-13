@@ -49,6 +49,15 @@ import {
 
 } from "../controllers/admin/brandController.js";
 
+
+import {
+
+    getProductAddPage,
+    addProducts,
+    getAllProduct
+
+} from "../controllers/admin/productControlller.js"
+
 router.get('/pageerror', loadPageerror)
 //Login  management
 router.get('/login', loadlogin)
@@ -72,4 +81,9 @@ router.post("/edit-Category/:id", adminAuth, editCategory);
 router.get("/brand",adminAuth,getBrandPage)
 router.post("/addBrand",adminAuth,uploads.single("image"),addBrand)
 
+
+//products management
+router.get("/addProducts",adminAuth,getProductAddPage)
+router.post("/addProducts",uploads.any(),adminAuth,addProducts)
+router.get("/products",adminAuth,getAllProduct)
 export default router;  

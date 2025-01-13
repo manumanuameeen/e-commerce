@@ -8,7 +8,6 @@ import session from "express-session";
 import { nextTick } from "process";
 import nocache from "nocache";
 import passport from "./config/passport.js";
-
 import userRouter from "./routes/userRouter.js"
 import adminRouter from "./routes/adminRouter.js"
 
