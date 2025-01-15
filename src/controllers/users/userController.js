@@ -3,8 +3,8 @@ import User from "../../models/userSchema.js"
 import nodemailer from "nodemailer"
 import env from "dotenv"
 import bcrypt from "bcrypt"
-
-
+import Category from "../../models/categorySchema.js"
+import Product from "../../models/productSchema.js"
 
 
 
@@ -244,11 +244,25 @@ const loadHomepage = async (req, res) => {
     console.log("home page renderd")
     try {
         const user = req.session.user
+
+        const categories = await Category.find({ isListed: true })
+        let productData = await Product.find(
+            {
+                isBlocked: false,
+                category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
+
+            }
+        )
+        console.log("product data is getting ", productData);
+
+        productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn))
+        productData = productData.slice(0, 4);
+
         if (user) {
             const userData = await User.findOne({ _id: user._id });
-            return res.render("home", { user: userData })
+            return res.render("home", { user: userData ,products:productData})
         } else {
-            return res.render("home")
+            return res.render("home",{products:productData})
         }
 
     } catch (error) {
@@ -314,22 +328,22 @@ const login = async (req, res) => {
 };
 
 
-const loadlogout =async (req,res) => {
-    
-    try {
-       
-req.session.destroy((err)=>{
-    if(err){
-        console.log("session destrution error",err);
-        return res.redirect("/pageNotFound")
-    }
+const loadlogout = async (req, res) => {
 
-    res.redirect("/login")
-})
+    try {
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.log("session destrution error", err);
+                return res.redirect("/pageNotFound")
+            }
+
+            res.redirect("/login")
+        })
 
 
     } catch (error) {
-        console.log("Logout error",error);
+        console.log("Logout error", error);
         res.redirect("/pageNotFound")
     }
 }

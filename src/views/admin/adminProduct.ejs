@@ -35,7 +35,7 @@
                         <% for (let i=data.length - 1; i>= 0; i--) { %>
                         <tr>
                             <td><%= data[i].productName %></td>
-                            <td><%= data[i].category.name %></td>
+                            <td><%= data[i].category?.name %></td>
                             <td><%= data[i].regularPrice %></td>
                             <td><%= data[i].salePrice %></td>
                             <td><%= data[i].quantity %></td>
@@ -51,7 +51,7 @@
 
                             
                             <td class="text-center">
-                                <a href="/admin/edit-product/<%= data[i]._id %>" class="btn btn-info btn-sm">Edit</a>
+                                <a href="/admin/edit-Product/?id=<%= data[i]._id %>" class="btn btn-info btn-sm">Edit</a>
                             </td>
                         </tr>
                         <% } %>

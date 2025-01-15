@@ -145,7 +145,7 @@
                                             <th>Offer</th>
                                             <th>Status</th>
                                             <th>Actions</th>
-                                           
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -189,31 +189,34 @@
                                                         <span class="badge alert-success">Listed</span>
                                                         <% } else { %>
                                                             <span class="badge alert-danger">Unlisted</span>
-                                                    <%}%>
-                                                   
-                                                   
+                                                            <%}%>
+
+
                                                 </td>
-                                               
-                                                 
+
+
                                                 <td>
                                                     <% if (category.isListed) { %>
-                                                        <a href="/admin/unListCategory?id=<%= category._id %>" class="btn btn-danger text-white">
+                                                        <a href="/admin/unListCategory?id=<%= category._id %>"
+                                                            class="btn btn-danger text-white">
                                                             Unlist
                                                         </a>
-                                                    <% } else { %>
-                                                        <a href="/admin/listCategory?id=<%= category._id %>" class="btn btn-success text-white">
-                                                            List
-                                                        </a>
-                                                    <% } %>
-                                                
-                                                    <!-- Edit Button -->
-                                                    <a href="/admin/edit-Category?id=<%= category._id %>" class="btn btn-warning text-white">
-                                                        Edit
-                                                    </a>
+                                                        <% } else { %>
+                                                            <a href="/admin/listCategory?id=<%= category._id %>"
+                                                                class="btn btn-success text-white">
+                                                                List
+                                                            </a>
+                                                            <% } %>
+
+                                                                <!-- Edit Button -->
+                                                                <a href="/admin/edit-Category?id=<%= category._id %>"
+                                                                    class="btn btn-warning text-white">
+                                                                    Edit
+                                                                </a>
                                                 </td>
-                                                
-                                                    
-                                                   
+
+
+
                                             </tr>
                                             <% }) %>
                                     </tbody>
@@ -391,40 +394,40 @@
             }
 
             async function removeOffer(categoryId) {
-    try {
-        const response = await fetch("/admin/removeCategoryOffer", {
-            method: "POST",
-            headers: {
-                'content-type': "application/json"
-            },
-            body: JSON.stringify({
-                categoryId: categoryId,
-            })
-        });
+                try {
+                    const response = await fetch("/admin/removeCategoryOffer", {
+                        method: "POST",
+                        headers: {
+                            'content-type': "application/json"
+                        },
+                        body: JSON.stringify({
+                            categoryId: categoryId,
+                        })
+                    });
 
-        const data = await response.json();
+                    const data = await response.json();
 
-        if (response.ok && data.status === true) {
-            Swal.fire(
-                "Offer removed",
-                "The offer has been removed",
-                "success"
-            ).then(() => {
-                location.reload();
-            });
-        } else {
-            Swal.fire("Failed", data.message || "Removing offer failed", "error");
-        }
-    } catch (error) {
-        Swal.fire(
-            "Error",
-            "An error occured while removing the offer",
-            "error"
-        );
-        
-        console.error("Error removing offer", error);
-    }
-}
+                    if (response.ok && data.status === true) {
+                        Swal.fire(
+                            "Offer removed",
+                            "The offer has been removed",
+                            "success"
+                        ).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Failed", data.message || "Removing offer failed", "error");
+                    }
+                } catch (error) {
+                    Swal.fire(
+                        "Error",
+                        "An error occured while removing the offer",
+                        "error"
+                    );
+
+                    console.error("Error removing offer", error);
+                }
+            }
         </script>
 
         <%- include("../partials/admin/footer") %>

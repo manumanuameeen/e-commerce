@@ -1,6 +1,12 @@
 import express from "express"
 
 const router = express.Router()
+
+import multer from "multer";
+
+import storage from "../helpers/multer.js"
+
+const uploads = multer({ storage: storage });
 import {
     userAuth,
     adminAuth,
@@ -37,17 +43,6 @@ import {
 } from "../controllers/admin/categoryController.js.js"
 
 
-import multer from "multer";
-
-import storage from "../helpers/multer.js"
-
-const uploads = multer({ storage: storage });
-
-import {
-    getBrandPage,
-    addBrand,
-
-} from "../controllers/admin/brandController.js";
 
 
 import {
@@ -57,7 +52,10 @@ import {
     getAllProduct,
     blockProduct,
     unBlockProduct,
-
+    getEditProduct,
+    editProduct,
+    deleteSingleImage,
+    
 
 } from "../controllers/admin/productControlller.js"
 
@@ -81,9 +79,6 @@ router.get('/listCategory', adminAuth, getListCategory)
 router.get('/unListCategory', adminAuth, getunListCategory)
 router.get("/edit-Category", adminAuth, getEditcategory)
 router.post("/edit-Category/:id", adminAuth, editCategory);
-//brand Mangement
-router.get("/brand", adminAuth, getBrandPage)
-router.post("/addBrand", adminAuth, uploads.single("image"), addBrand)
 
 
 //products management
@@ -92,4 +87,7 @@ router.post("/addProducts", uploads.any(), adminAuth, addProducts)
 router.get("/products", adminAuth, getAllProduct)
 router.get("/blockProduct",adminAuth,blockProduct)
 router.get("/unBlockProduct",adminAuth,unBlockProduct)
+router.get("/edit-Product",adminAuth,getEditProduct)
+router.post("/edit-Product/:id",adminAuth,uploads.any("images",4),editProduct)
+router.post("/deleteImage",adminAuth,deleteSingleImage)
 export default router;  
