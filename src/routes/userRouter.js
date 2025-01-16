@@ -54,4 +54,4 @@ router.post("/search",searchProduct)
 router.get("/productDetails",productDetails)
 
 
-export default router   
+export default router   ;

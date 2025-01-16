@@ -18,15 +18,23 @@ const productDetails = async (req, res) => {
         
         const product = await Product.findById(productId).populate('category');
         const findCategory = product.category;
-      
+      console.log("finding category",findCategory)
+      const findRelatedProduct =await Product.find({category:findCategory})
+      console.log("product name",findRelatedProduct.length)
         const categoryOffer = findCategory ? findCategory.offer || 0 : 0;  
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;
+        // console.log("product details",product.productImage[1]);
         
         res.render("product-details", {
-            product,
-            userData,
-            totalOffer
+          user:userData,
+          product:product,
+          quantity:product.quantity,
+          totalOffer:totalOffer,
+          categories:findCategory,
+          findRelatedProduct,
+          
+
         });
         
     } catch (error) {

@@ -141,6 +141,7 @@ const verifyOtp = async (req, res) => {
         if (otp == req.session.userOtp) {
 
             const user = req.session.userData;
+console.log("adnkjasnk");
 
             const passwordHash = await securePassword(user.password);
 
@@ -352,7 +353,8 @@ const loadShopingPage = async (req, res) => {
     try {
 
         const user = req.session.user
-        const userData = await User.findOne({ _id: user })
+        console.log("is user is there",user)
+        const userData = await User.findOne({ _id: user._id })
 
         const categories = await Category.find({ isListed: true })
 
@@ -369,9 +371,9 @@ const loadShopingPage = async (req, res) => {
             category: { $in: categoryIds },
             quantity: { $gt: 0 },
         }).sort({ createdAt: -1 }).skip(skip).limit(limit);
-        // console.log("products",products)
+        console.log("products",products)
         const totalProducts = await Product.countDocuments({
-            isBlockes: false,
+            isBlocked: false,
             category: { $in: categoryIds },
             quantity: { $gt: 0 },
         })
@@ -398,6 +400,68 @@ const loadShopingPage = async (req, res) => {
 
 
 }
+
+// const loadShopingPage = async (req, res) => {
+//     try {
+//         // Add session checks
+//         const user = req.session.user;
+//         console.log("Session user:", user);
+        
+//         if (!user || !user._id) {
+//             console.log("No valid user session");
+//             return res.redirect('/login');
+//         }
+
+//         const userData = await User.findOne({ _id: user._id });
+//         console.log("Found user data:", userData);
+
+//         if (!userData) {
+//             console.log("User not found in database");
+//             return res.redirect('/login');
+//         }
+
+//         const categories = await Category.find({ isListed: true });
+//         console.log("Found categories:", categories);
+
+//         const categoryIds = categories.map(category => category._id);
+//         console.log("Category IDs:", categoryIds);
+
+//         const page = parseInt(req.query.page) || 1;
+//         const limit = 9;
+//         const skip = (page - 1) * limit;
+
+//         // Query products with debug logs
+//         const products = await Product.find({
+//             isBlocked: false,
+//             category: { $in: categoryIds },
+//             quantity: { $gt: 0 },
+//         }).sort({ createdOn: -1 }).skip(skip).limit(limit);
+//         console.log("Found products:", products);
+
+//         // Fix the typo in totalProducts query
+//         const totalProducts = await Product.countDocuments({
+//             isBlocked: false,  // Fixed typo
+//             category: { $in: categoryIds },
+//             quantity: { $gt: 0 },
+//         });
+//         console.log("Total products count:", totalProducts);
+
+//         const totalPages = Math.ceil(totalProducts / limit);
+
+//         return res.render("shop", {
+//             user: userData,
+//             products: products,
+//             categories: categories,
+//             totalProducts: totalProducts,
+//             currentPage: page,
+//             totalPages: totalPages,
+//         });
+
+//     } catch (error) {
+//         console.error("Shop page error:", error);
+//         return res.redirect('/pageNotFound');
+//     }
+// }
 const filterProduct = async (req, res) => {
     try {
         const user = req.session.user;

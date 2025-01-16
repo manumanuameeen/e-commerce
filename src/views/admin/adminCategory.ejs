@@ -273,33 +273,30 @@
                     body: JSON.stringify({ name, description })
                 })
                     .then((response) => {
-                        if (!response.ok) {
-                            return response.json().then(err => {
-                                throw new Error(err.error);
-                            });
-                        }
-                        return response.json();
+                        return response.json().then(data => {
+                            if (!response.ok) {
+                                throw new Error(data.error || "Something went wrong");
+                            }
+                            return data;
+                        });
                     })
                     .then(data => {
-                        location.reload();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: data.message
+                        }).then(() => {
+                            location.reload();
+                        });
                     })
                     .catch(error => {
-                        if (error.message === "category already exists") {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops",
-                                text: "Category already exists"
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops",
-                                text: "An error occurred while adding the category"
-                            });
-                        }
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops",
+                            text: error.message
+                        });
                     });
             }
-
             function validateForm() {
                 clearErrorMessages();
                 const name = document.getElementsByName("name")[0].value.trim();
@@ -317,7 +314,11 @@
                 if (description === "") {
                     displayErrorMessage("description-error", "Please enter a description");
                     isValid = false;
+                } else if (!/^[a-zA-Z\s]+$/.test(description)) {
+                    displayErrorMessage("name-error", "description  should contain only alphabetics");
+                    isValid = false;
                 }
+
 
                 return isValid;
             }

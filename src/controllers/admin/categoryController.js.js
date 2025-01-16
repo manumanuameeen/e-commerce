@@ -1,6 +1,7 @@
 import { query } from "express";
 import Category from "../../models/categorySchema.js";
 import Product from "../../models/productSchema.js"
+import { name } from "ejs";
 
 const categoryInfo = async (req, res) => {
     try {
@@ -30,30 +31,33 @@ const categoryInfo = async (req, res) => {
     }
 };
 
-
 const addCategory = async (req, res) => {
-
     const { name, description } = req.body;
     try {
-        const existingCategory = await Category.findOne({ name })
+        const existingCategory = await Category.findOne({ name });
         if (existingCategory) {
-            console.log("category already exists");
-            return res.status(400).json({ error: "Category already exist" })
-
+            console.log("Category already exists");
+            return res.status(400).json({ error: "Category already exists" });
         }
+
         const newCategory = new Category({
             name,
             description,
-        })
-
+        });
         await newCategory.save();
-        return res.json({ success: true, message: "Category added successflly", category: newCategory })
+
+        return res.json({ 
+            success: true, 
+            message: "Category added successfully", 
+            category: newCategory 
+        });
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Internal server error" })
-
-
+        console.error("Error adding category:", error);
+        return res.status(500).json({ 
+            success: false, 
+            error: "Internal server error" 
+        });
     }
-
 }
 
 
@@ -77,8 +81,10 @@ const addCategoryOffer = async (req, res) => {
             return res.status(404).json({ status: false, message: "category not found " });
         }
 
+
+
         const products = await Product.find({ category: category._id });
-        console.log("products doucment is there: ", products)
+        // console.log("products doucment is there: ", products)
         const hasProductOffer = products.some((product) => product.productOffer > percentage);
         if (hasProductOffer) {
             return res.json({ status: false, message: "Product within this category already have product offer" })
@@ -91,7 +97,7 @@ const addCategoryOffer = async (req, res) => {
             product.salePrice = product.regularPrice - (product.regularPrice * percentage / 100);;
 
             await product.save();
-            console.log("products doucment is there: ", products)
+            // console.log("products doucment is there: ", products)
         }
         return res.json({ success: true })
     } catch (error) {
