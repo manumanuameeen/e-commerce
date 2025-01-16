@@ -16,7 +16,7 @@ const userAuth = (req,res,next)=>{
             res.status(500).send("Intenal server error")
         })
     }else{
-        return redirect("/login")
+        return res.redirect("/login")
     }
 }
 const adminAuth = (req,res,next)=>{
@@ -35,8 +35,7 @@ const adminAuth = (req,res,next)=>{
     })
 }
 
-export{
+export {
     adminAuth,
-    userAuth,
-
+    userAuth
 }

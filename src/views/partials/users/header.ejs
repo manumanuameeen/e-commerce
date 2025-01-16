@@ -35,6 +35,7 @@
             right: 0;
         }
 
+      
         .dropdown-content a {
             color: black;
             padding: 12px 16px;
@@ -84,6 +85,7 @@
             align-items: center;
             gap: 10px;
         }
+     
     </style>
 </head>
 
@@ -107,15 +109,16 @@
                                     <a class="nav-link dropdown-toggle" href="/shop" id="navbarDropdown_1" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown_1">
-                                        <a class="dropdown-item" href="/shop/categories">Shop Category</a>
-                                        <a class="dropdown-item" href="/shop/products">Product Details</a>
+                                        <a class="dropdown-item" href="/shop">Shop Category</a>
+
+
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="/pages" id="navbarDropdown_3" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown_2">
-                                        <a class="dropdown-item" href="/user/login">Login</a>
+                                        <a class="dropdown-item" href="/login">Login</a>
                                         <a class="dropdown-item" href="/order/tracking">Tracking</a>
                                         <a class="dropdown-item" href="/shop/checkout">Product Checkout</a>
                                         <a class="dropdown-item" href="/shop/cart">Shopping Cart</a>
@@ -135,10 +138,10 @@
                             </ul>
                         </div>
                         <div class="header_icon d-flex align-items-center">
-                            <a id="search_1" href="/shop/search"><i class="ti-search"></i></a>
-                            <a href="/user/wishlist"><i class="ti-heart"></i></a>
+                            <a id="search_1" href="/search"><i class="ti-search"></i></a>
+                            <a href="/wishlist"><i class="ti-heart"></i></a>
                             <div class="dropdown cart">
-                                <a class="dropdown-toggle" href="/shop/cart" id="navbarDropdown3" role="button"
+                                <a class="dropdown-toggle" href="/cart" id="navbarDropdown3" role="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-cart-plus"></i>
                                 </a>
@@ -148,17 +151,17 @@
                             </div>
                             <% if (locals.user) { %>
                                 <div class="dropdown">
-                                    <a href="/user/profile" class="btn">
+                                    <a href="/profile" class="btn">
                                         <%= locals.user.name %>
                                     </a>
                                     <div class="dropdown-content">
-                                        <a href="/user/profile">Profile</a>
-                                        <a href="/user/logout">Logout</a>
+                                        <a href="/profile">Profile</a>
+                                        <a href="/logout">Logout</a>
                                     </div>
                                 </div>
                             <% } else { %>
-                                <a href="/user/login" class="btn btn-primary ml-2">Login</a>
-                                <a href="/user/signup" class="btn btn-primary ml-2">Sign Up</a>
+                                <a href="/login" class="btn btn-primary ml-2">Login</a>
+                                <a href="/signup" class="btn btn-primary ml-2">Sign Up</a>
                             <% } %>
                         </div>
                     </nav>
