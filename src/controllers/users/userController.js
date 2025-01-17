@@ -26,7 +26,11 @@ const loadsignup = async (req, res) => {
     console.log("now in signup page");
 
     try {
-        return res.render('signup')
+        if (!req.session.user) {
+            console.log("there is no user here");
+            return res.render('signup')
+        } 
+        return res.redirect('/')
     } catch (error) {
         console.log("sign up page not found")
         res.status(500).send("service error")
@@ -156,11 +160,11 @@ const verifyOtp = async (req, res) => {
 
             await newUser.save();
 
-            req.session.user = newUser._id;
+            // req.session.user = newUser._id;
 
             return res.json({
                 success: true,
-                redirectUrl: "/login",
+                redirectUrl: "/",
             });
         } else {
             return res.status(400).json({
@@ -259,16 +263,12 @@ const loadHomepage = async (req, res) => {
         const viewData = {
             products: productData,
             categories: categories,
-            user:null,
+            user:user? user:null,
             
         };
 
-        if (req.session.user) {
-            const userData = await User.findOne({ _id: user._id }).lean();
-            viewData.user = userData;
-        }
 
-        res.render("home", viewData);
+        res.render("home",viewData);
     } catch (error) {
         console.log("Error in homepage:", error);
         res.status(500).send("Service error");
@@ -295,9 +295,6 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-if(!email||password){
-    res.render('login',{message:"Email and password are required"})
-}
         const findUser = await User.findOne({ isAdmin: false, email: email });
 
 

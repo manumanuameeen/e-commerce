@@ -21,13 +21,13 @@ import {
 
 import {
         productDetails,
-        
-}from "../controllers/users/productController.js"
+
+} from "../controllers/users/productController.js"
 
 
 
 import passport from "passport";
-import  {userAuth}  from "../middlewares/auth.js";
+import { userAuth } from "../middlewares/auth.js";
 
 
 router.get("/pageNotFOund", loadpageNotFound);
@@ -39,19 +39,29 @@ router.post('/verify-otp', verifyOtp)
 router.post('/resend-otp', resendotp);
 //googlw auth
 router.get('/auth/google', passport.authenticate("google", { scope: ["profile", "email"] }));
-router.get('/auth/google/callback', passport.authenticate("google", { failureRedirect: "/signup", }), (req, res) => { return res.redirect("/") })
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
+        req.session.user = req.user._id;
+        req.session.save((err) => {
+                if (err) {
+                        console.log("session save error", err);
+                        return res.redirect('/signup');
+                }
+                res.redirect("/")
+        })
+});
+
 //login,logout managment
 router.get('/login', loadlogin)
 router.post("/login", login)
 router.get('/logout', loadlogout);
 //shop
-router.get('/shop',loadShopingPage)
-router.get('/filter',filterProduct)
-router.get('/filterPrice',filterByPrice)
-router.post("/search",searchProduct)
+router.get('/shop', loadShopingPage)
+router.get('/filter', filterProduct)
+router.get('/filterPrice', filterByPrice)
+router.post("/search", searchProduct)
 
 //product detailes
-router.get("/productDetails",productDetails)
+router.get("/productDetails", productDetails)
 
 
-export default router   ;
+export default router;

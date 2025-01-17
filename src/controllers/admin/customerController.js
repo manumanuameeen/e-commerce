@@ -38,7 +38,7 @@ const customerinfo = async (req, res) => {
         }).countDocuments();
 
 
-        res.render("customers", { data: userData, totalPages: count, currentPage: page })
+        res.render("customers", { data: userData, totalPages: count/limit, currentPage: page })
 
 
     } catch (error) {

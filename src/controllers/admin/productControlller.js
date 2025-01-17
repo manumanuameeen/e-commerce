@@ -33,15 +33,11 @@ const getProductAddPage = async (req, res) => {
 };
 
 const addProducts = async (req, res) => {
-    // console.log("now in add product");
 
     try {
-        // console.log("the value from front end ", req.body);
 
         const products = req.body;
-        // console.log("productsINfo:", products);
 
-        // Check for duplicate product
         const productExists = await Product.findOne({ productName: products.productName });
         if (productExists) {
             return res.status(400).json({ success: false, message: "Product already exists" });
