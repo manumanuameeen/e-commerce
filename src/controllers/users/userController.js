@@ -100,8 +100,8 @@ const signup = async (req, res) => {
 
         req.session.userOtp = otp;
         req.session.userData = { email, password, phone, name };
-        // console.log("req.session.userOtp", req.session.userOtp)
-        // console.log("req.session.userData", req.session.userData);
+        // req.session.user = req.session.userData
+      
 
         res.render("verify-otp")
 
@@ -141,7 +141,7 @@ const verifyOtp = async (req, res) => {
         if (otp == req.session.userOtp) {
 
             const user = req.session.userData;
-console.log("adnkjasnk");
+            console.log("adnkjasnk");
 
             const passwordHash = await securePassword(user.password);
 
@@ -240,38 +240,40 @@ const resendotp = async (req, res) => {
     }
 };
 
-
 const loadHomepage = async (req, res) => {
-    console.log("home page renderd")
     try {
-        const user = req.session.user
+        const user = req.session.user;
+        const categories = await Category.find({ isListed: true });
+        
+       
+        let productData = await Product.find({
+            isBlocked: false,
+            category: { $in: categories.map(category => category._id) },
+            quantity: { $gt: 0 }
+        })
+        .populate('category')
+        .sort({ createdOn: -1 })
+        .limit(4)
+        .lean();
 
-        const categories = await Category.find({ isListed: true })
-        let productData = await Product.find(
-            {
-                isBlocked: false,
-                category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
+        const viewData = {
+            products: productData,
+            categories: categories,
+            user:null,
+            
+        };
 
-            }
-        )
-        console.log("product data is getting ", productData);
-
-        productData.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn))
-        productData = productData.slice(0, 4);
-
-        if (user) {
-            const userData = await User.findOne({ _id: user._id });
-            return res.render("home", { user: userData, products: productData })
-        } else {
-            return res.render("home", { products: productData })
+        if (req.session.user) {
+            const userData = await User.findOne({ _id: user._id }).lean();
+            viewData.user = userData;
         }
 
+        res.render("home", viewData);
     } catch (error) {
-        console.log("home page not found", error);
-        res.status(500).send("service error");
+        console.log("Error in homepage:", error);
+        res.status(500).send("Service error");
     }
 };
-
 
 const loadlogin = async (req, res) => {
     console.log("now login");
@@ -290,26 +292,24 @@ const loadlogin = async (req, res) => {
 
 
 const login = async (req, res) => {
-    // console.log("login verification going on");
     try {
         const { email, password } = req.body;
 
-        // console.log("data from the user that entered in the login page", email, password);
-
+if(!email||password){
+    res.render('login',{message:"Email and password are required"})
+}
         const findUser = await User.findOne({ isAdmin: false, email: email });
 
-        // console.log("user from database", findUser);
 
         if (!findUser) {
             return res.render("login", { message: "User not found" });
         }
 
-        if (findUser.isblocked) {
+        if (findUser.isBlocked) {
             return res.render("login", { message: "User is blocked by Admin" });
         }
 
         const passwordMatch = await bcrypt.compare(password, findUser.password);
-        // console.log("the password is matching:", passwordMatch);
 
         if (!passwordMatch) {
             return res.render("login", { message: "Password doesn't match. Please try again" });
@@ -317,8 +317,6 @@ const login = async (req, res) => {
 
 
         req.session.user = findUser;
-        // console.log("User data stored in the session successfully");
-        // console.log("Database user ID", req.session.user._id);
 
         res.redirect("/");
 
@@ -353,8 +351,12 @@ const loadShopingPage = async (req, res) => {
     try {
 
         const user = req.session.user
-        console.log("is user is there",user)
-        const userData = await User.findOne({ _id: user._id })
+        console.log("is user is there", user)
+        
+        const userData = await User.findOne({ _id: user})
+
+
+
 
         const categories = await Category.find({ isListed: true })
 
@@ -371,13 +373,13 @@ const loadShopingPage = async (req, res) => {
             category: { $in: categoryIds },
             quantity: { $gt: 0 },
         }).sort({ createdAt: -1 }).skip(skip).limit(limit);
-        console.log("products",products)
+        console.log("products", products)
         const totalProducts = await Product.countDocuments({
             isBlocked: false,
             category: { $in: categoryIds },
             quantity: { $gt: 0 },
         })
-        // console.log("totalProdcut",totalProducts)
+        // console.log("totalProdcut is getting here",totalProducts)
 
         const totalPages = Math.ceil(totalProducts / limit);
 
@@ -401,67 +403,7 @@ const loadShopingPage = async (req, res) => {
 
 }
 
-// const loadShopingPage = async (req, res) => {
-//     try {
-//         // Add session checks
-//         const user = req.session.user;
-//         console.log("Session user:", user);
-        
-//         if (!user || !user._id) {
-//             console.log("No valid user session");
-//             return res.redirect('/login');
-//         }
 
-//         const userData = await User.findOne({ _id: user._id });
-//         console.log("Found user data:", userData);
-
-//         if (!userData) {
-//             console.log("User not found in database");
-//             return res.redirect('/login');
-//         }
-
-//         const categories = await Category.find({ isListed: true });
-//         console.log("Found categories:", categories);
-
-//         const categoryIds = categories.map(category => category._id);
-//         console.log("Category IDs:", categoryIds);
-
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 9;
-//         const skip = (page - 1) * limit;
-
-//         // Query products with debug logs
-//         const products = await Product.find({
-//             isBlocked: false,
-//             category: { $in: categoryIds },
-//             quantity: { $gt: 0 },
-//         }).sort({ createdOn: -1 }).skip(skip).limit(limit);
-//         console.log("Found products:", products);
-
-//         // Fix the typo in totalProducts query
-//         const totalProducts = await Product.countDocuments({
-//             isBlocked: false,  // Fixed typo
-//             category: { $in: categoryIds },
-//             quantity: { $gt: 0 },
-//         });
-//         console.log("Total products count:", totalProducts);
-
-//         const totalPages = Math.ceil(totalProducts / limit);
-
-//         return res.render("shop", {
-//             user: userData,
-//             products: products,
-//             categories: categories,
-//             totalProducts: totalProducts,
-//             currentPage: page,
-//             totalPages: totalPages,
-//         });
-
-//     } catch (error) {
-//         console.error("Shop page error:", error);
-//         return res.redirect('/pageNotFound');
-//     }
-// }
 const filterProduct = async (req, res) => {
     try {
         const user = req.session.user;
@@ -566,7 +508,7 @@ const searchProduct = async (req, res) => {
     try {
         const user = req.session.user;
         const userData = await User.findOne({ _id: user });
-        let search = req.body.search || ''; 
+        let search = req.body.search || '';
         const categories = await Category.find({ isListed: true }).lean();
         const categoryIds = categories.map(category => category._id.toString());
 
@@ -577,7 +519,7 @@ const searchProduct = async (req, res) => {
             );
         } else {
             searchResult = await Product.find({
-                productName: { $regex: new RegExp(search, 'i') }, 
+                productName: { $regex: new RegExp(search, 'i') },
                 isBlocked: false,
                 quantity: { $gt: 0 },
                 category: { $in: categoryIds }
@@ -600,7 +542,7 @@ const searchProduct = async (req, res) => {
             totalPages: totalPages,
             currentPage: currentPage,
             count: searchResult.length,
-            searchQuery: search 
+            searchQuery: search
         });
     } catch (error) {
         console.log("error in search:", error);

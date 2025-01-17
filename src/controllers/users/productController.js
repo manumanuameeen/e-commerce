@@ -24,7 +24,6 @@ const productDetails = async (req, res) => {
         const categoryOffer = findCategory ? findCategory.offer || 0 : 0;  
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;
-        // console.log("product details",product.productImage[1]);
         
         res.render("product-details", {
           user:userData,

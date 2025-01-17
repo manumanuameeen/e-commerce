@@ -47,7 +47,90 @@
     <link rel="stylesheet" href="css/magnific-popup.css">
     <link rel="stylesheet" href="css/style.css">
 
+
+    
     <style>
+        .feature_part {
+            padding: 60px 0;
+            background-color: #fff;
+        }
+        
+        .section_tittle h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .featured-product-card {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .premium-tag {
+            color: #ff3368;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .product-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2a2a2a;
+        }
+        
+        .feature-link {
+            display: inline-block;
+            color: #ff3368;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .feature-link:hover {
+            color: #e61e4d;
+        }
+        
+        .product-image-wrapper {
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .product-image-wrapper img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+            object-fit: cover;
+        }
+        
+        .featured-product-card:hover .product-image-wrapper img {
+            transform: scale(1.05);
+        }
+        
+        /* Ensure consistent spacing between cards */
+        .mb-4 {
+            margin-bottom: 2rem !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .col-md-6 {
+                margin-bottom: 30px;
+            }
+            
+            .featured-product-card {
+                padding: 20px;
+            }
+        }
+       
         .zoom-container {
             position: relative;
             overflow: hidden;
@@ -151,7 +234,7 @@
                                     <a class="nav-link dropdown-toggle" href="/shop" id="navbarDropdown_1" role="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown_1">
-                                        <a class="dropdown-item" href="/shop">Shop Category</a>
+                                        <a class="dropdown-item" href="/shop">Shop </a>
 
 
                                     </div>
@@ -195,7 +278,7 @@
                             <% if (locals.user) { %>
                                 <div class="dropdown">
                                     <a href="/profile" class="btn">
-                                        <%= locals.user.name %>
+                                        <%=user.name%>
                                     </a>
                                     <div class="dropdown-content">
                                         <a href="/profile">Profile</a>
