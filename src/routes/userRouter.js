@@ -25,6 +25,16 @@ import {
 } from "../controllers/users/productController.js"
 
 
+import{
+        loadProfile,
+        updateProfile,
+        loadUpdateProifle,
+        loadVerify,
+        
+
+
+}from "../controllers/users/profileController.js"
+
 
 import passport from "passport";
 import { userAuth } from "../middlewares/auth.js";
@@ -64,4 +74,9 @@ router.post("/search", searchProduct)
 router.get("/productDetails", productDetails)
 
 
+//profile management 
+router.get("/profile",userAuth,loadProfile)
+router.get("/update-email",userAuth,loadUpdateProifle)
+router.get("/update-email",userAuth,updateProfile)
+router.get("/email-otp",userAuth,loadVerify)
 export default router;
