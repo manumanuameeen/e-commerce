@@ -1,0 +1,197 @@
+<%- include("../partials/users/header") %>
+<style>
+    .mt-3.text-primary {
+      padding-top: 120px;
+    }
+  </style>
+<div class="container mt-4">
+   <h3 class="mt-3 text-primary ">Create User Address</h3>
+   <form id="addressForm" method="POST" action="/addAddress" class="border rounded p-4 shadow-sm">
+       <div class="row mb-3">
+           <div class="col-md-4 mb-3">
+               <label for="addressType" class="form-label">Address Type</label>
+               <input 
+                   type="text" 
+                   class="form-control" 
+                   id="addressType" 
+                   name="addressType" 
+                   placeholder="Home/Office/etc."
+               >
+               <div id="addressType-error" class="text-danger small"></div>
+           </div>
+           <div class="col-md-4 mb-3">
+               <label for="name" class="form-label">Full Name</label>
+               <input 
+                   type="text" 
+                   class="form-control" 
+                   id="name" 
+                   name="name" 
+                   placeholder="Enter full name"
+               >
+               <div id="name-error" class="text-danger small"></div>
+           </div>
+           <div class="col-md-4 mb-3">
+               <label for="city" class="form-label">City</label>
+               <input 
+                   type="text" 
+                   class="form-control" 
+                   id="city" 
+                   name="city" 
+                   placeholder="Enter city"
+               >
+               <div id="city-error" class="text-danger small"></div>
+           </div>
+       </div>
+
+       <div class="row mb-3">
+           <div class="col-md-4 mb-3">
+               <label for="landMark" class="form-label">Landmark</label>
+               <input 
+                   type="text" 
+                   class="form-control" 
+                   id="landMark" 
+                   name="landMark" 
+                   placeholder="Nearby landmark"
+               >
+               <div id="landMark-error" class="text-danger small"></div>
+           </div>
+           <div class="col-md-4 mb-3">
+               <label for="state" class="form-label">State</label>
+               <input 
+                   type="text" 
+                   class="form-control" 
+                   id="state" 
+                   name="state" 
+                   placeholder="Enter state"
+               >
+               <div id="state-error" class="text-danger small"></div>
+           </div>
+           <div class="col-md-4 mb-3">
+               <label for="pincode" class="form-label">Pincode</label>
+               <input 
+                   type="number" 
+                   class="form-control" 
+                   id="pincode" 
+                   name="pincode" 
+                   placeholder="6-digit pincode"
+               >
+               <div id="pincode-error" class="text-danger small"></div>
+           </div>
+       </div>
+
+       <div class="row mb-3">
+           <div class="col-md-4 mb-3">
+               <label for="phone" class="form-label">Primary Phone</label>
+               <input 
+                   type="number" 
+                   class="form-control" 
+                   id="phone" 
+                   name="phone" 
+                   placeholder="10-digit mobile number"
+               >
+               <div id="phone-error" class="text-danger small"></div>
+           </div>
+           <div class="col-md-4 mb-3">
+               <label for="altPhone" class="form-label">Alternate Phone (Optional)</label>
+               <input 
+                   type="number" 
+                   class="form-control" 
+                   id="altPhone" 
+                   name="altPhone" 
+                   placeholder="Alternate mobile number"
+               >
+               <div id="altPhone-error" class="text-danger small"></div>
+           </div>
+       </div>
+
+       <div class="row">
+           <div class="col-12">
+               <button type="submit" class="btn btn-primary px-4">
+                   Save Address
+               </button>
+           </div>
+       </div>
+   </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('addressForm').addEventListener('submit', function(event) {
+    if (!validateForm()) {
+        event.preventDefault();
+    }
+});
+
+function validateForm() {
+    const fields = [
+        { id: 'addressType', pattern: /^[A-Za-z\s]+$/, errorMsg: 'Address type should contain alphabets only.' },
+        { id: 'name', pattern: /^[A-Za-z\s]+$/, errorMsg: 'Name should contain alphabets only.' },
+        { id: 'city', pattern: /^[A-Za-z\s]+$/, errorMsg: 'City should contain alphabets only.' },
+        { id: 'landMark', pattern: /^[A-Za-z\s]+$/, errorMsg: 'Landmark should contain alphabets only.' },
+        { id: 'state', pattern: /^[A-Za-z\s]+$/, errorMsg: 'State should contain alphabets only.' },
+        { id: 'pincode', pattern: /^\d{6}$/, errorMsg: 'Pincode should be a 6-digit number.' },
+        { id: 'phone', pattern: /^\d{10}$/, errorMsg: 'Phone number should be a 10-digit number.' }
+    ];
+
+    let isValid = true;
+
+    // Check required fields
+    fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        const errorElement = document.getElementById(`${field.id}-error`);
+        const value = input.value.trim();
+
+        // Clear previous errors
+        if (errorElement) errorElement.textContent = '';
+        input.classList.remove('is-invalid');
+
+        // Check if field is empty
+        if (value === '') {
+            if (errorElement) {
+                errorElement.textContent = 'This field is required';
+                input.classList.add('is-invalid');
+            }
+            isValid = false;
+        } 
+        // Validate pattern if not empty
+        else if (!field.pattern.test(value)) {
+            Swal.fire({
+                title: 'Error',
+                text: field.errorMsg,
+                icon: 'error'
+            });
+            input.classList.add('is-invalid');
+            isValid = false;
+        }
+    });
+
+//     // Additional validation for alternate phone
+    const altPhone = document.getElementById('altPhone');
+    if (altPhone.value.trim() !== '') {
+        const phonePattern = /^\d{10}$/;
+        if (!phonePattern.test(altPhone.value)) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Alternate phone number should be a 10-digit number.',
+                icon: 'error'
+            });
+            altPhone.classList.add('is-invalid');
+            isValid = false;
+        }
+    }
+
+    // Check if phone and alt phone are the same
+    const phone = document.getElementById('phone');
+    if (altPhone.value.trim() !== '' && phone.value === altPhone.value) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Phone number and alternate phone number should be different.',
+            icon: 'error'
+        });
+        isValid = false;
+    }
+
+    return isValid;
+}
+</script>
+<%- include("../partials/users/footer") %>

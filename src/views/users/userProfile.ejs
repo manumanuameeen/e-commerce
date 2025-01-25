@@ -1,286 +1,202 @@
 <%- include('../partials/users/header') %>
 
-<section class="profile_section padding_top">
-    <div class="container">
-        <div class="row">
-            <!-- Profile Navigation Sidebar -->
-            <div class="col-lg-3">
-                <div class="profile_nav card">
-                    <div class="card-body">
-                        <div class="user_info text-center mb-4">
-                            <div class="user_avatar mb-3">
-                                <img src="<%= user.avatar || '/img/default-avatar.png' %>" alt="User Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
-                            </div>
-                            <h4><%= user.name %></h4>
-                        </div>
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#profile" data-toggle="tab">My Profile</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#orders" data-toggle="tab">My Orders</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#address" data-toggle="tab">Address Book</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#password" data-toggle="tab">Change Password</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Content Area -->
-            <div class="col-lg-9">
-                <div class="tab-content">
-                    <!-- Profile Details Tab -->
-                    <div class="tab-pane fade show active" id="profile">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="mb-0">Profile Details</h4>
-                               <br>
-                               <br>
-                               <br>
-                               <br>
-                                <button class="btn_2" data-toggle="modal" data-target="#editProfileModal" ><a    style="text-decoration: none;  color: white;"   href="/update-email">edit Email</a></button>
-                                <button class="btn_2" data-toggle="modal" data-target="#editProfileModal" ><a  style="text-decoration: none;  color: white;"  href="/update-name">edit Name</a></button>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Name:</strong> <%= user.name %></p>
-                                        <p><strong>Email:</strong> <%= user.email %></p>
-                                        <p><strong>Phone:</strong> <%= user.phone %></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Orders Tab -->
-                  <!-- Orders Tab -->
-<div class="tab-pane fade" id="orders">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="mb-0">My Orders</h4>
-        </div>
-        <div class="card-body">
-            <div class="order-item mb-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5>Order #12345</h5>
-                        <p class="mb-1">Date: January 15, 2024</p>
-                        <p class="mb-1">Status: <span class="badge badge-warning">Processing</span></p>
-                    </div>
-                    <div>
-                        <h5>₹1,499</h5>
-                        <button class="btn_2" onclick="cancelOrder('123')">Cancel Order</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="order-item mb-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5>Order #12346</h5>
-                        <p class="mb-1">Date: January 10, 2024</p>
-                        <p class="mb-1">Status: <span class="badge badge-success">Delivered</span></p>
-                    </div>
-                    <div>
-                        <h5>₹2,999</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Address Tab -->
-<div class="tab-pane fade" id="address">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Address Book</h4>
-            <button class="btn_2" data-toggle="modal" data-target="#addAddressModal">Add New Address</button>
-        </div>
-        <div class="card-body">
+    <section class="profile_section padding_top">
+        <div class="container">
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card">
+                <!-- Profile Navigation Sidebar -->
+                <div class="col-lg-3">
+                    <div class="profile_nav card">
                         <div class="card-body">
-                            <h5>Home</h5>
-                            <p>123 Main Street</p>
-                            <p>Mumbai, Maharashtra</p>
-                            <p>400001</p>
-                            <div class="mt-3">
-                                <button class="btn btn-sm btn-outline-primary mr-2" onclick="editAddress('1')">Edit</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAddress('1')">Delete</button>
+                            <div class="user_info text-center mb-4">
+                                <div class="user_avatar mb-3">
+                                    <img src="<%= user.avatar || '/img/default-avatar.png' %>" alt="User Avatar"
+                                        class="rounded-circle" style="width: 100px; height: 100px;">
+                                </div>
+                                <h4>
+                                    <%= user.name %>
+                                </h4>
                             </div>
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#profile" data-toggle="tab">My Profile</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#orders" data-toggle="tab">My Orders</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#address" data-toggle="tab">Address Book</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/change-password">Change Password</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Work</h5>
-                            <p>456 Business Park</p>
-                            <p>Bangalore, Karnataka</p>
-                            <p>560001</p>
-                            <div class="mt-3">
-                                <button class="btn btn-sm btn-outline-primary mr-2" onclick="editAddress('2')">Edit</button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAddress('2')">Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-                    <!-- Change Password Tab -->
-                    <div class="tab-pane fade" id="password">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="mb-0">Change Password</h4>
-                            </div>
-                            <div class="card-body">
-                                <form id="changePasswordForm" action="/change-password" method="POST">
-                                    <div class="form-group">
-                                        <label>Current Password</label>
-                                        <input type="password" class="form-control" name="currentPassword" required>
+                <!-- Profile Content Area -->
+                <div class="col-lg-9">
+                    <div class="tab-content">
+                        <!-- Profile Details Tab -->
+                        <div class="tab-pane fade show active" id="profile">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4 class="mb-0">Profile Details</h4>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <button class="btn_2" data-toggle="modal" data-target="#editProfileModal"
+                                        onclick=""><a style="text-decoration: none;  color: white;"
+                                            href="/update-email">edit Email</a></button>
+                                    <button class="btn_2" data-toggle="modal" data-target="#editProfileModal"><a
+                                            style="text-decoration: none;  color: white;" href="/update-name">edit
+                                            Name</a></button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Name:</strong>
+                                                <%= user.name %>
+                                            </p>
+                                            <p><strong>Email:</strong>
+                                                <%= user.email %>
+                                            </p>
+                                            <p><strong>Phone:</strong>
+                                                <%= user.phone %>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>New Password</label>
-                                        <input type="password" class="form-control" name="newPassword" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Confirm New Password</label>
-                                        <input type="password" class="form-control" name="confirmPassword" required>
-                                    </div>
-                                    <button type="submit" class="btn_2">Update Password</button>
-                                </form>
-                                <div class="mt-3">
-                                    <a href="/forgot-password">Forgot Password?</a>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Orders Tab -->
+                        <!-- Orders Tab -->
+                        <div class="tab-pane fade" id="orders">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="mb-0">My Orders</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="order-item mb-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5>Order #12345</h5>
+                                                <p class="mb-1">Date: January 15, 2024</p>
+                                                <p class="mb-1">Status: <span
+                                                        class="badge badge-warning">Processing</span></p>
+                                            </div>
+                                            <div>
+                                                <h5>₹1,499</h5>
+                                                <button class="btn_2" onclick="cancelOrder('123')">Cancel Order</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="order-item mb-4">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5>Order #12346</h5>
+                                                <p class="mb-1">Date: January 10, 2024</p>
+                                                <p class="mb-1">Status: <span
+                                                        class="badge badge-success">Delivered</span></p>
+                                            </div>
+                                            <div>
+                                                <h5>₹2,999</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="address">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h4 class="mb-0">Address Book</h4>
+                                    <a href="/addAddress" class="btn_2">Add New Address</a>
+                                </div>
+                                <div class="card-body">
+                                    <% if (userAddress && userAddress.address && userAddress.address.length> 0) { %>
+                                        <% userAddress.address.forEach(function(addressItem) { %>
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h5>
+                                                        <%= addressItem.addressType %>
+                                                    </h5>
+                                                    <p>
+                                                        <%= addressItem.name %>
+                                                    </p>
+                                                    <p>
+                                                        <%= addressItem.landMark %>
+                                                    </p>
+                                                    <p>
+                                                        <%= addressItem.city %>
+                                                    </p>
+                                                    <p>
+                                                        <%= addressItem.state %>
+                                                    </p>
+                                                    <p>
+                                                        <%= addressItem.pincode %>
+                                                    </p>
+                                                    <div class="mt-3">
+                                                        <a href="/editAddress?id=<%= addressItem._id %>"
+                                                            class="btn btn-sm btn-outline-primary mr-2">Edit</a>
+                                                            <a href="/deleteAddress?id=<%=addressItem._id%>" class="btn btn-sm btn-danger"
+                                                                onclick="return confirm('Delete this address?')">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <p class="text-center">No address found. Add a new address.</p>
+                                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Edit Profile Modal -->
-<!-- <div class="modal fade" id="editProfileModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Profile</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editProfileForm" action="/update-profile" method="POST">
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control" name="name" value="<%= user.name %>" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" class="form-control" name="phone" value="<%= user.phone %>">
-                    </div>
-                    <button type="submit" class="btn_2">Save Changes</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
 
-<!-- Add Address Modal -->
-<div class="modal fade" id="addAddressModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Address</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="addAddressForm" action="/user/add-address" method="POST">
-                    <div class="form-group">
-                        <label>Address Type</label>
-                        <select class="form-control" name="type" required>
-                            <option value="Home">Home</option>
-                            <option value="Work">Work</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Street Address</label>
-                        <textarea class="form-control" name="street" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>City</label>
-                        <input type="text" class="form-control" name="city" required>
-                    </div>
-                    <div class="form-group">
-                        <label>State</label>
-                        <input type="text" class="form-control" name="state" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Pincode</label>
-                        <input type="text" class="form-control" name="pincode" required>
-                    </div>
-                    <button type="submit" class="btn_2">Add Address</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function cancelOrder(orderId) {
-    if (confirm('Are you sure you want to cancel this order?')) {
-        fetch(`/user/cancel-order/${orderId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+    <script>
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`/user/cancel-order/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed to cancel order');
+                        }
+                    });
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert('Failed to cancel order');
-            }
-        });
-    }
-}
+        }
 
-function deleteAddress(addressId) {
-    if (confirm('Are you sure you want to delete this address?')) {
-        fetch(`/user/delete-address/${addressId}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert('Failed to delete address');
-            }
-        });
-    }
-}
-</script>
+//         function deleteAddress(addressId) {
+//     if (confirm('Are you sure you want to delete this address?')) {
+//         fetch(`/deleteAddress?id=${addressId}`, {
+//             method: 'DELETE'
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.success) {
+//                 window.location.reload();
+//             } else {
+//                 alert('Failed to delete address');
+//             }
+//         });
+//     }
+// }
+    </script>
 
-<%- include('../partials/users/footer') %>
+    <%- include('../partials/users/footer') %>

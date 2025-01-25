@@ -26,11 +26,31 @@ import {
 
 
 import{
-        loadProfile,
-        updateProfile,
-        loadUpdateProifle,
-        loadVerify,
         
+        getForgotPassPage,
+        forgotEmailValid,
+        verifyForgotPassOtp,
+        getResetPassPage,
+        resendOtp,
+        postNewPassword,
+        userProfile,
+        changeEmail,
+        changeEmailValid,
+        verifyEmailOtp,
+        updateEmail,
+        getUpdateEmailPage,
+        changePassword,
+        changePasswordValid,
+        verifyChangePassOtp,
+        addAddress,
+        postAddAddress,
+        editAddress,
+        postEditAddress,
+        deleteAddress,
+        viewOrderDetails,
+        cancelOrder,
+        updateName,
+        changeName,
 
 
 }from "../controllers/users/profileController.js"
@@ -75,8 +95,33 @@ router.get("/productDetails", productDetails)
 
 
 //profile management 
-router.get("/profile",userAuth,loadProfile)
-router.get("/update-email",userAuth,loadUpdateProifle)
-router.get("/update-email",userAuth,updateProfile)
-router.get("/email-otp",userAuth,loadVerify)
+
+
+router.get("/forgot-password",getForgotPassPage);
+router.post("/forgot-email-valid",forgotEmailValid);
+router.post("/verify-passForgot-otp",verifyForgotPassOtp)
+router.get("/reset-password",getResetPassPage);
+router.post("/resend-forgot-otp",resendOtp);
+router.post("/reset-password",postNewPassword);
+router.get("/Profile",userAuth,userProfile);
+router.get("/change-email",userAuth,changeEmail)
+router.post("/change-email",userAuth,changeEmailValid);
+router.post("/verify-email-otp",userAuth,verifyEmailOtp);
+router.get("/update-email", userAuth, getUpdateEmailPage);
+router.post("/update-email",userAuth,updateEmail)
+router.get("/change-password", userAuth, changePassword);
+router.post("/change-password",userAuth,changePasswordValid)
+router.post("/verify-changePassword-otp",userAuth,verifyChangePassOtp);
+router.get("/orderDetails/:orderId",userAuth,viewOrderDetails);
+router.post("/cancelOrder/:orderId",userAuth,cancelOrder);
+router.get("/update-name",userAuth,updateName)
+router.post("/update-name",userAuth,changeName)
+
+//address  management
+router.get("/addAddress",userAuth,addAddress)
+router.post("/addAddress",userAuth,postAddAddress);
+router.get("/editAddress",userAuth,editAddress);
+router.post("/editAddress",userAuth,postEditAddress);
+router.get("/deleteAddress", userAuth, deleteAddress);
+
 export default router;
