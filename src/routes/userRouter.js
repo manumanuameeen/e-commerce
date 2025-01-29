@@ -25,8 +25,8 @@ import {
 } from "../controllers/users/productController.js"
 
 
-import{
-        
+import {
+
         getForgotPassPage,
         forgotEmailValid,
         verifyForgotPassOtp,
@@ -53,10 +53,28 @@ import{
         changeName,
 
 
-}from "../controllers/users/profileController.js"
+} from "../controllers/users/profileController.js"
 
+
+import {
+
+        addToCart,
+        loadCart,
+        updateCartQuantity,
+        removeFromCart,
+
+} from "../controllers/users/cartController.js"
+
+
+import{
+        getChekout,
+        checkoutAddress,
+        
+
+} from '../controllers/users/checkoutController.js'
 
 import passport from "passport";
+
 import { userAuth } from "../middlewares/auth.js";
 
 
@@ -97,31 +115,48 @@ router.get("/productDetails", productDetails)
 //profile management 
 
 
-router.get("/forgot-password",getForgotPassPage);
-router.post("/forgot-email-valid",forgotEmailValid);
-router.post("/verify-passForgot-otp",verifyForgotPassOtp)
-router.get("/reset-password",getResetPassPage);
-router.post("/resend-forgot-otp",resendOtp);
-router.post("/reset-password",postNewPassword);
-router.get("/Profile",userAuth,userProfile);
-router.get("/change-email",userAuth,changeEmail)
-router.post("/change-email",userAuth,changeEmailValid);
-router.post("/verify-email-otp",userAuth,verifyEmailOtp);
+router.get("/forgot-password", getForgotPassPage);
+router.post("/forgot-email-valid", forgotEmailValid);
+router.post("/verify-passForgot-otp", verifyForgotPassOtp)
+router.get("/reset-password", getResetPassPage);
+router.post("/resend-forgot-otp", resendOtp);
+router.post("/reset-password", postNewPassword);
+router.get("/Profile", userAuth, userProfile);
+router.get("/change-email", userAuth, changeEmail)
+router.post("/change-email", userAuth, changeEmailValid);
+router.post("/verify-email-otp", userAuth, verifyEmailOtp);
 router.get("/update-email", userAuth, getUpdateEmailPage);
-router.post("/update-email",userAuth,updateEmail)
+router.post("/update-email", userAuth, updateEmail)
 router.get("/change-password", userAuth, changePassword);
-router.post("/change-password",userAuth,changePasswordValid)
-router.post("/verify-changePassword-otp",userAuth,verifyChangePassOtp);
-router.get("/orderDetails/:orderId",userAuth,viewOrderDetails);
-router.post("/cancelOrder/:orderId",userAuth,cancelOrder);
-router.get("/update-name",userAuth,updateName)
-router.post("/update-name",userAuth,changeName)
+router.post("/change-password", userAuth, changePasswordValid)
+router.post("/verify-changePassword-otp", userAuth, verifyChangePassOtp);
+
+router.get("/update-name", userAuth, updateName)
+router.post("/update-name", userAuth, changeName)
 
 //address  management
-router.get("/addAddress",userAuth,addAddress)
-router.post("/addAddress",userAuth,postAddAddress);
-router.get("/editAddress",userAuth,editAddress);
-router.post("/editAddress",userAuth,postEditAddress);
+router.get("/addAddress", userAuth, addAddress)
+router.post("/addAddress", userAuth, postAddAddress);
+router.get("/editAddress", userAuth, editAddress);
+router.post("/editAddress", userAuth, postEditAddress);
 router.get("/deleteAddress", userAuth, deleteAddress);
+
+//order 
+router.get("/orderDetails/:orderId", userAuth, viewOrderDetails);
+router.post("/cancelOrder/:orderId", userAuth, cancelOrder);
+
+
+
+
+// cart Mangement 
+router.get('/cart', userAuth, loadCart)
+router.post('/addToCart', userAuth, addToCart)
+router.post("/updateQuantity/:cartItemId", userAuth, updateCartQuantity);
+router.delete("/removeFromCart/:cartItemId", userAuth, removeFromCart);
+
+
+//checkout
+router.get('/checkout',userAuth,getChekout)
+router.post('/checkout-address',userAuth,checkoutAddress)
 
 export default router;

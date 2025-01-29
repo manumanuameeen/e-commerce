@@ -12,7 +12,7 @@ const userAuth = (req,res,next)=>{
             }
         })
         .catch(error=>{
-            console.log("Error in user auth middleware");
+            console.log("Error in user auth middleware",error);
             res.status(500).send("Intenal server error")
         })
     }else{

@@ -1,8 +1,14 @@
 import User from "../../models/userSchema.js";
-import nodemailer from "nodemailer"
-import env from "dotenv"
-import bcrypt from "bcrypt"
+import Product from "../../models/productSchema.js";
 import Address from "../../models/addressSchema.js";
+import Order from "../../models/orderSchema.js";
+
+import nodemailer from "nodemailer"
+
+import env from "dotenv"
+
+import bcrypt from "bcrypt"
+
 
 
 function generateOtp() {
@@ -173,11 +179,11 @@ const userProfile = async (req, res) => {
         const addressData = await Address.findOne({ userId: userId })
         console.log("user address",addressData);
         
-        // const orders = await Order.find({'address':userId}).sort({createdOn:-1}).populate('orderedItems.product','productName')
+        const orders = await Order.find({'address':userId}).sort({createdOn:-1}).populate('orderedItems.product','productName')
         res.render('userProfile', {
             user: userData,
             userAddress: addressData,
-            // orders: orders
+            orders: orders
         })
 
     } catch (error) {
@@ -543,64 +549,49 @@ const viewOrderDetails = async (req, res) => {
     }
 }
 
+
+
 const cancelOrder = async (req, res) => {
     try {
-
-        const orderId = req.params.orderId;
-
-        const order = await Order.findOne({ orderId: orderId }).populate('orderedItems.product')
+        const { orderId } = req.params;
+        const order = await Order.findOne({ orderId });
 
         if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            })
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Order not found' 
+            });
         }
 
-        if (order.status === "Cancelled") {
+        if (order.status !== 'Pending' && order.status !== 'Processing') {
             return res.status(400).json({
                 success: false,
-                message: 'Order is already cancelled'
-            })
-        }
-
-        if (['Shipped', 'Delivered', 'Returned'].includes(order.status)) {
-            return res.status(400).json({
-                success: false,
-                message: `Cannot cancel order in ${order.status} status`
-            })
+                message: 'Order cannot be cancelled at this stage'
+            });
         }
 
         order.status = 'Cancelled';
-        order.cancelledDate = new Date();
+        order.orderTimeline.push({
+            status: 'Cancelled',
+            date: new Date(),
+            description: 'Order cancelled by customer'
+        });
 
         await order.save();
 
-        for (const item of order.orderedItems) {
-
-            const product = item.product
-
-            const sizeVariant = product.sizeVariants.find(variant => variant.size === item.size);
-
-            if (sizeVariant) {
-                await Product.findOneAndUpdate(
-                    { _id: product._id, "sizeVariants.size": item.size },
-                    { $inc: { "sizeVariants.$.quantity": item.quantity } }
-                );
-            }
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Order cancelled successfully'
+        res.json({ 
+            success: true, 
+            message: 'Order cancelled successfully' 
         });
 
     } catch (error) {
-        console.error('Error in cancelOrder:', error);
-        return res.status(500).json({ success: false, message: 'An error occured while canceling the order' })
+        console.error('Error cancelling order:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error cancelling order' 
+        });
     }
-}
-
+};
 
 const updateName = async (req, res) => {
 

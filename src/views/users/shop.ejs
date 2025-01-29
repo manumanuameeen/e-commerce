@@ -1,6 +1,77 @@
 <%- include('../partials/users/header') %>
 
     <style>
+      
+
+.add_cart_btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add_cart_btn:hover {
+    background-color: #0056b3;
+}
+
+.add-to-cart-form {
+    margin: 0;
+    padding: 0;
+}
+
+/* SweetAlert2 Custom Styles */
+.swal2-popup {
+    font-size: 1.rem;
+    border-radius: 15px;
+}
+
+.swal2-title {
+    font-size: 1.5rem;
+}
+
+.swal2-content {
+    font-size: 1.1rem;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -20%, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.animated {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.fadeInDown {
+    animation-name: fadeInDown;
+}
+
+        .add_cart_btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .add_cart_btn:hover {
+            background-color: #0056b3;
+        }
+      
         .single_product_menu select {
             max-height: 0;
             overflow-y: hidden;
@@ -174,28 +245,35 @@
                         </div>
                     </div>
 
-                    <div class="container">
-                        <div class="row">
-                            <% for (let i = 0; i < products.length; i++) { %>
-                                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                    <div class="single_product_item">
-                                        <a href="/productDetails?id=<%= products[i]._id %>">
-                                            <img src="/uploads/re-image/<%= products[i].productImage[0] %>" class="img-fluid">
-                                            <div class="single_product_text">
-                                                <h4><%= products[i].productName %></h4>
-                                                <div class="product-price">
-                                                    <span class="current-price">₹<%= products[i].salePrice.toLocaleString('en-IN') %></span>
-                                                    <span class="original-price">₹<%= products[i].regularPrice.toLocaleString('en-IN') %></span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#" class="add_cart">+ add to cart <i class="ti-heart"></i></a>
-                                    </div>
-                                </div>
-                            <% } %>
+  <div class="container">
+    <div class="row">
+        <% for (let i = 0; i < products.length; i++) { %>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="single_product_item">
+                    <a href="/productDetails?id=<%= products[i]._id %>">
+                        <img src="/uploads/re-image/<%= products[i].productImage[0] %>" class="img-fluid">
+                        <div class="single_product_text">
+                            <h4><%= products[i].productName %></h4>
+                            <div class="product-price">
+                                <span class="current-price">₹<%= products[i].salePrice.toLocaleString('en-IN') %></span>
+                                <span class="original-price">₹<%= products[i].regularPrice.toLocaleString('en-IN') %></span>
+                            </div>
                         </div>
-                    </div>
-                    
+                    </a>
+                    <!-- <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= products[i]._id %>', '<%= products[i].productName %>')">
+                        <input type="hidden" name="productId" value="<%= products[i]._id %>">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="add_cart_btn">
+                            + add to cart <i class="ti-heart"></i>
+                        </button>
+                    </form> -->
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+
 
                         <div class="col-lg-12">
                             <div class="pageination">
@@ -362,3 +440,49 @@
     </body>
 
     </html>
+    
+<!-- Add SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// function addToCart(event, productId, productName) {
+//     event.preventDefault();
+    
+   
+    
+//     fetch('/addToCart', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             productId: productId,
+//             quantity: 1
+//         })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.status) {
+//             Swal.fire({
+//                 text: 'Product added to cart',
+//                 icon: 'success',
+//                 showConfirmButton: false,
+//                 timer: 1500
+//             });
+//         } else {
+//             Swal.fire({
+//                 text: 'Failed to add product',
+//                 icon: 'error'
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         Swal.fire({
+//             text: 'Something went wrong',
+//             icon: 'error'
+//         });
+//     });
+    
+//     return false;
+// }
+</script>

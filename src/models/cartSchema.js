@@ -1,7 +1,9 @@
 import mongoose, { SchemaTypes } from "mongoose";
-import User from "./userSchema";
-import Product from "./productSchema";
+import User from "../models/userSchema.js";
+import Product from "../models/productSchema.js";
 const {Schema} = mongoose;
+
+
 
 const cartSchema = new Schema({
 
@@ -11,6 +13,7 @@ const cartSchema = new Schema({
         required:true     
     },
     items:[{
+       
         ProductId:{
             type:Schema.Types.ObjectId,
             ref:"Product",
@@ -21,6 +24,7 @@ const cartSchema = new Schema({
             default:1,
             min:1
         },
+       
         price:{
             type:Number,
             default:0,
@@ -38,6 +42,10 @@ const cartSchema = new Schema({
             type:String,
             default:'none'
             
+        },
+        colorVariant: { 
+            type: String,
+            required: true
         }
     }]
 },{timestamps:true})

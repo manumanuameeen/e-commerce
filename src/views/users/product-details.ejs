@@ -1,6 +1,21 @@
 <%- include('../partials/users/header') %>
     <!-- Header part end-->
-
+<style>
+    .stock-info {
+  font-size: 14px;
+  margin-top: 10px;
+}
+.low-stock {
+  color: #ff4444;
+}
+.out-of-stock {
+  color: #ff0000;
+  font-weight: bold;
+}
+.in-stock {
+  color: #28a745;
+}
+</style>
     <!-- breadcrumb start-->
     <section class="breadcrumb breadcrumb_bg">
         <div class="container">
@@ -28,45 +43,54 @@
                         <div id="vertical">
                             <div data-thumb="/uploads/re-image/<%=product.productImage[0]%>" class="zoom-container">
                                 <img src="/uploads/re-image/<%=product.productImage[0]%>" alt="product image"
-                                    class="zoom-image" />
+                                     class="zoom-image" />
                             </div>
                             <div data-thumb="/uploads/re-image/<%=product.productImage[1]%>" class="zoom-container">
                                 <img src="/uploads/re-image/<%=product.productImage[1]%>" alt="product image"
-                                    class="zoom-image" />
+                                     class="zoom-image" />
                             </div>
                             <div data-thumb="/uploads/re-image/<%=product.productImage[2]%>" class="zoom-container">
                                 <img src="/uploads/re-image/<%=product.productImage[2]%>" alt="product image"
-                                    class="zoom-image" />
+                                     class="zoom-image" />
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-lg-5 col-xl-4">
                     <div class="s_product_text">
                         <h3>
                             <%=product.productName%>
                         </h3>
-                        <h2>₹<%= product.salePrice%>
-                        </h2>
+                        <h2>₹<%= product.salePrice %></h2>
                         <ul class="list">
                             <li>
                                 <a class="active" href="#">
                                     <span>Category</span>
-                                    <%= product.category.name%>
+                                    <%= product.category.name %>
                                 </a>
-                            </li>
-                            <li>
-                                <a href="#"> <span>Availibility</span>
-                                    <%if(quantity>0){
-
-                                        %> <%=quantity%>
-                                </a>
-                                <%}else{%>
-                                    Out Of Stock
-                                    <%}%>
                             </li>
                         </ul>
+    
+                        <!-- Color Selection -->
+                        <div class="color-selection">
+                            <label for="colorSelect">Select Color:</label>
+                            <select id="colorSelect" name="color" required>
+                                <% product.colorVarients.forEach(function(variant) { %>
+                                    <option value="<%= variant.color %>">
+                                        <%= variant.color %> - <%= variant.quantity %> left
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+    
+                        <div class="stock-info <%= product.quantity < 5 ? 'low-stock' : '' %>">
+                            <% if (product.quantity === 0) { %>
+                                <span class="out-of-stock">Out of Stock</span>
+                            <% } else { %>
+                                <span class="in-stock">In Stock: <%= product.quantity %> left</span>
+                            <% } %>
+                        </div>
+    
                         <div class="product_highlights mt-4">
                             <h4>Highlights</h4>
                             <ul class="list">
@@ -77,45 +101,44 @@
                             </ul>
                         </div>
                         <p>
-                            <%=product.description%>
+                            <%= product.description %>
                         </p>
-
-
-
-
-
+    
                         <div class="card_area d-flex justify-content-between align-items-center">
                             <div class="product_count">
                                 <span class="inumber-decrement"> <i class="ti-minus"></i></span>
                                 <input class="input-number" type="text" value="1" min="0" max="10">
                                 <span class="number-increment"> <i class="ti-plus"></i></span>
                             </div>
-
-
-
-
-                            <a href="#" class="btn_3">add to cart</a>
+    
+                            <!-- Add to Cart Form -->
+                            <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= product._id %>', '<%= product.productName %>')">
+                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="add_cart_btn">
+                                    + add to cart <i class="ti-heart"></i>
+                                </button>
+                            </form>
                             <a href="#" class="like_us"> <i class="ti-heart"></i> </a>
                         </div>
+    
                         <div class="product_discount mt-3">
-                            <%if(!totalOffer){%>
+                            <% if(!totalOffer){ %>
                                 <span class="badge badge-success">OFFER : 0% OFF</span>
-                                <%}else{%>
-                                    <span class="badge badge-success">OFFER :<%=totalOffer%>% OFF</span>
-
-                                    <%}%>
-                                        <div class="coupon_code mt-2">
-                                            <input type="text" class="form-control" placeholder="Enter coupon code">
-                                            <button class="btn_3">Apply</button>
-                                        </div>
-                        </div>>
+                            <% } else { %>
+                                <span class="badge badge-success">OFFER : <%= totalOffer %>% OFF</span>
+                            <% } %>
+                            <div class="coupon_code mt-2">
+                                <input type="text" class="form-control" placeholder="Enter coupon code">
+                                <button class="btn_3">Apply</button>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-    </div>
+    
     <!--================End Single Product Area =================-->
 
 
@@ -683,7 +706,7 @@
 
 
                     const xPercent = (x / rect.width) * 100;
-                    const yPercent = (y / rect.height) * 100;
+                    const yPercent = (y / rect.height) * 100;   
 
                     img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
                 });
@@ -737,6 +760,46 @@
             addToCartButton.disabled = false;
         }
 
+        function addToCart(event, productId, productName) {
+    event.preventDefault();
+    
+   
+    
+    fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            Swal.fire({
+                text: 'Product added to cart',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                text: 'Failed to add product',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            text: 'Something went wrong',
+            icon: 'error'
+        });
+    });
+    
+    return false;
+}
     </script>
 
 

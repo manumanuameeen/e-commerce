@@ -1,13 +1,6 @@
 import Product from "../../models/productSchema.js";
-
+import User from "../../models/userSchema.js";
 import Category from "../../models/categorySchema.js";
-
-import User from "../../models/userSchema.js"
-
-
-
-
-
 
 const productDetails = async (req, res) => {
     try {
@@ -15,39 +8,43 @@ const productDetails = async (req, res) => {
         const userData = await User.findById(userId);
         const productId = req.query.id;
 
-        
-        const product = await Product.findById(productId).populate('category');
+        // Check if productId exists
+        if (!productId) {
+            return res.status(400).render("pageNotFound");
+        }
+
+        const product = await Product.findById(productId).populate("category");
+
+        // Check if product exists
+        if (!product) {
+            return res.status(404).render("pageNotFound");
+        }
+
         const findCategory = product.category;
-      console.log("finding category",findCategory)
-      const findRelatedProduct =await Product.find({category:findCategory})
-      console.log("product name",findRelatedProduct.length)
-        const categoryOffer = findCategory ? findCategory.offer || 0 : 0;  
+        console.log("Finding category:", findCategory);
+
+        // Ensure category is properly referenced
+        const findRelatedProduct = await Product.find({ category: findCategory._id }).limit(5);
+        console.log("Related products found:", findRelatedProduct.length);
+
+        // Offer calculation
+        const categoryOffer = findCategory ? findCategory.offer || 0 : 0;
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;
-        
-        res.render("product-details", {
-          user:userData,
-          product:product,
-          quantity:product.quantity,
-          totalOffer:totalOffer,
-          categories:findCategory,
-          findRelatedProduct,
-          
 
+        res.render("product-details", {
+            user: userData,
+            product: product,
+            quantity: product.quantity,
+            totalOffer: totalOffer,
+            categories: findCategory,
+            findRelatedProduct,
         });
-        
+
     } catch (error) {
         console.log("Error in product details:", error);
         res.redirect("/pageNotFound");
     }
 };
 
-
-
-
-
-
-export {
-    productDetails,
-
-}
+export { productDetails };

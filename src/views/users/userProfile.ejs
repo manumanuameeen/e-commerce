@@ -110,6 +110,8 @@
                                 </div>
                             </div>
                         </div>
+
+                    <!-- address -->
                         <div class="tab-pane fade" id="address">
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -182,21 +184,7 @@
             }
         }
 
-//         function deleteAddress(addressId) {
-//     if (confirm('Are you sure you want to delete this address?')) {
-//         fetch(`/deleteAddress?id=${addressId}`, {
-//             method: 'DELETE'
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.success) {
-//                 window.location.reload();
-//             } else {
-//                 alert('Failed to delete address');
-//             }
-//         });
-//     }
-// }
+
     </script>
 
     <%- include('../partials/users/footer') %>

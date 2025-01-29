@@ -10,8 +10,8 @@ import nocache from "nocache";
 import passport from "./config/passport.js";
 import userRouter from "./routes/userRouter.js"
 import adminRouter from "./routes/adminRouter.js"
-
-
+import flash from 'connect-flash'
+process.removeAllListeners('warning');
 connectDB()
 
 
@@ -33,6 +33,7 @@ app.use(session({
         maxAge:72*60*60*1000
     }
 }))
+app.use(flash());
 
 app.use(passport.session())
 
