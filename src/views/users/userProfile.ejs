@@ -78,36 +78,26 @@
                                 <div class="card-header">
                                     <h4 class="mb-0">My Orders</h4>
                                 </div>
+                                
                                 <div class="card-body">
+                                    <% orders.forEach(item => { %>
                                     <div class="order-item mb-4">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h5>Order #12345</h5>
-                                                <p class="mb-1">Date: January 15, 2024</p>
-                                                <p class="mb-1">Status: <span
-                                                        class="badge badge-warning">Processing</span></p>
+                                                <h5>Order <%=item.orderId%></h5>
+                                                <p class="mb-1">Date: <%=item.createdAt%></p>
+                                                <p class="mb-1">Status: <span class="badge badge-warning"><%=item.status%></span></p>
                                             </div>
                                             <div>
-                                                <h5>₹1,499</h5>
-                                                <button class="btn_2" onclick="cancelOrder('123')">Cancel Order</button>
+                                                <h5>₹<%=item.totalPrice%></h5>
+                                                <button class="btn_2" onclick="viewOrderDetails('<%=item._id%>')">View Details</button>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="order-item mb-4">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h5>Order #12346</h5>
-                                                <p class="mb-1">Date: January 10, 2024</p>
-                                                <p class="mb-1">Status: <span
-                                                        class="badge badge-success">Delivered</span></p>
-                                            </div>
-                                            <div>
-                                                <h5>₹2,999</h5>
-                                            </div>
-                                        </div>
-                                    </div>
+                        
+                                    <% }) %>
                                 </div>
+                               
                             </div>
                         </div>
 
@@ -165,25 +155,10 @@
 
 
     <script>
-        function cancelOrder(orderId) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                fetch(`/user/cancel-order/${orderId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert('Failed to cancel order');
-                        }
-                    });
-            }
+        function viewOrderDetails(orderId) {
+            
+         window.location.href = `/order-details/${orderId}`
         }
-
 
     </script>
 

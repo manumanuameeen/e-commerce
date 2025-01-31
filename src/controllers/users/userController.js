@@ -346,37 +346,50 @@ const loadlogout = async (req, res) => {
 
 const loadShopingPage = async (req, res) => {
     try {
-
-        const user = req.session.user
-        console.log("is user is there", user)
-        
-        const userData = await User.findOne({ _id: user})
-
-
-
-
-        const categories = await Category.find({ isListed: true })
-
+        const user = req.session.user;
+        const userData = await User.findOne({ _id: user });
+        const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map((category) => category._id);
-
         const page = parseInt(req.query.page) || 1;
-
-        const limit = 9
-
+        const limit = 9;
         const skip = (page - 1) * limit;
+        const sort = req.query.sort || 'newest';
+
+        // Define sort options
+        let sortOptions = {};
+        switch(sort) {
+            case 'newest':
+                sortOptions = { createdAt: -1 };
+                break;
+            case 'price-asc':
+                sortOptions = { salePrice: 1 };
+                break;
+            case 'price-desc':
+                sortOptions = { salePrice: -1 };
+                break;
+            case 'name-asc':
+                sortOptions = { productName: 1 };
+                break;
+            case 'name-desc':
+                sortOptions = { productName: -1 };
+                break;
+            // Add other sort cases as needed
+        }
 
         const products = await Product.find({
             isBlocked: false,
             category: { $in: categoryIds },
-            quantity: { $gt: 0 },
-        }).sort({ createdAt: -1 }).skip(skip).limit(limit);
-        console.log("products", products)
+            'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
+        })
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+
         const totalProducts = await Product.countDocuments({
             isBlocked: false,
             category: { $in: categoryIds },
-            quantity: { $gt: 0 },
-        })
-        // console.log("totalProdcut is getting here",totalProducts)
+            'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
+        });
 
         const totalPages = Math.ceil(totalProducts / limit);
 
@@ -387,19 +400,14 @@ const loadShopingPage = async (req, res) => {
             totalProducts: totalProducts,
             currentPage: page,
             totalPages: totalPages,
-        })
-        console.log(categoryIds);
+            currentSort: sort
+        });
 
     } catch (error) {
         console.log(error);
-
-        res.redirect('/pageNotFound')
-
+        res.redirect('/pageNotFound');
     }
-
-
-}
-
+};
 
 const filterProduct = async (req, res) => {
     try {
@@ -448,7 +456,7 @@ const filterProduct = async (req, res) => {
             categories: categories,
             totalPages: totalPages,
             currentPage: currentPage,
-            selectedCategory: findCategory || null,
+            // selectedCategory: findCategory || null,
         });
 
     } catch (error) {
@@ -457,26 +465,39 @@ const filterProduct = async (req, res) => {
     }
 };
 
+
+
+// Update filterByPrice to include sorting
 const filterByPrice = async (req, res) => {
     try {
         const user = req.session.user;
-        let userData = await User.findOne({ _id: user })
-
+        const userData = await User.findOne({ _id: user });
         const categories = await Category.find({ isListed: true }).lean();
-
+        const sort = req.query.sort || 'newest';
 
         let findProducts = await Product.find({
             salePrice: { $gt: req.query.gt, $lt: req.query.lt },
             isBlocked: false,
-            quantity: { $gt: 0 },
+            quantity: { $gt: 0 }
+        }).lean();
 
-
-        }).lean()
-
-
-
-        findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
-
+        // Apply sorting
+        switch(sort) {
+            case 'price-asc':
+                findProducts.sort((a, b) => a.salePrice - b.salePrice);
+                break;
+            case 'price-desc':
+                findProducts.sort((a, b) => b.salePrice - a.salePrice);
+                break;
+            case 'name-asc':
+                findProducts.sort((a, b) => a.productName.localeCompare(b.productName));
+                break;
+            case 'name-desc':
+                findProducts.sort((a, b) => b.productName.localeCompare(a.productName));
+                break;
+            default:
+                findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+        }
 
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
@@ -485,7 +506,6 @@ const filterByPrice = async (req, res) => {
         let totalPages = Math.ceil(findProducts.length / itemsPerPage);
         const currentProduct = findProducts.slice(startIndex, endIndex);
 
-
         req.session.filteredProducts = currentProduct;
         res.render('shop', {
             user: userData,
@@ -493,7 +513,7 @@ const filterByPrice = async (req, res) => {
             categories: categories,
             totalPages: totalPages,
             currentPage: currentPage,
-
+            currentSort: sort
         });
 
     } catch (error) {

@@ -177,13 +177,22 @@ const userProfile = async (req, res) => {
         const userId = req.session.user;
         const userData = await User.findById(userId)
         const addressData = await Address.findOne({ userId: userId })
+        const orders = await Order.find({
+
+            _id:{$in:userData.orderHistory}
+        })
+        .sort({createdOn:-1})
+        .populate(
+        "orderIteams",'productName'
+        )
+console.log("orders ",orders)
         console.log("user address",addressData);
         
-        const orders = await Order.find({'address':userId}).sort({createdOn:-1}).populate('orderedItems.product','productName')
         res.render('userProfile', {
             user: userData,
             userAddress: addressData,
-            orders: orders
+            orders
+        
         })
 
     } catch (error) {
@@ -551,47 +560,6 @@ const viewOrderDetails = async (req, res) => {
 
 
 
-const cancelOrder = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const order = await Order.findOne({ orderId });
-
-        if (!order) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Order not found' 
-            });
-        }
-
-        if (order.status !== 'Pending' && order.status !== 'Processing') {
-            return res.status(400).json({
-                success: false,
-                message: 'Order cannot be cancelled at this stage'
-            });
-        }
-
-        order.status = 'Cancelled';
-        order.orderTimeline.push({
-            status: 'Cancelled',
-            date: new Date(),
-            description: 'Order cancelled by customer'
-        });
-
-        await order.save();
-
-        res.json({ 
-            success: true, 
-            message: 'Order cancelled successfully' 
-        });
-
-    } catch (error) {
-        console.error('Error cancelling order:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Error cancelling order' 
-        });
-    }
-};
 
 const updateName = async (req, res) => {
 
@@ -657,8 +625,8 @@ export {
     editAddress,
     postEditAddress,
     deleteAddress,
-    viewOrderDetails,
-    cancelOrder,
+   
+ 
     updateName,
     changeName,
 

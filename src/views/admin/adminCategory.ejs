@@ -299,7 +299,7 @@
             }
             function validateForm() {
                 clearErrorMessages();
-                const name = document.getElementsByName("name")[0].value.trim();
+                const name = document.getElementsByName("name")[0].value.trim().toLowerCase();
                 const description = document.getElementById("descriptionId").value.trim();
                 let isValid = true;
 

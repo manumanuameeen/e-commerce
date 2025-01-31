@@ -60,6 +60,13 @@ import {
 } from "../controllers/admin/productControlller.js"
 
 
+import {
+    loadOrder,
+    updateOrderStatus,
+    orderDetails,
+
+} from "../controllers/admin/orderManagement.js"
+
 router.get('/pageerror', loadPageerror)
 //Login  management
 router.get('/login', loadlogin)
@@ -90,4 +97,12 @@ router.get("/unBlockProduct",adminAuth,unBlockProduct)
 router.get("/edit-Product",adminAuth,getEditProduct)
 router.post("/edit-Product/:id",adminAuth,uploads.any("images",4),editProduct)
 router.post("/deleteImage",adminAuth,deleteSingleImage)
+
+
+//order management
+
+router.get("/order", adminAuth, loadOrder);
+router.post("/order/:orderId", adminAuth, updateOrderStatus);
+router.get('/orderDetails/:id',adminAuth,orderDetails)
+
 export default router;  

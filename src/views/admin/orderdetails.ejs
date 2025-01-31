@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Order Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 shadow-md rounded-lg">
+        <h1 class="text-2xl font-semibold mb-4">Order Details</h1>
+        
+        <div class="border p-4 rounded-lg mb-4">
+            <p><strong>Order ID:</strong> <%= order._id %> </p>
+            <p><strong>Status:</strong> <span class="text-red-500"><%= order.status %></span></p>
+            <p><strong>Placed On:</strong> <%= new Date(order.createdAt).toDateString() %> </p>
+            <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+        </div>
+        
+        <h2 class="text-xl font-semibold mb-3">Items</h2>
+        <div class="border p-4 rounded-lg">
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 px-4 py-2">Image</th>
+                        <th class="border border-gray-300 px-4 py-2">Name</th>
+                        <th class="border border-gray-300 px-4 py-2">Sale Price</th>
+                        <th class="border border-gray-300 px-4 py-2">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.orderIteams.forEach(item => { %>
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                <div class="w-16 h-16 flex-shrink-0">
+                                    <img src="/uploads/re-image/<%=item.product.productImage[0]%>"
+                                        alt="<%= item.product.productName %>" class="w-full h-full object-cover rounded-lg">
+                                </div>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2"><%= item.product.productName %></td>
+                            <td class="border border-gray-300 px-4 py-2">$<%= item.price %></td>
+                            <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        
+        <h2 class="text-xl font-semibold mt-6">Summary</h2>
+        <div class="border p-4 rounded-lg">
+            <p><strong>Subtotal:</strong> $<%= order.totalPrice %></p>
+            <p><strong>Discount:</strong> -$<%= order.discount %></p>
+            <p class="font-bold text-lg"><strong>Total:</strong> $<%= order.finalAmount %></p>
+        </div>
+
+        <button class="mt-6 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-900" onclick="window.location.href='/admin/order'">Go to orders</button>
+    </div>
+</body>
+</html>

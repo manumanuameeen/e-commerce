@@ -34,7 +34,8 @@ const categoryInfo = async (req, res) => {
 const addCategory = async (req, res) => {
     const { name, description } = req.body;
     try {
-        const existingCategory = await Category.findOne({ name });
+        const normalizedName = name.trim().toLowerCase();
+        const existingCategory = await Category.findOne({ normalizedName })
         if (existingCategory) {
             console.log("Category already exists");
             return res.status(400).json({ error: "Category already exists" });

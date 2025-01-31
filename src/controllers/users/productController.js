@@ -15,7 +15,7 @@ const productDetails = async (req, res) => {
 
         const product = await Product.findById(productId).populate("category");
 
-        // Check if product exists
+       
         if (!product) {
             return res.status(404).render("pageNotFound");
         }
@@ -23,11 +23,10 @@ const productDetails = async (req, res) => {
         const findCategory = product.category;
         console.log("Finding category:", findCategory);
 
-        // Ensure category is properly referenced
         const findRelatedProduct = await Product.find({ category: findCategory._id }).limit(5);
         console.log("Related products found:", findRelatedProduct.length);
 
-        // Offer calculation
+        
         const categoryOffer = findCategory ? findCategory.offer || 0 : 0;
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;

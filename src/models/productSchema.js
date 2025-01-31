@@ -31,7 +31,7 @@ const productSchema = new Schema({
         type: Number,
         default: 0
     },
-    colorVarients: [{
+    colorVarients: [{  
         color: {
             type: String,
             required: true

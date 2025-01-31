@@ -125,22 +125,28 @@
                             <div id="category-error" class="error-message"></div>
                         </div>
                         
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="mb-4">
-                                    <label for="color" class="form-label">Color</label>
-                                    <input name="color" type="text" placeholder="e.g., Red, Blue" class="form-control" id="color" />
-                                    <div id="color-error" class="error-message"></div>
+                        <div class="col-lg-8">
+                            <div class="mb-4">
+                                <label class="form-label">Product Colors and Quantities</label>
+                                <div id="colorsContainer">
+                                    <div class="color-entry mb-3">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <input type="text" id="color" name="colors[]" class="form-control" placeholder="Enter Color (e.g., Red, Blue)">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="number" id="quantity" name="quantities[]" class="form-control" placeholder="Quantity" min="0">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" class="btn btn-danger remove-color">Remove</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="mb-4">
-                                    <label for="quantity" class="form-label">Quantity</label>
-                                    <input name="quantity" type="number" placeholder="Enter quantity" class="form-control" id="quantity" min="0" />
-                                    <div id="quantity-error" class="error-message"></div>
-                                </div>
+                                <button type="button" class="btn btn-secondary" id="addMoreColors">Add More Colors</button>
                             </div>
                         </div>
+                        
                         <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
                     </form>
                 </div>
@@ -176,12 +182,11 @@
         </div>
     </div>
 </section>
-
 <script>
 
+// Initialize global variables
 const cropperInstances = {};
 const croppedImages = {};
-
 
 function viewImage(event, index) {
     const file = event.target.files[0];
@@ -204,19 +209,14 @@ function viewImage(event, index) {
         image.src = reader.result;
         image.style.display = 'block';
 
-      
-        const thumbnail = document.createElement('img');
-        thumbnail.src = URL.createObjectURL(file);
-        thumbnail.onload = () => URL.revokeObjectURL(thumbnail.src);
-        thumbnail.alt = `Thumbnail ${index}`;
-        thumbnail.style.width = '50px';
-        thumbnail.style.height = 'auto';
+        // Create thumbnail preview
+        const thumbnailContainer = document.getElementById(`addedImagesContainer${index}`);
+        thumbnailContainer.innerHTML = `
+            <div class="thumbnail">
+                <img src="${reader.result}" alt="Thumbnail ${index}" style="width: 50px; height: 50px; object-fit: cover;">
+            </div>`;
 
-        const container = document.getElementById(`addedImagesContainer${index}`);
-        container.innerHTML = '';
-        container.appendChild(thumbnail);
-
-
+        // Initialize or reinitialize cropper
         if (cropperInstances[index]) {
             cropperInstances[index].destroy();
         }
@@ -233,29 +233,87 @@ function viewImage(event, index) {
         const cropperContainer = document.querySelector(`#imageView${index}`).parentNode.querySelector('.image-cropper');
         cropperContainer.style.display = 'block';
 
+        // Setup save button with proper event handling
         const saveButton = document.getElementById(`saveButton${index}`);
-        const newSaveButton = saveButton.cloneNode(true);
-        saveButton.parentNode.replaceChild(newSaveButton, saveButton);
+        if (saveButton) {
+            // Remove old event listeners by cloning and replacing the button
+            const newSaveButton = saveButton.cloneNode(true);
+            saveButton.parentNode.replaceChild(newSaveButton, saveButton);
 
-        newSaveButton.addEventListener('click', () => {
-            const cropper = cropperInstances[index];
-            const croppedCanvas = cropper.getCroppedCanvas();
-            
-         
-            croppedImages[index] = croppedCanvas.toDataURL('image/jpeg', 0.9);
-       
-            const croppedImg = document.getElementById(`croppedImg${index}`);
-            croppedImg.src = croppedImages[index];
-            
-            cropperContainer.style.display = 'none';
-            image.style.display = 'none';
-            cropper.destroy();
-            delete cropperInstances[index];
-        });
+            newSaveButton.addEventListener('click', () => {
+                const cropper = cropperInstances[index];
+                if (cropper) {
+                    const croppedCanvas = cropper.getCroppedCanvas({
+                        width: 600,
+                        height: 600,
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high',
+                    });
+                    
+                    croppedImages[index] = croppedCanvas.toDataURL('image/jpeg', 0.9);
+                    
+                    // Update thumbnail
+                    const thumbnailContainer = document.getElementById(`addedImagesContainer${index}`);
+                    thumbnailContainer.innerHTML = `
+                        <div class="thumbnail">
+                            <img src="${croppedImages[index]}" alt="Thumbnail ${index}" style="width: 50px; height: 50px; object-fit: cover;">
+                        </div>`;
+                    
+                    // Update cropped preview
+                    const croppedImg = document.getElementById(`croppedImg${index}`);
+                    if (croppedImg) {
+                        croppedImg.src = croppedImages[index];
+                    }
+                    
+                    // Hide cropper elements
+                    cropperContainer.style.display = 'none';
+                    image.style.display = 'none';
+                    
+                    // Cleanup cropper
+                    cropper.destroy();
+                    delete cropperInstances[index];
+                }
+            });
+        }
     };
     reader.readAsDataURL(file);
 }
 
+// Add color variants functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const addMoreColorsBtn = document.getElementById('addMoreColors');
+    const colorsContainer = document.getElementById('colorsContainer');
+
+    if (addMoreColorsBtn && colorsContainer) {
+        addMoreColorsBtn.addEventListener('click', function() {
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('color-entry', 'mb-3');
+            newEntry.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" name="colors[]" class="form-control" placeholder="Enter Color (e.g., Red, Blue)">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" name="quantities[]" class="form-control" placeholder="Quantity" min="0">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger remove-color">Remove</button>
+                    </div>
+                </div>
+            `;
+            colorsContainer.appendChild(newEntry);
+        });
+
+        // Event delegation for remove buttons
+        colorsContainer.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-color')) {
+                event.target.closest('.color-entry').remove();
+            }
+        });
+    }
+});
+
+// Form submission handler
 async function handleSubmit(event) {
     event.preventDefault();
     
@@ -267,19 +325,33 @@ async function handleSubmit(event) {
         const form = document.getElementById('productSubmitForm');
         const formData = new FormData(form);
 
+        // Handle color variants
+        formData.delete('colors[]');
+        formData.delete('quantities[]');
+        
+        const colorEntries = document.querySelectorAll('.color-entry');
+        colorEntries.forEach((entry) => {
+            const colorInput = entry.querySelector('input[name="colors[]"]');
+            const quantityInput = entry.querySelector('input[name="quantities[]"]');
+            
+            if (colorInput && colorInput.value && quantityInput && quantityInput.value) {
+                formData.append('colors', colorInput.value);
+                formData.append('quantities', quantityInput.value);
+            }
+        });
+
+        // Handle images
         const hasImages = Object.keys(croppedImages).length > 0;
         if (!hasImages) {
             throw new Error('Please select and crop at least one image.');
         }
 
         for (const [index, dataUrl] of Object.entries(croppedImages)) {
-            const fetchResponse = await fetch(dataUrl);
-            const blob = await fetchResponse.blob();
-            
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
             formData.append('images', blob, `image-${Date.now()}-${index}.jpg`);
         }
 
-        
         const response = await fetch(form.action, {
             method: 'POST',
             body: formData
@@ -302,11 +374,10 @@ async function handleSubmit(event) {
         const errorDiv = document.getElementById('error-message');
         errorDiv.textContent = `Error saving product: ${error.message}`;
         errorDiv.style.display = 'block';
-        return false;
     }
 }
 
-// Form validation
+// Form validation helper functions
 function validateForm() {
     clearErrorMessages();
     let isValid = true;
@@ -351,36 +422,19 @@ function validateForm() {
                     message: 'Please enter a valid non-negative price.'
                 }
             ]
-        },
-        quantity: {
-            element: document.getElementById('quantity'),
-            rules: [
-                {
-                    test: value => value !== '' && parseInt(value) >= 0,
-                    message: 'Please enter a valid non-negative quantity.'
-                }
-            ]
-        },
-        color: {
-            element: document.getElementById('color'),
-            rules: [
-                {
-                    test: value => value.trim() !== '',
-                    message: 'Please enter a color.'
-                }
-            ]
         }
     };
 
     // Validate each field
     for (const [fieldName, validation] of Object.entries(validations)) {
-        const value = validation.element.value;
-        
-        for (const rule of validation.rules) {
-            if (!rule.test(value)) {
-                displayErrorMessage(`${fieldName}-error`, rule.message);
-                isValid = false;
-                break;
+        if (validation.element) {
+            const value = validation.element.value;
+            for (const rule of validation.rules) {
+                if (!rule.test(value)) {
+                    displayErrorMessage(`${fieldName}-error`, rule.message);
+                    isValid = false;
+                    break;
+                }
             }
         }
     }
@@ -390,13 +444,6 @@ function validateForm() {
     const salePrice = parseFloat(document.getElementById('salePrice').value);
     if (!isNaN(regularPrice) && !isNaN(salePrice) && regularPrice <= salePrice) {
         displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
-        isValid = false;
-    }
-
-    // Validate images
-    const hasCroppedImages = Object.keys(croppedImages).length > 0;
-    if (!hasCroppedImages) {
-        displayErrorMessage('images-error1', 'Please select and crop at least one image.');
         isValid = false;
     }
 
@@ -425,7 +472,7 @@ function clearErrorMessages() {
     }
 }
 
-// Attach form submit handler
+// Initialize form submit handler
 document.getElementById('productSubmitForm').addEventListener('submit', handleSubmit);
 </script>
 

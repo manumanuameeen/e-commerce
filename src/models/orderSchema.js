@@ -10,7 +10,7 @@ const orderSchema = new Schema({
         default: () => uuidv4(),
         unique: true
     },
-    orderIteams: [{
+    orderIteams:[{
         product: {
             type: Schema.Types.ObjectId,
             ref: "Product",
@@ -39,7 +39,7 @@ const orderSchema = new Schema({
     },
     address: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Address",
         required: true
     },
     invoiceDate: {
@@ -50,14 +50,14 @@ const orderSchema = new Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['razorpay', 'Cash on delivery', 'wallet', 'paypal']
+        enum: ['razorpay', 'Cash on Delivery', 'wallet', 'paypal']
     },
     status: {
         type: String,
         required: true,
-        enum: ["Pending", "Processing", "Shipped", "Deliverd", "cancelled", "Return Request", "Returned"],
+        enum: ["Pending", "Processing", "Shipped", "Deliverd", "Cancelled", "Return Request", "Returned"],
 
-
+ 
     },
     createdOn: {
         type: Date,

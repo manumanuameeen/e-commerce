@@ -21,6 +21,27 @@
                 color: red;
                 display: none;
             }
+            .variant-row {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.btn-danger {
+    background-color: #ff0000;
+    border-color: #ff0000;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.form-select, .form-control {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+}
         </style>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
     </head>
@@ -40,7 +61,7 @@
                     <div class="card-body">
                         <form method="post" action="/admin/edit-Product/<%= product._id %>" enctype="multipart/form-data">
 
-                            onsubmit="return validateForm()">
+                        
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" name="productName" value="<%=product.productName%>"
@@ -71,30 +92,50 @@
                                     </div>
                                     <div id="salePrice-error" class="error-message"></div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Quantity</label>
-                                        <input name="quantity" type="text" value="<%= product.quantity%>"
-                                            class="form-control border">
-                                        <div id="quantity-error" class="error-message"></div>
-                                    </div>
-                                </div>
+                                
                             </div>
-                            <div class="row">
-
-                                <div class="col-lg-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Color</label>
-                                        <input name="color" type="text" value="<%=product.color%>"
-                                            class="form-control border">
-                                        <div id="color-error" class="error-message"></div>
-                                    </div>
-                                </div>
-
-                            </div>
+                           
                             <div class="card mb-4">
 
-
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4>Color Variants</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="colorVariantsContainer">
+                                            <% if(product.colorVarients && product.colorVarients.length > 0) { %>
+                                                <% product.colorVarients.forEach((variant, index) => { %>
+                                                    <div class="variant-row mb-3">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-4">
+                                                                <input type="text" 
+                                                                       name="colors[]" 
+                                                                       class="form-control"
+                                                                       placeholder="Enter color (e.g., Navy Blue)"
+                                                                       value="<%= variant.color %>" 
+                                                                       required>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <input type="number" 
+                                                                       name="quantities[]" 
+                                                                       class="form-control" 
+                                                                       value="<%= variant.quantity %>" 
+                                                                       placeholder="Enter quantity"
+                                                                       min="0" 
+                                                                       required>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <% }) %>
+                                            <% } %>
+                                        </div>
+                                        <div id="variant-error" class="error-message"></div>
+                                        <button type="button" class="btn btn-success" onclick="addVariant()">Add Color Variant</button>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     <div class="row gx-2">
                                         <div class="mb-4">
@@ -194,6 +235,73 @@
     <%- include("../partials/admin/footer") %>
         <script>
 
+function addVariant() {
+    const container = document.getElementById('colorVariantsContainer');
+    const newVariant = document.createElement('div');
+    newVariant.classList.add('variant-row', 'mb-3');
+    
+    newVariant.innerHTML = `
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <input type="text" 
+                       name="colors[]" 
+                       class="form-control"
+                       placeholder="Enter color (e.g., Navy Blue)"
+                       required>
+            </div>
+            <div class="col-md-4">
+                <input type="number" 
+                       name="quantities[]" 
+                       class="form-control" 
+                       placeholder="Enter quantity"
+                       min="0" 
+                       required>
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(newVariant);
+}
+
+function removeVariant(button) {
+    const variantRow = button.closest('.variant-row');
+    variantRow.remove();
+}
+
+function validateVariants() {
+    const colors = document.getElementsByName('colors[]');
+    const quantities = document.getElementsByName('quantities[]');
+    
+    if (colors.length === 0) {
+        displayErrorMessage('variant-error', 'At least one color variant is required.');
+        return false;
+    }
+    
+    const colorValues = Array.from(colors).map(input => input.value.trim().toLowerCase());
+    if (colorValues.some(color => color === '')) {
+        displayErrorMessage('variant-error', 'Color name cannot be empty.');
+        return false;
+    }
+    
+    if (new Set(colorValues).size !== colorValues.length) {
+        displayErrorMessage('variant-error', 'Duplicate colors are not allowed.');
+        return false;
+    }
+    
+   
+    for (let i = 0; i < quantities.length; i++) {
+        if (quantities[i].value < 0 || quantities[i].value === '') {
+            displayErrorMessage('variant-error', 'All quantities must be valid numbers greater than or equal to 0.');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 
             function validateAndSubmit() {
                 if (validateForm()) {
@@ -212,7 +320,6 @@
                 const description = document.getElementsByName('descriptionData')[0].value;
                 const price = document.getElementsByName('regularPrice')[0].value;
                 const saleprice = document.getElementsByName('salePrice')[0].value;
-                const color = document.getElementsByName('color')[0].value;
                 const category = document.getElementsByName('category')[0].value;
                 const images = document.getElementById('input1')
                 const quantity = document.getElementsByName('quantity')
@@ -246,10 +353,7 @@
                     isValid = false;
                 }
 
-                if (color.trim() === "") {
-                    displayErrorMessage('color-error', 'Please enter a color.');
-                    isValid = false;
-                }
+               
                 if (!imageDatas && images.files.length === 0) {
                     displayErrorMessage("images-error", 'Please select an image.');
                     isValid = false;

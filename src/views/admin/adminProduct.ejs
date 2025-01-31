@@ -26,7 +26,7 @@
                             <th>Category</th>
                             <th>Sale Price</th>
                             <th>Offer Price</th>
-                            <th>Quantity</th>
+                            <th>Variants</th>
                             <th class="text-center">Action</th>
                             <th class="text-center">Edit</th>
                         </tr>
@@ -38,18 +38,31 @@
                             <td><%= data[i].category?.name %></td>
                             <td><%= data[i].regularPrice %></td>
                             <td><%= data[i].salePrice %></td>
-                            <td><%= data[i].quantity %></td>
                             <td>
-                                <% if (data[i].isBlocked) { %>
-                                    
-                                    <button  class="btn btn-danger btn-sm"><a href="/admin/unBlockProduct?id=<%=data[i]._id%>" style="text-decoration: none;  color: white;" >Block</a></button>
-                                    <% }else{ %>
-                                        <button class="btn btn-success btn-sm"><a href="/admin/blockProduct?id=<%=data[i]._id%>" style="text-decoration: none; color: white;">Unblock</a></button>
-                               
-                                <%}%>
+                                <% if (data[i].colorVarients && data[i].colorVarients.length > 0) { %>
+                                    <div class="variants-container">
+                                        <% data[i].colorVarients.forEach(variant => { %>
+                                            <div class="variant-item">
+                                                <span class="color-indicator"><%= variant.color %></span>
+                                                <span class="quantity-indicator">Qty: <%= variant.quantity %></span>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                <% } else { %>
+                                    <span class="no-variants">No variants</span>
+                                <% } %>
                             </td>
-
-                            
+                            <td class="text-center">
+                                <% if (data[i].isBlocked) { %>
+                                    <button class="btn btn-danger btn-sm">
+                                        <a href="/admin/unBlockProduct?id=<%=data[i]._id%>" style="text-decoration: none; color: white;">Block</a>
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-success btn-sm">
+                                        <a href="/admin/blockProduct?id=<%=data[i]._id%>" style="text-decoration: none; color: white;">Unblock</a>
+                                    </button>
+                                <% } %>
+                            </td>
                             <td class="text-center">
                                 <a href="/admin/edit-Product/?id=<%= data[i]._id %>" class="btn btn-info btn-sm">Edit</a>
                             </td>
@@ -94,6 +107,42 @@
     border-bottom: 1px solid #dee2e6;
 }
 
+.variants-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 0.25rem;
+}
+
+.variant-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.color-indicator {
+    padding: 0.25rem 0.5rem;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.quantity-indicator {
+    color: #666;
+}
+
+.no-variants {
+    color: #999;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
 .gap-2 {
     gap: 0.5rem;
 }
@@ -122,6 +171,18 @@
     border: 1px solid #28a745;
 }
 
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border: 1px solid #17a2b8;
+}
+
 .pagination-container {
     display: flex;
     justify-content: center;
@@ -140,5 +201,23 @@
 .current-page {
     background-color: #007bff;
     color: white;
+}
+
+/* Scrollbar styling */
+.variants-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.variants-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.variants-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.variants-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 </style>

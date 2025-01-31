@@ -18,9 +18,12 @@ const getProductAddPage = async (req, res) => {
     }
 };
 
+
+
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
+        
         if (!products.productName || !products.category || !products.regularPrice) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
@@ -30,6 +33,7 @@ const addProducts = async (req, res) => {
             return res.status(400).json({ success: false, message: "Product already exists" });
         }
 
+        // Process images
         const images = [];
         if (req.files && req.files.length > 0) {
             const uploadDir = path.join(__dirname, "../../public/uploads/re-image");
@@ -39,16 +43,31 @@ const addProducts = async (req, res) => {
                 try {
                     const fileName = `${Date.now()}-${file.originalname}`;
                     const filePath = path.join(uploadDir, fileName);
-
+                    
+                    // Process with sharp
                     await sharp(file.path)
                         .resize(440, 440, { fit: 'cover', position: 'center' })
                         .toFile(filePath);
 
                     images.push(fileName);
-                    fs.unlinkSync(file.path);
+                    
                 } catch (error) {
                     console.error("Error processing image:", error);
                 }
+            }
+        }
+
+     
+        let colorVarients = [];
+        const colors = Array.isArray(products.colors) ? products.colors : [products.colors];
+        const quantities = Array.isArray(products.quantities) ? products.quantities : [products.quantities];
+
+        for (let i = 0; i < colors.length; i++) {
+            if (colors[i] && quantities[i]) {
+                colorVarients.push({
+                    color: colors[i],
+                    quantity: parseInt(quantities[i])
+                });
             }
         }
 
@@ -61,11 +80,9 @@ const addProducts = async (req, res) => {
             productName: products.productName,
             description: products.description,
             category: category._id,
-            regularPrice: products.regularPrice,
-            salePrice: products.salePrice,
-            createdOn: new Date(),
-            quantity: products.quantity,
-            color: products.color,
+            regularPrice: parseFloat(products.regularPrice),
+            salePrice: parseFloat(products.salePrice),
+            colorVarients: colorVarients,
             productImage: images,
             status: "Available",
         });
@@ -77,7 +94,6 @@ const addProducts = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-
 const getAllProduct = async (req, res) => {
     try {
         const search = req.query.search || "";
@@ -97,6 +113,7 @@ const getAllProduct = async (req, res) => {
         });
 
         const category = await Category.find({ isListed: true }).lean();
+console.log("product data from product page",productData);
 
         res.render('adminProduct', {
             data: productData,
@@ -176,6 +193,18 @@ const editProduct = async (req, res) => {
         if (!category) {
             return res.status(400).json({ error: "Category not found" });
         }
+        const colorVarients = [];
+        const colors = Array.isArray(data.colors) ? data.colors : [data.colors];
+        const quantities = Array.isArray(data.quantities) ? data.quantities : [data.quantities];
+        
+        for (let i = 0; i < colors.length; i++) {
+            if (colors[i] && quantities[i]) {
+                colorVarients.push({
+                    color: colors[i],
+                    quantity: parseInt(quantities[i])
+                });
+            }
+        }
 
         const updateFields = {
             productName: data.productName,
@@ -183,8 +212,8 @@ const editProduct = async (req, res) => {
             category: category._id,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
-            quantity: data.quantity,
-            color: data.color,
+            colorVarients: colorVarients, // Update color variants
+            // ... other fields
         };
 
         if (images.length > 0) {
@@ -199,6 +228,7 @@ const editProduct = async (req, res) => {
     }
 };
 
+ 
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;

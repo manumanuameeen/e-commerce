@@ -47,8 +47,6 @@ import {
         editAddress,
         postEditAddress,
         deleteAddress,
-        viewOrderDetails,
-        cancelOrder,
         updateName,
         changeName,
 
@@ -69,7 +67,11 @@ import {
 import{
         getChekout,
         checkoutAddress,
-        
+        placeOrder,
+        orderSuccess,
+        orderDetails,
+        orderCancel,
+
 
 } from '../controllers/users/checkoutController.js'
 
@@ -142,8 +144,7 @@ router.post("/editAddress", userAuth, postEditAddress);
 router.get("/deleteAddress", userAuth, deleteAddress);
 
 //order 
-router.get("/orderDetails/:orderId", userAuth, viewOrderDetails);
-router.post("/cancelOrder/:orderId", userAuth, cancelOrder);
+
 
 
 
@@ -158,5 +159,10 @@ router.delete("/removeFromCart/:cartItemId", userAuth, removeFromCart);
 //checkout
 router.get('/checkout',userAuth,getChekout)
 router.post('/checkout-address',userAuth,checkoutAddress)
+router.post('/placeOrder',userAuth,placeOrder)
+router.get('/orderSuccess',userAuth,orderSuccess)
+router.get('/order-details/:orderId',userAuth,orderDetails)
+router.post("/orderCancel/:orderId",userAuth,orderCancel)
+
 
 export default router;

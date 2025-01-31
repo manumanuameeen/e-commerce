@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     .breadcrumb_bg {
         background: #f8f8f8;
@@ -626,29 +627,23 @@
                     </div>
 
                     <div class="address-box selected">
-                        <% if (address && address.address.length> 0) { %>
-                            <% for (let i=0; i < address.address.length; i++) { %>
+                        <% if (address && address.address.length > 0) { %>
+                            <% for (let addr of address.address) { %>
                                 <div class="address-content">
-                                    <input type="radio" name="address" <%=i===0 ? 'checked' : '' %>>
+                                    <input type="radio" name="address" value="<%= addr._id %>" >
                                     <div class="address-details">
-                                        <p class="name">
-                                            <%= address.address[i].name %>
-                                        </p>
-                                        <p>
-                                            <%= address.address[i].city %>
-                                        </p>
-                                        <p>
-                                            <%= address.address[i].state %>
-                                        </p>
-                                        <p>
-                                            <%= address.address[i].phone %>
-                                        </p>
+                                        <p class="name"><%= addr.name %></p>
+                                        <p><%= addr.city %></p>
+                                        <p><%= addr.landMark %></p>
+                                        <p><%= addr.state %></p>
+                                        <p><%= addr.pincode %></p>
+                                        <p><%= addr.phone %></p>
                                     </div>
                                 </div>
-                                <% } %>
-                                    <% } else { %>
-                                        <p>No addresses found. Please add one!</p>
-                                        <% } %>
+                            <% } %>
+                        <% } else { %>
+                            <p>No addresses found. Please add one!</p>
+                        <% } %>
                     </div>
 
 
@@ -679,7 +674,7 @@
                             Payment Method
                         </div>
 
-                        <div class="payment-methods">
+                        <!-- <div class="payment-methods">
                             <div class="payment-option selected">
                                 <div class="payment-content">
                                     <input type="radio" name="payment" value="card" checked>
@@ -689,9 +684,9 @@
                                         <p class="description">Pay securely with your card</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="payment-option">
+                            <!-- <div class="payment-option">
                                 <div class="payment-content">
                                     <input type="radio" name="payment" value="online">
                                     <i class="fas fa-mobile-alt payment-icon"></i>
@@ -700,11 +695,11 @@
                                         <p class="description">UPI, Net Banking, Wallet</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="payment-option">
                                 <div class="payment-content">
-                                    <input type="radio" name="payment" value="cod">
+                                    <input type="radio" name="payment" value="Cash on Delivery">
                                     <i class="fas fa-money-bill-wave payment-icon"></i>
                                     <div class="payment-details">
                                         <p class="name">Cash on Delivery</p>
@@ -726,8 +721,7 @@
                                         <div class="order-details">
                                             <h4>
                                                 <%= product.ProductId.productName %>
-                                            </h4> <!-- Access productName from ProductId -->
-                                            <p class="order-quantity">Quantity: <%= product.quantity %>
+                                            </h4>   <p class="order-quantity">Quantity: <%= product.quantity %>
                                             </p>
                                         </div>
                                     </div>
@@ -753,7 +747,7 @@
                                     <% } else { %>
                                         <p>No items in the cart.</p>
                                         <% } %>
-                                            <button class="place-order-btn">Place Order</button>
+                                            <button class="place-order-btn" onclick="placeOrder()">Place Order</button>
                                             <div class="delivery-info">
                                                 <i class="fas fa-truck"></i>
                                                 Estimated delivery: 3-5 business days
@@ -825,6 +819,7 @@
                     </form>
                 </div>
             </div>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script src="js/jquery-1.12.1.min.js"></script>
             <script src="js/bootstrap.min.js"></script>
             <script>
@@ -837,8 +832,6 @@
                     const successElement = document.getElementById('success-message');
                     const errorElement = document.getElementById('error-message');
                     const messageContainer = document.getElementById('message-container');
-
-                    // Display the success message if available
                     if (successMessage) {
                         successElement.style.display = 'block';
                         messageContainer.style.display = 'block';
@@ -908,4 +901,83 @@
                         }, 5000); // Hide after 5 seconds
                     }
                 });
-            </script>
+
+
+</script>
+
+
+
+
+<script>
+
+async function placeOrder() {
+    const selectedAddressElem = document.querySelector('input[name="address"]:checked');
+    const selectedPayment = document.querySelector('input[name="payment"]:checked');
+    
+    if (!selectedAddressElem) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please select a delivery address',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (!selectedPayment) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please select a payment method',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch('/placeOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                selectedAddress: selectedAddressElem.value,  
+                paymentMethod: selectedPayment.value
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: 'Order Placed!',
+                text: 'Your order has been placed successfully.',
+                icon: 'success',
+                confirmButtonText: 'View Order'
+            }).then((result) => {
+                if (result.isConfirmed) {
+    window.location.href = `/orderSuccess?orderId=${data.orderId}`;
+
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: data.message || 'Failed to place order. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+}
+ </script>
+
+
+
+            

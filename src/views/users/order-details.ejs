@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Order History Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">My Orders</h1>
+        </div>
+
+        <!-- Orders List -->
+        <div class="space-y-6">
+
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <!-- Order Header -->
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-start">
+                        <div>
+
+                            <h2 class="text-lg font-semibold text-gray-800">Order: <%= order.orderId %>
+                            </h2>
+                            <p class="text-sm text-gray-500">Placed on <%= order.createdAt.toDateString() %>
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="p-6 border-b">
+                    <% order.orderIteams.forEach(item=> { %>
+                        <div class="flex items-center py-4 border-b last:border-0">
+                            <!-- Product Image -->
+                            <div class="w-16 h-16 flex-shrink-0">
+                                <img src="/uploads/re-image/<%=item.product.productImage[0]%>"
+                                    alt="<%= item.product.name %>" class="w-full h-full object-cover rounded-lg">
+                            </div>
+
+                            <!-- Product Details -->
+                            <div class="flex-1 ml-4">
+                                <h3 class="font-medium text-gray-800">
+                                    <%= item.product.name %>
+                                </h3>
+                                <p class="text-sm text-gray-500">salePrice: <%=item.price%>
+                                </p>
+
+                                <p class="text-sm text-gray-500">Quantity: <%= item.quantity %>
+                                </p>
+
+                            </div>
+
+                            <!-- Product Price -->
+                            <div class="text-right">
+                                <p class="font-medium text-gray-800">$<%= item.price %>
+                                </p>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+
+
+                <!-- Order Summary -->
+                <div class="p-6 bg-gray-50">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="font-medium">$<%= order.totalPrice %></span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Discount</span>
+                        <span class="font-medium text-green-600">-$<%= order.discount %></span>
+                    </div>
+                    <div class="flex justify-between font-semibold">
+                        <span>Total</span>
+                        <span>$<%= order.finalAmount %></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+
+                    <div class="mt-6 flex gap-4 justify-end">
+                        <% if (order.status==="Pending" || order.status==="Processing" ) { %>
+                            <button onclick="cancelOrder('<%= order._id %>')"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                Cancel Order
+                            </button>
+                            <% } %>
+
+                                <% if (order.status==="Delivered" || order.status==="Shipped" ) { %>
+                                    <button onclick="requestReturn('<%= order._id %>')"
+                                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                        Request Return
+                                    </button>
+                                    <% } %>
+                    </div>
+
+                </div>
+                <button onclick="goToProfile()"
+             class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                    Go to  profile 
+                </button>
+
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            async function cancelOrder(orderId) {
+                
+                const { isConfirmed } = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it'
+                });
+
+
+                if (!isConfirmed) return;
+                try {
+                    const response = await fetch(`/orderCancel/${orderId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        swal.fire({
+                            title: "Order cancel",
+                            text: 'Your order has been cancelled successfully.',
+                            icon: "success",
+                            confirmButtonText:'ok'
+                        }).then(()=>{
+                            window.location.reload();
+                        })
+                        
+                    } else {
+                        swal.fire({
+                            title: "Order cancel",
+                            text: "your order failed",
+                            icon: "error",
+                            confirmButtonText: "ohk"
+                        })
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    swal.fire({
+                        title: "Order cancel",
+                        text: "An error occurred while canceling the order",
+                        icon: "error",
+                        confirmButtonText: "ohk"
+                    })
+                }
+            }
+
+
+           async function goToProfile() {
+            
+ window.location.href = `/Profile`
+
+
+           } 
+      </script>
+</body>
+
+</html>

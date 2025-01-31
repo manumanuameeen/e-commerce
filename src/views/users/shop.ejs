@@ -108,6 +108,180 @@
             color: #999;
             /* Optional: You can change the color to make it look lighter */
         }
+        /* Product Top Bar Styles */
+.product_top_bar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.single_product_menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.single_product_menu h5 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.single_product_menu p {
+    margin: 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.single_product_menu p span {
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Sort Dropdown Styles */
+.nice-select {
+    min-width: 200px;
+    height: 40px;
+    line-height: 38px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 15px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    z-index: 100;
+}
+
+.nice-select:after {
+    content: '\f107';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.nice-select .list {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-top: 4px;
+    padding: 5px 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.nice-select.open .list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.nice-select .option {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nice-select .option:hover {
+    background: #f8f9fa;
+}
+
+/* Product Grid Styles */
+.single_product_item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.single_product_item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.single_product_item img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.single_product_text {
+    padding: 20px;
+}
+
+.single_product_text h4 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.product-price {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.current-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.original-price {
+    font-size: 16px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+/* Pagination Styles */
+.pagination {
+    margin-top: 30px;
+}
+
+.pagination .page-link {
+    padding: 8px 16px;
+    margin: 0 4px;
+    border-radius: 4px;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.pagination .page-link:hover {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .product_top_bar {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .single_product_menu {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .nice-select {
+        width: 100%;
+        max-width: none;
+    }
+}
     </style>
     <!--================Home Banner Area =================-->
     <!-- breadcrumb start-->
@@ -206,41 +380,29 @@
                         <div class="col-lg-12">
                             <div class="product_top_bar d-flex justify-content-between align-items-center">
                                 <div class="single_product_menu">
-                                    <p><span>
-                                            <%= products.length%>
-                                        </span> Prodict Found</p>
+                                    <p><span><%= products.length%></span> Products Found</p>
                                 </div>
                                 <div class="single_product_menu d-flex">
-                                    <h5>short by : </h5>
-                                    <select>
-                                        <option data-display="Select">name</option>
-                                        <option value="1">price</option>
-                                        <option value="2">product</option>
+                                    <h5>Sort by:</h5>
+                                    <select class="nice-select" onchange="window.location.href=this.value">
+                                        <option value="/shop?sort=newest" <%= currentSort === 'newest' ? 'selected' : '' %>>New Arrivals</option>
+                                        <option value="/shop?sort=featured" <%= currentSort === 'featured' ? 'selected' : '' %>>Featured</option>
+                                        <option value="/shop?sort=popularity" <%= currentSort === 'popularity' ? 'selected' : '' %>>Popularity</option>
+                                        <option value="/shop?sort=price-asc" <%= currentSort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+                                        <option value="/shop?sort=price-desc" <%= currentSort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+                                        <option value="/shop?sort=rating" <%= currentSort === 'rating' ? 'selected' : '' %>>Average Rating</option>
+                                        <option value="/shop?sort=name-asc" <%= currentSort === 'name-asc' ? 'selected' : '' %>>Name: A to Z</option>
+                                        <option value="/shop?sort=name-desc" <%= currentSort === 'name-desc' ? 'selected' : '' %>>Name: Z to A</option>
                                     </select>
                                 </div>
                                 <div class="single_product_menu d-flex">
-                                    <h5>show :</h5>
                                     <div class="top_pageniation">
-                                        <ul>
-                                            <li>1</li>
-                                            <li>2</li>
-                                            <li>3</li>
-                                        </ul>
+                                        <% for(let i = 1; i <= totalPages; i++) { %>
+                                            <a href="/shop?page=<%= i %>&sort=<%= currentSort %>" 
+                                               class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+                                        <% } %>
                                     </div>
                                 </div>
-                                <!-- <div class="single_product_menu d-flex">
-                                    <div class="input-group">
-                                        <form action="/search" method="post">
-                                            <input type="text" name="search" class="form-control" placeholder="search"
-                                                aria-describedby="inputGroupPrepend">
-                                            <div class="input-group-prepend">
-                                                <button type="submit" class="input-group-text" id="inputGroupPrepend">
-                                                    <i class="ti-search"></i>
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                     </div>

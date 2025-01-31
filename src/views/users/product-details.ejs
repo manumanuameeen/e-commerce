@@ -1,144 +1,261 @@
 <%- include('../partials/users/header') %>
-    <!-- Header part end-->
-<style>
-    .stock-info {
-  font-size: 14px;
-  margin-top: 10px;
-}
-.low-stock {
-  color: #ff4444;
-}
-.out-of-stock {
-  color: #ff0000;
-  font-weight: bold;
-}
-.in-stock {
-  color: #28a745;
-}
-</style>
-    <!-- breadcrumb start-->
-    <section class="breadcrumb breadcrumb_bg">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="breadcrumb_iner">
-                        <div class="breadcrumb_iner_item">
-                            <h2>product details</h2>
-                            <p>Home <span>-</span> product details</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- breadcrumb start-->
-    <!--================End Home Banner Area =================-->
+<!-- Header part end-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!--================Single Product Area =================-->
-    <div class="product_image_area section_padding">
-        <div class="container">
-            <div class="row s_product_inner justify-content-between">
-                <div class="col-lg-7 col-xl-7">
-                    <div class="product_slider_img">
-                        <div id="vertical">
-                            <div data-thumb="/uploads/re-image/<%=product.productImage[0]%>" class="zoom-container">
-                                <img src="/uploads/re-image/<%=product.productImage[0]%>" alt="product image"
-                                     class="zoom-image" />
-                            </div>
-                            <div data-thumb="/uploads/re-image/<%=product.productImage[1]%>" class="zoom-container">
-                                <img src="/uploads/re-image/<%=product.productImage[1]%>" alt="product image"
-                                     class="zoom-image" />
-                            </div>
-                            <div data-thumb="/uploads/re-image/<%=product.productImage[2]%>" class="zoom-container">
-                                <img src="/uploads/re-image/<%=product.productImage[2]%>" alt="product image"
-                                     class="zoom-image" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 col-xl-4">
-                    <div class="s_product_text">
-                        <h3>
-                            <%=product.productName%>
-                        </h3>
-                        <h2>₹<%= product.salePrice %></h2>
-                        <ul class="list">
-                            <li>
-                                <a class="active" href="#">
-                                    <span>Category</span>
-                                    <%= product.category.name %>
-                                </a>
-                            </li>
-                        </ul>
-    
-                        <!-- Color Selection -->
-                        <div class="color-selection">
-                            <label for="colorSelect">Select Color:</label>
-                            <select id="colorSelect" name="color" required>
-                                <% product.colorVarients.forEach(function(variant) { %>
-                                    <option value="<%= variant.color %>">
-                                        <%= variant.color %> - <%= variant.quantity %> left
-                                    </option>
-                                <% }); %>
-                            </select>
-                        </div>
-    
-                        <div class="stock-info <%= product.quantity < 5 ? 'low-stock' : '' %>">
-                            <% if (product.quantity === 0) { %>
-                                <span class="out-of-stock">Out of Stock</span>
-                            <% } else { %>
-                                <span class="in-stock">In Stock: <%= product.quantity %> left</span>
-                            <% } %>
-                        </div>
-    
-                        <div class="product_highlights mt-4">
-                            <h4>Highlights</h4>
-                            <ul class="list">
-                                <li><i class="fas fa-check"></i> Premium quality denim material</li>
-                                <li><i class="fas fa-check"></i> Comfortable stretch fabric</li>
-                                <li><i class="fas fa-check"></i> Stylish faded design</li>
-                                <li><i class="fas fa-check"></i> Perfect for casual wear</li>
-                            </ul>
-                        </div>
-                        <p>
-                            <%= product.description %>
-                        </p>
-    
-                        <div class="card_area d-flex justify-content-between align-items-center">
-                            <div class="product_count">
-                                <span class="inumber-decrement"> <i class="ti-minus"></i></span>
-                                <input class="input-number" type="text" value="1" min="0" max="10">
-                                <span class="number-increment"> <i class="ti-plus"></i></span>
-                            </div>
-    
-                            <!-- Add to Cart Form -->
-                            <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= product._id %>', '<%= product.productName %>')">
-                                <input type="hidden" name="productId" value="<%= product._id %>">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="add_cart_btn">
-                                    + add to cart <i class="ti-heart"></i>
-                                </button>
-                            </form>
-                            <a href="#" class="like_us"> <i class="ti-heart"></i> </a>
-                        </div>
-    
-                        <div class="product_discount mt-3">
-                            <% if(!totalOffer){ %>
-                                <span class="badge badge-success">OFFER : 0% OFF</span>
-                            <% } else { %>
-                                <span class="badge badge-success">OFFER : <%= totalOffer %>% OFF</span>
-                            <% } %>
-                            <div class="coupon_code mt-2">
-                                <input type="text" class="form-control" placeholder="Enter coupon code">
-                                <button class="btn_3">Apply</button>
-                            </div>
-                        </div>
+<style>
+    .custom-dropdown {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.custom-dropdown:hover,
+.custom-dropdown:focus {
+    border-color: #007bff;
+}
+
+.dropdown-selected {
+    display: block;
+    color: #555;
+}
+
+.dropdown-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-option {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-option:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-option[data-disabled="true"] {
+    color: #aaa;
+    pointer-events: none;
+}
+
+.dropdown-option[data-selected="true"] {
+    background-color: #007bff;
+    color: #fff;
+}
+
+    .stock-info {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .low-stock {
+        color: #ff4444;
+    }
+
+    .out-of-stock {
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    .in-stock {
+        color: #28a745;
+    }
+
+    /* Custom Styles for Color Selection */
+    .color-selection {
+        margin-top: 20px;
+    }
+
+    .color-selection select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .color-selection select:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    /* Modern Add to Cart Button */
+    .add_cart_btn {
+        padding: 12px 20px;
+        font-size: 18px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .add_cart_btn:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Like Button Style */
+    .like_us {
+        font-size: 20px;
+        color: #ff6f61;
+        transition: color 0.3s ease;
+    }
+
+    .like_us:hover {
+        color: #d9534f;
+    }
+</style>
+
+<!-- breadcrumb start-->
+<section class="breadcrumb breadcrumb_bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="breadcrumb_iner">
+                    <div class="breadcrumb_iner_item">
+                        <h2>product details</h2>
+                        <p>Home <span>-</span> product details</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+</section>
+<!-- breadcrumb end-->
+
+<!-- Single Product Area -->
+<div class="product_image_area section_padding">
+    <div class="container">
+        <div class="row s_product_inner justify-content-between">
+            <div class="col-lg-7 col-xl-7">
+                <div class="product_slider_img">
+                    <div id="vertical">
+                        <div data-thumb="/uploads/re-image/<%=product.productImage[0]%>" class="zoom-container">
+                            <img src="/uploads/re-image/<%=product.productImage[0]%>" alt="product image" class="zoom-image" />
+                        </div>
+                        <div data-thumb="/uploads/re-image/<%=product.productImage[1]%>" class="zoom-container">
+                            <img src="/uploads/re-image/<%=product.productImage[1]%>" alt="product image" class="zoom-image" />
+                        </div>
+                        <div data-thumb="/uploads/re-image/<%=product.productImage[2]%>" class="zoom-container">
+                            <img src="/uploads/re-image/<%=product.productImage[2]%>" alt="product image" class="zoom-image" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-xl-4">
+                <div class="s_product_text">
+                    <h3><%=product.productName%></h3>
+                    <h2>₹<%= product.salePrice %></h2>
+                    <ul class="list">
+                        <li>
+                            <a class="active" href="#">
+                                <span>Category</span> <%= product.category.name %>
+                            </a>
+                        </li>
+                    </ul>
+
+                  
+
+
+                    <!-- Product Highlights -->
+                    <div class="product_highlights mt-4">
+                        <h4>Highlights</h4>
+                        <ul class="list">
+                            <li><i class="fas fa-check"></i> Premium quality denim material</li>
+                            <li><i class="fas fa-check"></i> Comfortable stretch fabric</li>
+                            <li><i class="fas fa-check"></i> Stylish faded design</li>
+                            <li><i class="fas fa-check"></i> Perfect for casual wear</li>
+                        </ul>
+                    </div>
+
+                    <p><%= product.description %></p>
+
+                    <div class="color-selection">
+                        <label for="colorSelect">Select Color:</label>
+                        <div class="custom-dropdown" id="colorDropdown">
+                            <span class="dropdown-selected" onclick="toggleDropdown()">-- Choose Color --</span>
+                            <div class="dropdown-options" id="colorOptions">
+                                <% product.colorVarients.forEach(function(variant) { %>
+                                    <div class="dropdown-option" 
+                                         data-value="<%= variant.color %>" 
+                                         data-quantity="<%= variant.quantity %>" 
+                                         onclick="selectColor('<%= variant.color %>')">
+                                        <%= variant.color %> - <%= variant.quantity %> left
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedColor" name="color" value=""> <!-- To store the selected value -->
+                    
+                    
+
+                    <div class="card_area d-flex justify-content-between align-items-center">
+                        <div class="product_count">
+                            <span class="inumber-decrement"> <i class="ti-minus"></i></span>
+                            <input class="input-number" type="text" value="1" min="0" max="10">
+                            <span class="number-increment"> <i class="ti-plus"></i></span>
+                        </div>
+
+                        <!-- Add to Cart Form -->
+                        <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= product._id %>', '<%= product.productName %>')">
+                            <input type="hidden" name="productId" value="<%= product._id %>">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" id="selectedColor" name="color" value="<%= product.colorVarients[0].color %>"> Default color
+                            <button type="submit" class="add_cart_btn">
+                                + Add to Cart <i class="ti-heart"></i>
+                            </button>
+                        </form>
+
+                        <!-- <a href="#" class="like_us"><i class="ti-heart"></i> </a> -->
+                    </div>
+
+                    <!-- Discount Section
+                    <div class="product_discount mt-3">
+                        <% if(!totalOffer){ %>
+                            <span class="badge badge-success">OFFER : 0% OFF</span>
+                        <% } else { %>
+                            <span class="badge badge-success">OFFER : <%= totalOffer %>% OFF</span>
+                        <% } %> -->
+                        <!-- <div class="coupon_code mt-2">
+                            <input type="text" class="form-control" placeholder="Enter coupon code">
+                            <button class="btn_3">Apply</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End of Single Product Area -->
+
+
+
+
+
+
     <!--================End Single Product Area =================-->
 
 
@@ -691,6 +808,103 @@
             </div>
         </div>
     </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+    function toggleDropdown() {
+    const dropdown = document.getElementById('colorOptions');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+function selectColor(color) {
+    const selectedColorInput = document.getElementById('selectedColor');
+    const dropdownSelected = document.querySelector('.dropdown-selected');
+    const dropdownOptions = document.querySelectorAll('.dropdown-option');
+
+    // Update selected color
+    selectedColorInput.value = color;
+    console.log(selectedColorInput.value);
+    
+    dropdownSelected.innerText = color;
+
+    // Close dropdown
+    document.getElementById('colorOptions').style.display = 'none';
+
+    // Update active state for options
+    dropdownOptions.forEach(option => {
+        option.setAttribute('data-selected', option.getAttribute('data-value') === color ? 'true' : 'false');
+    });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function (event) {
+    const dropdown = document.getElementById('colorDropdown');
+    if (!dropdown.contains(event.target)) {
+        document.getElementById('colorOptions').style.display = 'none';
+    }
+});
+
+
+
+function addToCart(event, productId, productName) {
+    event.preventDefault();
+
+    // Get the selected color from the hidden input
+    const selectedColor = document.getElementById('selectedColor').value;
+    const quantity = parseInt(document.querySelector('.input-number').value) || 1;
+
+    if (!selectedColor) {
+        Swal.fire({
+            text: 'Please select a color before adding to cart.',
+            icon: 'warning'
+        });
+        return false;
+    }
+
+    
+    fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: quantity,
+            colorVariant: selectedColor 
+         })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            Swal.fire({
+                text: 'Product added to cart successfully!',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                text: data.message || 'Failed to add product to cart.',
+                icon: 'error'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Add to Cart Error:', error);
+        Swal.fire({
+            text: 'An error occurred while adding the product to cart.',
+            icon: 'error'
+        });
+    });
+
+    return false;
+}
+   
+   
+   </script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -722,6 +936,7 @@
                 });
             });
         });
+        
     </script>
     <script src="js/jquery-1.12.1.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -745,7 +960,7 @@
     <script src="js/theme.js"></script>
     <script src="js/custom.js"></script>
 
-    <script>
+    <!-- <script>
         const availability = "Out of Stock"; // Dynamic status from backend or database
         const availabilityElement = document.getElementById("availability");
         const addToCartButton = document.getElementById("addToCart");
@@ -760,48 +975,7 @@
             addToCartButton.disabled = false;
         }
 
-        function addToCart(event, productId, productName) {
-    event.preventDefault();
-    
-   
-    
-    fetch('/addToCart', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            productId: productId,
-            quantity: 1
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status) {
-            Swal.fire({
-                text: 'Product added to cart',
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        } else {
-            Swal.fire({
-                text: 'Failed to add product',
-                icon: 'error'
-            });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            text: 'Something went wrong',
-            icon: 'error'
-        });
-    });
-    
-    return false;
-}
-    </script>
-
+       </script> -->
 
     </body>
 

@@ -118,7 +118,7 @@
       <div class="timer" id="timer"></div>
     </form>
 
-    <div><button type="button" class="btn btn-secondary" onclick="resendOTP()" id="resendOtp">
+    <div><button type="button" class="btn btn-secondary" onclick="resendOTP()" id="resendOtp" disabled>
         Resend otp</button></div>
     <div class="links">
       <div></div>
@@ -127,14 +127,19 @@
   </div>
 
   <script>
-    const timerDuration = 120;
+    const timerDuration = 120;  // OTP validity time in seconds
     let remainingTime = timerDuration;
-let interval;
+    let interval;
+
     function startTimer() {
       const timerElement = document.getElementById("timer");
       const submitButton = document.getElementById("submitButton");
+      const resendButton = document.getElementById("resendOtp");
 
-       interval = setInterval(() => {
+      // Disable resend OTP button initially
+      resendButton.disabled = true;
+
+      interval = setInterval(() => {
         const minutes = Math.floor(remainingTime / 60);
         const seconds = remainingTime % 60;
         timerElement.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, "0")}`;
@@ -142,7 +147,9 @@ let interval;
         if (remainingTime <= 0) {
           clearInterval(interval);
           timerElement.textContent = "OTP expired. Please request a new OTP.";
-          submitButton.disabled = true;
+
+          // Enable the "Resend OTP" button after expiration
+          resendButton.disabled = false;
         }
 
         remainingTime--;
@@ -199,46 +206,50 @@ let interval;
 
       return false;
     }
+
     function resendOTP() {
-    clearInterval(interval);
-    remainingTime = timerDuration;
+      clearInterval(interval);  // Reset the timer
 
-    document.getElementById("otp").disabled = false;
-    document.getElementById("timer").classList.remove("expired");
-    startTimer();
+      // Reset the remaining time
+      remainingTime = timerDuration;
 
-    fetch("/resend-otp", {
+      // Disable OTP input while waiting for a new OTP
+      document.getElementById("otp").disabled = false;
+      document.getElementById("timer").classList.remove("expired");
+
+      startTimer();  // Restart the timer
+
+      fetch("/resend-otp", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+          "Content-Type": "application/json",
         },
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        if (data.success) {
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
             Swal.fire({
-                icon: "success",
-                title: "OTP Resent Successfully",
-                showConfirmButton: false,
-                timer: 1500,
+              icon: "success",
+              title: "OTP Resent Successfully",
+              showConfirmButton: false,
+              timer: 1500,
             });
-        } else {
+          } else {
             Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: data.message,
+              icon: "error",
+              title: "Error",
+              text: data.message,
             });
-        }
-    })
-    .catch(() => {
-        Swal.fire({
+          }
+        })
+        .catch(() => {
+          Swal.fire({
             icon: "error",
             title: "Error",
             text: "An error occurred. Please try again.",
+          });
         });
-    });
-}
-
+    }
 
   </script>
 </body>

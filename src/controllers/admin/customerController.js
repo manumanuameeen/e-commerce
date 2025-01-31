@@ -22,7 +22,7 @@ const customerinfo = async (req, res) => {
             isAdmin: false,
             $or: [
                 { name: { $regex: ".*" + search + ".*" } },
-                { eamil: { $regex: ".*" + search + ".*" } }
+                { email: { $regex: ".*" + search + ".*" } }
             ]
         })
             .limit(limit * 1)
