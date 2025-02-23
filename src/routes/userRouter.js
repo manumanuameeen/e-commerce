@@ -1,6 +1,6 @@
 import express from "express"
 const router = express.Router()
-
+import User from "../models/userSchema.js"
 import {
         loadHomepage,
         loadpageNotFound,
@@ -12,15 +12,16 @@ import {
         login,
         loadlogout,
         loadShopingPage,
-        filterProduct,
-        filterByPrice,
-        searchProduct,
+       
 
 
 } from "../controllers/users/userController.js"
 
 import {
         productDetails,
+        getWishlist,
+        addWishlist,
+        removeFromWishlist,
 
 } from "../controllers/users/productController.js"
 
@@ -71,6 +72,11 @@ import{
         orderSuccess,
         orderDetails,
         orderCancel,
+        createRazorpayOrder,
+        verifyRazorpayPayment,
+        requestReturn
+        ,cancelOrderItem,
+        handlePaymentDismissal,
 
 
 } from '../controllers/users/checkoutController.js'
@@ -78,6 +84,10 @@ import{
 import passport from "passport";
 
 import { userAuth } from "../middlewares/auth.js";
+import { applyCoupon,removeCoupon } from "../controllers/users/couponController.js"
+
+
+
 
 
 router.get("/pageNotFOund", loadpageNotFound);
@@ -89,16 +99,39 @@ router.post('/verify-otp', verifyOtp)
 router.post('/resend-otp', resendotp);
 //googlw auth
 router.get('/auth/google', passport.authenticate("google", { scope: ["profile", "email"] }));
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
-        req.session.user = req.user._id;
-        req.session.save((err) => {
-                if (err) {
+
+router.get('/auth/google/callback', 
+        passport.authenticate('google', { 
+            failureRedirect: '/signup',
+            failureMessage: true 
+        }), 
+        async (req, res) => {
+            try {
+                const user = await User.findById(req.user._id);
+                
+                if (user.isBlocked) {
+                    req.logout((err) => {
+                        if (err) console.log("Logout error:", err);
+                    });
+                    return res.render('signup', { 
+                        message: "Your account has been blocked by admin" 
+                    });
+                }
+    
+                req.session.user = req.user._id;
+                req.session.save((err) => {
+                    if (err) {
                         console.log("session save error", err);
                         return res.redirect('/signup');
-                }
-                res.redirect("/")
-        })
-});
+                    }
+                    res.redirect("/");
+                });
+            } catch (error) {
+                console.log("Google auth error:", error);
+                res.redirect('/signup');
+            }
+        }
+    );
 
 //login,logout managment
 router.get('/login', loadlogin)
@@ -106,9 +139,7 @@ router.post("/login", login)
 router.get('/logout', loadlogout);
 //shop
 router.get('/shop', loadShopingPage)
-router.get('/filter', filterProduct)
-router.get('/filterPrice', filterByPrice)
-router.post("/search", searchProduct)
+
 
 //product detailes
 router.get("/productDetails", productDetails)
@@ -121,15 +152,18 @@ router.get("/forgot-password", getForgotPassPage);
 router.post("/forgot-email-valid", forgotEmailValid);
 router.post("/verify-passForgot-otp", verifyForgotPassOtp)
 router.get("/reset-password", getResetPassPage);
+
 router.post("/resend-forgot-otp", resendOtp);
 router.post("/reset-password", postNewPassword);
 router.get("/Profile", userAuth, userProfile);
 router.get("/change-email", userAuth, changeEmail)
 router.post("/change-email", userAuth, changeEmailValid);
+
 router.post("/verify-email-otp", userAuth, verifyEmailOtp);
 router.get("/update-email", userAuth, getUpdateEmailPage);
 router.post("/update-email", userAuth, updateEmail)
 router.get("/change-password", userAuth, changePassword);
+
 router.post("/change-password", userAuth, changePasswordValid)
 router.post("/verify-changePassword-otp", userAuth, verifyChangePassOtp);
 
@@ -140,19 +174,14 @@ router.post("/update-name", userAuth, changeName)
 router.get("/addAddress", userAuth, addAddress)
 router.post("/addAddress", userAuth, postAddAddress);
 router.get("/editAddress", userAuth, editAddress);
-router.post("/editAddress", userAuth, postEditAddress);
-router.get("/deleteAddress", userAuth, deleteAddress);
-
-//order 
-
-
-
-
-
+router.patch("/editAddress", userAuth, postEditAddress);
+router.delete("/deleteAddress/:id", userAuth, deleteAddress);
+ 
+ 
 // cart Mangement 
 router.get('/cart', userAuth, loadCart)
 router.post('/addToCart', userAuth, addToCart)
-router.post("/updateQuantity/:cartItemId", userAuth, updateCartQuantity);
+router.patch("/updateQuantity/:cartItemId", userAuth, updateCartQuantity);
 router.delete("/removeFromCart/:cartItemId", userAuth, removeFromCart);
 
 
@@ -160,9 +189,28 @@ router.delete("/removeFromCart/:cartItemId", userAuth, removeFromCart);
 router.get('/checkout',userAuth,getChekout)
 router.post('/checkout-address',userAuth,checkoutAddress)
 router.post('/placeOrder',userAuth,placeOrder)
-router.get('/orderSuccess',userAuth,orderSuccess)
-router.get('/order-details/:orderId',userAuth,orderDetails)
-router.post("/orderCancel/:orderId",userAuth,orderCancel)
+//razorpay
+router.post('/create-razorpay-order', createRazorpayOrder);
+router.post('/verify-razorpay-payment', verifyRazorpayPayment);
+router.post('/handle-payment-dismissal', handlePaymentDismissal);
+//order
+router.get('/orderSuccess', userAuth, orderSuccess);
+router.get('/order-details/:orderId', userAuth, orderDetails);
+router.patch("/orderCancel/:orderId", userAuth, orderCancel);
+router.patch('/requestReturn/:orderId', userAuth, requestReturn);
+router.patch('/cancelOrderItem/:orderId/:itemId', userAuth, cancelOrderItem);
 
+
+//wishlist
+router.get('/wishlist',userAuth,getWishlist)
+router.post('/addWishlist', addWishlist);
+router.delete('/removeFromWishlist',userAuth, removeFromWishlist);
+
+
+//coupone
+
+router.post("/apply-coupon",userAuth,applyCoupon)
+router.delete("/remove-coupon",userAuth,removeCoupon)
+ 
 
 export default router;

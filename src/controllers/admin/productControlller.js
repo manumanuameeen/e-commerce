@@ -9,7 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const getProductAddPage = async (req, res) => {
+ 
     try {
+
+        // if (!req.session.admin) {
+        //     return res.redirect("/admin/login");
+        // }
+
         const category = await Category.find({ isListed: true }).lean();
         res.render("product-add", { cat: category });
     } catch (error) {

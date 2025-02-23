@@ -9,7 +9,7 @@ import env from "dotenv"
 
 import bcrypt from "bcrypt"
 
-
+import Wallet from "../../models/wallet.js";
 
 function generateOtp() {
 
@@ -173,36 +173,35 @@ const postNewPassword = async (req, res) => {
 
 const userProfile = async (req, res) => {
     try {
-
         const userId = req.session.user;
-        const userData = await User.findById(userId)
-        const addressData = await Address.findOne({ userId: userId })
-        const orders = await Order.find({
+        const userData = await User.findById(userId);
+        const addressData = await Address.findOne({ userId: userId });
 
-            _id:{$in:userData.orderHistory}
-        })
-        .sort({createdOn:-1})
-        .populate(
-        "orderIteams",'productName'
-        )
-console.log("orders ",orders)
-        console.log("user address",addressData);
+
+        const orders = await Order.find({ userId: userId })
+            .sort({ createdAt: -1 })
+            .populate('orderIteams.product');
+
+        console.log("orders ", orders);
+        console.log("user address", addressData);
+
+        const wallet = await Wallet.find({ userId: userId }).sort({ createdAt: -1 })
         
+        console.log("the wallet is getting", wallet);
+
         res.render('userProfile', {
             user: userData,
             userAddress: addressData,
-            orders
-        
-        })
+            orders,
+            wallet,
+
+        });
 
     } catch (error) {
-
-        console.error("Error for retrieve profile data", error);
-        return res.redirect("/pageNotFound")
-
+        console.error("Error retrieving profile data", error);
+        return res.redirect("/pageNotFound");
     }
 }
-
 const changeEmail = async (req, res) => {
     try {
 
@@ -400,8 +399,8 @@ const addAddress = async (req, res) => {
         return res.render("add-address", { user: user })
 
     } catch (error) {
-        console.log("error inloading",error);
-        
+        console.log("error inloading", error);
+
         return res.redirect("pageNotFound")
     }
 }
@@ -440,16 +439,16 @@ const editAddress = async (req, res) => {
 
         const addressId = req.query.id;
         console.log(addressId);
-        
+
         const user = req.session.user;
         const currAddress = await Address.findOne({
             "address._id": addressId
         }, {
             "address.$": 1
         });
-        
+
         if (!currAddress) {
-console.log("current addess not exist")
+            console.log("current addess not exist")
             return res.redirect("/pageNotFound")
         }
 
@@ -459,7 +458,7 @@ console.log("current addess not exist")
 
         if (!addressData) {
             console.log("no addressData");
-            
+
             return res.redirect("/pageNotFound")
         }
 
@@ -472,18 +471,19 @@ console.log("current addess not exist")
     }
 }
 
-
 const postEditAddress = async (req, res) => {
     try {
-
         const data = req.body;
         const addressId = req.query.id;
         const user = req.session.user;
+
         const findAddress = await Address.findOne({ "address._id": addressId });
         if (!findAddress) {
-            return res.redirect("/pageNotFound")
+            return res.status(404).json({ error: "Address not found" });
         }
-        await Address.updateOne({ "address._id": addressId },
+
+        await Address.updateOne(
+            { "address._id": addressId },
             {
                 $set: {
                     "address.$": {
@@ -498,65 +498,125 @@ const postEditAddress = async (req, res) => {
                         altPhone: data.altPhone,
                     }
                 }
-
             }
-        )
+        );
 
-        return res.redirect("/profile")
+        return res.status(200).json({ message: "Address updated successfully" });
 
     } catch (error) {
-        console.error("Error in edit address", error);
-        res.redirect("/pageNotFound")
-    }
-}
-const deleteAddress = async (req, res) => {
-    try {
-        const addressId = req.query.id;
-        const findAddress = await Address.findOne({ "address._id": addressId });
-        if (!findAddress) {
-            return res.status(404).send("Address not found");
-        }
-
-        await Address.updateOne({
-            "address._id": addressId
-        }, {
-            $pull: {
-                address: {
-                    _id: addressId
-                }
-            }
-        });
-
-        return res.redirect("/Profile");
-    } catch (error) {
-        console.error("Error in delete address:", error);
-        return res.redirect("/pageNotFound");
+        console.error("Error in edit address:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
-
-const viewOrderDetails = async (req, res) => {
+const deleteAddress = async (req, res) => {
     try {
-
-        const { orderId } = req.params;
-        const order = await Order.findOne({ orderId })
-            .populate({
-                path: 'orderedItems.product',
-                select: 'productName price sizeVariants productImage'
+        const addressId = req.params.id;
+        console.log("address id", addressId);
+        
+        const findAddress = await Address.findOne({ "address._id": addressId });
+        console.log("address ", findAddress);
+        
+        if (!findAddress) {
+            return res.status(404).json({
+                success: false,
+                message: "Address not found"
             });
-
-
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' })
         }
 
-        return res.json(order);
+        await Address.updateOne(
+            { "address._id": addressId },
+            {
+                $pull: {
+                    address: {
+                        _id: addressId
+                    }
+                }
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Address deleted successfully"
+        });
 
     } catch (error) {
-        console.error('Error fetching order details:', error);
-        res.status(500).json({ message: 'Error fetching order details' });
+        console.error("Error in delete address:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error deleting address"
+        });
     }
+};
+
+// Frontend - JavaScript function
+function confirmDelete(addressId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/deleteAddress/${addressId}`, {
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(async (response) => {
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    Swal.fire(
+                        'Deleted!',
+                        'The address has been deleted.',
+                        'success'
+                    ).then(() => {
+                        window.location.href = '/Profile';
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to delete the address');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire(
+                    'Error!',
+                    error.message || 'An error occurred.',
+                    'error'
+                );
+            });
+        }
+    });
 }
+
+
+// const viewOrderDetails = async (req, res) => {
+//     try {
+
+//         const { orderId } = req.params;
+//         const order = await Order.findOne({ orderId })
+//             .populate({
+//                 path: 'orderedItems.product',
+//                 select: 'productName price sizeVariants productImage'
+//             });
+
+
+//         if (!order) {
+//             return res.status(404).json({ message: 'Order not found' })
+//         }
+
+//         return res.json(order);
+
+//     } catch (error) {
+//         console.error('Error fetching order details:', error);
+//         res.status(500).json({ message: 'Error fetching order details' });
+//     }
+// }
 
 
 
@@ -564,7 +624,7 @@ const viewOrderDetails = async (req, res) => {
 const updateName = async (req, res) => {
 
     try {
-
+ 
         res.render("change-name")
 
 
@@ -574,7 +634,7 @@ const updateName = async (req, res) => {
 
 }
 
-
+    
 const changeName = async (req, res) => {
 
 
@@ -625,8 +685,8 @@ export {
     editAddress,
     postEditAddress,
     deleteAddress,
-   
- 
+
+
     updateName,
     changeName,
 

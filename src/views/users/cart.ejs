@@ -335,7 +335,7 @@
       background: #f8f8f8;
       padding: 40px 0;
       margin-bottom: 30px;
-      background-image: url('https://i.pinimg.com/736x/5a/1a/85/5a1a85ad7afacac679bfdda2d06ba7e5.jpg');
+      /* background-image: url('https://i.pinimg.com/736x/5a/1a/85/5a1a85ad7afacac679bfdda2d06ba7e5.jpg'); */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -437,6 +437,7 @@
                                             </td>
                                             <td><button class="remove-item">×</button></td>
                                         </tr>
+                                        <tr data-cart-item-id="<%= items._id %>" data-color="<%= items.colorVariant %>" data-product-id="<%= items.ProductId._id %>"></tr>
                                         <%})%>
                                             <%}else{%>
                                                 <tr>
@@ -465,7 +466,7 @@
                         <h3 style="font-size: 18px; margin-bottom: 20px;">Cart Totals</h3>
                         <div class="summary-item">
                             <span>Subtotal</span>
-                            <span>₹ <%=cart.reduce((acc,items)=>acc+items.totalPrice,0)%></span>
+                            <span>₹ <%=cart.reduce((acc,items)=>acc+items.totalPrice,0).toFixed(2)%></span>
                         </div>
                         <div class="summary-item">
                             <span>Shipping</span>
@@ -473,7 +474,7 @@
                         </div>
                         <div class="summary-total">
                             <span>Total</span>
-                            <span>₹ <%=cart.reduce((acc,items)=>acc+items.totalPrice,0)%></span>
+                            <span>₹ <%=cart.reduce((acc,items)=>acc+items.totalPrice,0).toFixed(2)%></span>
                         </div>
                         <a class="btn btn-checkout" href="/checkout">Proceed to
                                 Checkout</a>
@@ -482,110 +483,345 @@
             </div>
         </div>
     </section>
-    <script>
-        document.querySelectorAll('.quantity-controls button').forEach(button => {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
 
-            button.addEventListener('click', async (e) => {
-                const cartItemId = e.target.closest('tr').getAttribute('data-cart-item-id');
-                const inputField = e.target.closest('tr').querySelector('input[type="text"]');
-                if (!inputField) return;
-                let quantity = parseInt(inputField.value);
+document.querySelectorAll('.quantity-controls button').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        const row = e.target.closest('tr');
+        const cartItemId = row.getAttribute('data-cart-item-id');
+        const inputField = row.querySelector('input[type="text"]');
+        if (!inputField) return;
+        
+        let currentQuantity = parseInt(inputField.value);
+        const isIncrement = e.target.textContent === '+';
+        let newQuantity = isIncrement ? currentQuantity + 1 : currentQuantity - 1;
 
-                if (e.target.textContent === '-') {
-                    quantity--;
-                } else if (e.target.textContent === '+') {
-                    quantity++;
-                }
+        // Basic client-side validation
+        if (newQuantity < 1) {
+            showNotification('Minimum quantity is 1', 'error');
+            return;
+        }
 
-                const response = await fetch(`/updateQuantity/${cartItemId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ quantity })
-                });
+        if (newQuantity > 5) {
+            showNotification('Maximum quantity per item is 5', 'error');
+            return;
+        }
 
-                const data = await response.json();
-                if (!response.ok) {
-                    showNotification(data.message || 'Error updating quantity');
-                    inputField.value = quantity > 5 ? 5 : quantity;
-                    return
-                }
-                if (data.status) {
-                    if (data.removed) {
-                        e.target.closest('tr').remove()
-                        showNotification('Item removed from cart');
-                    } else {
-                        inputField.value = quantity;
-                        const subtotalCell = e.target.closest('tr').querySelector('td:nth-child(5)');
-                        subtotalCell.textContent = `₹ ${data.newTotal}`;
-                    }
-                    updateCartSummary();
-                }
+       
+        const totalCartItems = Array.from(document.querySelectorAll('.quantity-controls input'))
+            .reduce((sum, input) => {
+                if (input === inputField) return sum + newQuantity;
+                return sum + parseInt(input.value);
+            }, 0);
+
+        if (totalCartItems > 10) {
+            showNotification('Maximum 10 items allowed in cart', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/updateQuantity/${cartItemId}`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: newQuantity })
             });
-        });
 
-        document.querySelectorAll('.remove-item').forEach(button => {
-            button.addEventListener('click', async (e) => {
+            const data = await response.json();
 
-                const cartItemId = e.target.closest('tr').getAttribute('data-cart-item-id');
-
-                const response = await fetch(`/removeFromCart/${cartItemId}`, {
-                    method: 'DELETE',
-                });
-
-                const data = await response.json();
-                if (data.status) {
-                    e.target.closest('tr').remove();
-
-                    updateCartSummary()
-                    showNotification('Item removed from cart successfully');
-                }
-            });
-        });
-
-        function updateCartSummary() {
-
-            const subtotals = Array.from(document.querySelectorAll('.cart-table tbody tr'))
-                .map(row => {
-                    const subtotalText = row.querySelector('td:nth-child(5)').textContent;
-                    return parseFloat(subtotalText.replace('₹', '').trim()) || 0;
-                })
-
-            const newTotal = subtotals.reduce((sum, value) => sum + value, 0);
-
-            const summarySubtotal = document.querySelector('.summary-item span:last-child');
-            const summaryTotal = document.querySelector('.summary-total span:last-child');
-
-            if (summarySubtotal && summaryTotal) {
-                summarySubtotal.textContent = `₹ ${newTotal}`;
-                summaryTotal.textContent = `₹ ${newTotal}`;
+            if (!response.ok) {
+                showNotification(data.message, 'error');
+                return;
             }
+
+            if (data.status) {
+                if (data.removed) {
+                    row.remove();
+                    showNotification('Item removed from cart');
+                } else {
+                    inputField.value = newQuantity;
+                    const subtotalCell = row.querySelector('td:nth-child(5)');
+                    subtotalCell.textContent = `₹ ${data.newTotal}`;
+                }
+                updateCartSummary();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error updating cart', 'error');
+            inputField.value = currentQuantity; 
+        }
+    });
+});
+
+document.querySelectorAll('.quantity-controls input').forEach(input => {
+    input.addEventListener('change', async (e) => {
+        const row = e.target.closest('tr');
+        const cartItemId = row.getAttribute('data-cart-item-id');
+        const originalValue = parseInt(e.target.getAttribute('data-original-value'));
+        let newQuantity = parseInt(e.target.value);
+
+        if (isNaN(newQuantity)) {
+            e.target.value = originalValue;
+            showNotification('Please enter a valid number', 'error');
+            return;
         }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const messageElement = document.getElementById('notification-message');
-
-            messageElement.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
-
-            const timeout = setTimeout(() => {
-                hideNotification();
-            }, 3000);
-
-            document.querySelector('.close-notification').onclick = () => {
-                clearTimeout(timeout);
-                hideNotification();
-            };
+        if (newQuantity > 5) {
+            e.target.value = originalValue;
+            showNotification('Maximum quantity per item is 5', 'error');
+            return;
         }
 
-        function hideNotification() {
-            const notification = document.getElementById('notification');
-            notification.style.animation = 'slideOut 0.5s ease-out';
-            setTimeout(() => {
-                notification.style.display = 'none';
-                notification.style.animation = 'slideIn 0.5s ease-out';
-            }, 500);
+        if (newQuantity < 1) {
+            e.target.value = originalValue;
+            showNotification('Minimum quantity is 1', 'error');
+            return;
         }
 
-    </script>
+        try {
+            const response = await fetch(`/updateQuantity/${cartItemId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantity: newQuantity })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                e.target.value = originalValue;
+                showNotification(data.message, 'error');
+                return;
+            }
+
+            if (data.status) {
+                if (data.removed) {
+                    row.remove();
+                    showNotification('Item removed from cart');
+                } else {
+                    const subtotalCell = row.querySelector('td:nth-child(5)');
+                    subtotalCell.textContent = `₹ ${data.newTotal}`;
+                    e.target.setAttribute('data-original-value', newQuantity);
+                }
+                updateCartSummary();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            e.target.value = originalValue;
+            showNotification('Error updating cart', 'error');
+        }
+    });
+
+    input.addEventListener('focus', (e) => {
+        e.target.setAttribute('data-original-value', e.target.value);
+    });
+});
+
+const updateCartQuantity = async (req, res) => {
+    try {
+        const { cartItemId } = req.params;
+        const { quantity } = req.body;
+        
+        const cart = await Cart.findOne({ userId: req.session.user })
+            .populate('items.ProductId');  
+            
+        if (!cart) {
+            return res.status(404).json({
+                status: false,
+                message: 'Cart not found'
+            });
+        }
+
+        const cartItem = cart.items.find(item => item._id.toString() === cartItemId);
+        if (!cartItem) {
+            return res.status(404).json({
+                status: false,
+                message: 'Item not found in cart'
+            });
+        }
+
+        if (quantity <= 0) {
+            cart.items = cart.items.filter(item => item._id.toString() !== cartItemId);
+            await cart.save();
+            return res.json({
+                status: true,
+                removed: true,
+                message: 'Item removed from cart'
+            });
+        }
+
+        const product = await Product.findById(cartItem.ProductId);
+        if (!product) {
+            return res.status(404).json({
+                status: false,
+                message: 'Product not found'
+            });
+        }
+
+        const colorVariant = product.colorVariants.find(
+            variant => variant.color === cartItem.colorVariant
+        );
+
+        if (!colorVariant) {
+            return res.status(404).json({
+                status: false,
+                message: 'Selected color variant not found'
+            });
+        }
+
+        if (quantity > colorVariant.quantity) {
+            return res.status(400).json({
+                status: false,
+                message: `Only ${colorVariant.quantity} items are available in ${cartItem.colorVariant} color`
+            });
+        }
+
+        if (quantity > 5) {
+            return res.status(400).json({
+                status: false,
+                message: 'Maximum quantity allowed is 5 items'
+            });
+        }
+
+        const totalCartItems = cart.items.reduce((sum, item) => {
+            if (item._id.toString() === cartItemId) {
+                return sum + quantity;
+            }
+            return sum + item.quantity;
+        }, 0);
+
+        if (totalCartItems > 10) {
+            return res.status(400).json({
+                status: false,
+                message: 'Maximum 10 items allowed in cart'
+            });
+        }
+
+       
+        cartItem.quantity = quantity;
+        cartItem.totalPrice = product.salePrice * quantity;
+        await cart.save();
+
+        return res.json({
+            status: true,
+            newTotal: cartItem.totalPrice.toFixed(2)
+        });
+
+    } catch (error) {
+        console.error('Update cart error:', error);
+        return res.status(500).json({
+            status: false,
+            message: 'Error updating cart'
+        });
+    }
+};
+
+
+function updateCartSummary() {
+    const subtotals = Array.from(document.querySelectorAll('.cart-table tbody tr'))
+        .map(row => {
+            const subtotalText = row.querySelector('td:nth-child(5)')?.textContent;
+            return subtotalText ? parseFloat(subtotalText.replace('₹', '').trim()) : 0;
+        })
+        .filter(value => !isNaN(value));
+
+    const newTotal = subtotals.reduce((sum, value) => sum + value, 0);
+
+    const summarySubtotal = document.querySelector('.summary-item span:last-child');
+    const summaryTotal = document.querySelector('.summary-total span:last-child');
+
+    if (summarySubtotal && summaryTotal) {
+        const formattedTotal = newTotal.toFixed(2);
+        summarySubtotal.textContent = `₹ ${formattedTotal}`;
+        summaryTotal.textContent = `₹ ${formattedTotal}`;
+    }
+
+    // Update cart count if it exists
+    const cartCount = document.querySelector('.cart-count');
+    if (cartCount) {
+        const totalItems = Array.from(document.querySelectorAll('.quantity-controls input'))
+            .reduce((sum, input) => sum + parseInt(input.value), 0);
+        cartCount.textContent = totalItems;
+    }
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    const messageElement = document.getElementById('notification-message');
+
+    messageElement.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.style.display = 'block';
+
+    // Auto-hide after 3 seconds
+    const timeout = setTimeout(() => {
+        hideNotification();
+    }, 3000);
+
+    // Allow manual close
+    document.querySelector('.close-notification').onclick = () => {
+        clearTimeout(timeout);
+        hideNotification();
+    };
+}
+
+function hideNotification() {
+    const notification = document.getElementById('notification');
+    notification.style.animation = 'slideOut 0.5s ease-out';
+    setTimeout(() => {
+        notification.style.display = 'none';
+        notification.style.animation = 'slideIn 0.5s ease-out';
+    }, 500);
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartSummary();
+    
+    document.querySelectorAll('.quantity-controls input').forEach(input => {
+        input.setAttribute('data-original-value', input.value);
+    });
+});
+
+
+
+document.querySelectorAll('.remove-item').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        const row = e.target.closest('tr');
+        const cartItemId = row.getAttribute('data-cart-item-id');
+        
+        try {
+            const response = await fetch(`/removeFromCart/${cartItemId}`, {
+                method: 'DELETE'
+            }); 
+            
+            const data = await response.json();
+            
+            if (data.status) {
+                row.nextElementSibling?.remove();
+                row.remove();
+                showNotification('Item removed from cart successfully');
+                updateCartSummary();
+                
+                if (document.querySelectorAll('.cart-table tbody tr').length === 0) {
+                    const emptyRow = `
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <p class="lead mb-4">No items found in Cart</p>
+                            </td>
+                        </tr>`;
+                    document.querySelector('.cart-table tbody').innerHTML = emptyRow;
+                }
+            } else {
+                showNotification(data.message || 'Failed to remove item', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+            showNotification('Error removing item from cart', 'error');
+        }
+    });
+});
+
+
+  </script>

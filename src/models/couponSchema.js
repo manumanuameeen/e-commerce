@@ -28,14 +28,14 @@ const couponSchema = new mongoose.Schema({
     },
     isList:{
         type:Boolean,
-        defualt:true,
+        default:true,
     },
-    userId:{
+    userBy:[{
         type:Schema.Types.ObjectId,
         ref:"User"
-    }
+    }]
 },{timestamps:true})
 
 const Coupon = mongoose.model("Coupon",couponSchema)
 
-export default Coupon;m
+export default Coupon;

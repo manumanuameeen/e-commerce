@@ -1,5 +1,6 @@
 <%- include('../partials/users/header') %>
 <!-- Header part end-->
+<!-- Latest SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -125,6 +126,101 @@
     .like_us:hover {
         color: #d9534f;
     }
+    .current-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #da4141;
+}
+
+.original-price {
+    font-size: 16px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+
+
+
+
+.login_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #898686, #898686);
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.login_btn:hover {
+    background: linear-gradient(135deg, #ffffff, #ffffff);
+}
+
+.login_btn:active {
+    transform: scale(0.95);
+}
+
+
+
+.login_btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: all 0.5s;
+}
+
+.login_btn:hover::before {
+    left: 100%;
+}
+
+/* Icon Animation */
+.login_btn i {
+    transition: transform 0.3s ease-in-out;
+}
+
+.login_btn:hover i {
+    transform: rotate(360deg);
+}
+
+
+.product_count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-number {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 4px;
+}
+/* 
+.inumber-decrement,
+.number-increment {
+    cursor: pointer;
+    padding: 5px 10px;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.inumber-decrement:hover,
+.number-increment:hover {
+    background: #eee;
+} */
 </style>
 
 <!-- breadcrumb start-->
@@ -167,7 +263,12 @@
             <div class="col-lg-5 col-xl-4">
                 <div class="s_product_text">
                     <h3><%=product.productName%></h3>
-                    <h2>₹<%= product.salePrice %></h2>
+                    <div class="product-price">
+                        <span class="current-price">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
+                        <% if (product.regularPrice > product.salePrice) { %>
+                            <span class="original-price">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
+                        <% } %>
+                    </div>
                     <ul class="list">
                         <li>
                             <a class="active" href="#">
@@ -213,53 +314,43 @@
                     
 
                     <div class="card_area d-flex justify-content-between align-items-center">
-                        <div class="product_count">
-                            <span class="inumber-decrement"> <i class="ti-minus"></i></span>
-                            <input class="input-number" type="text" value="1" min="0" max="10">
-                            <span class="number-increment"> <i class="ti-plus"></i></span>
+                        <% if (locals.user) { %>
+                            <!-- Show quantity controls and Add to Cart for logged in users -->
+                            <div class="product_count">
+                                <span class="inumber-decrement"> <i class="ti-minus"></i></span>
+                                <input class="input-number" type="text" value="1" min="0" max="10">
+                                <span class="number-increment"> <i class="ti-plus"></i></span>
+                            </div>
+    
+                            <!-- Add to Cart Form -->
+                            <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= product._id %>', '<%= product.productName %>')">
+                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                <input type="hidden" name="quantity" value="1">
+                                <!-- <input type="hidden" id="selectedColor" name="color" value="<%= product.colorVarients[0].color %>"> Default colory -->
+                                <button type="submit" class="add_cart_btn">
+                                    + Add to Cart <i class="ti-heart"></i>
+                                </button>
+                            </form>
+    
+                            <!-- <a href="#" class="like_us"><i class="ti-heart"></i> </a> -->
                         </div>
-
-                        <!-- Add to Cart Form -->
-                        <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= product._id %>', '<%= product.productName %>')">
-                            <input type="hidden" name="productId" value="<%= product._id %>">
-                            <input type="hidden" name="quantity" value="1">
-                            <input type="hidden" id="selectedColor" name="color" value="<%= product.colorVarients[0].color %>"> Default color
-                            <button type="submit" class="add_cart_btn">
-                                + Add to Cart <i class="ti-heart"></i>
+                        <% } else { %>
+                            <button class="login_btn" onclick="showLoginPrompt()">
+                                <span>Login to Add Cart</span> <i class="ti-user"></i>
                             </button>
-                        </form>
-
-                        <!-- <a href="#" class="like_us"><i class="ti-heart"></i> </a> -->
+                            
+                        <% } %>
                     </div>
 
-                    <!-- Discount Section
-                    <div class="product_discount mt-3">
-                        <% if(!totalOffer){ %>
-                            <span class="badge badge-success">OFFER : 0% OFF</span>
-                        <% } else { %>
-                            <span class="badge badge-success">OFFER : <%= totalOffer %>% OFF</span>
-                        <% } %> -->
-                        <!-- <div class="coupon_code mt-2">
-                            <input type="text" class="form-control" placeholder="Enter coupon code">
-                            <button class="btn_3">Apply</button>
-                        </div> -->
+                    <!--  Discount Section -->
+                    
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- End of Single Product Area -->
 
-
-
-
-
-
-    <!--================End Single Product Area =================-->
-
-
-    <!-- product_list part start-->
     <section class="product_list best_seller">
         <div class="container">
             <div class="row justify-content-center">
@@ -808,6 +899,8 @@
             </div>
         </div>
     </footer>
+<!-- Latest SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -823,22 +916,22 @@ function selectColor(color) {
     const dropdownSelected = document.querySelector('.dropdown-selected');
     const dropdownOptions = document.querySelectorAll('.dropdown-option');
 
-    // Update selected color
     selectedColorInput.value = color;
     console.log(selectedColorInput.value);
     
     dropdownSelected.innerText = color;
+console.log(dropdownSelected.innerText);
 
-    // Close dropdown
+  
     document.getElementById('colorOptions').style.display = 'none';
 
-    // Update active state for options
+  
     dropdownOptions.forEach(option => {
         option.setAttribute('data-selected', option.getAttribute('data-value') === color ? 'true' : 'false');
     });
 }
 
-// Close dropdown when clicking outside
+
 document.addEventListener('click', function (event) {
     const dropdown = document.getElementById('colorDropdown');
     if (!dropdown.contains(event.target)) {
@@ -850,8 +943,7 @@ document.addEventListener('click', function (event) {
 
 function addToCart(event, productId, productName) {
     event.preventDefault();
-
-    // Get the selected color from the hidden input
+    
     const selectedColor = document.getElementById('selectedColor').value;
     const quantity = parseInt(document.querySelector('.input-number').value) || 1;
 
@@ -863,7 +955,6 @@ function addToCart(event, productId, productName) {
         return false;
     }
 
-    
     fetch('/addToCart', {
         method: 'POST',
         headers: {
@@ -872,14 +963,21 @@ function addToCart(event, productId, productName) {
         body: JSON.stringify({
             productId: productId,
             quantity: quantity,
-            colorVariant: selectedColor 
-         })
+            colorVariant: selectedColor
+        })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log("Server Response:", data);
+        
         if (data.status) {
             Swal.fire({
-                text: 'Product added to cart successfully!',
+                text: data.message || 'Product added to cart successfully!',
                 icon: 'success',
                 showConfirmButton: false,
                 timer: 1500
@@ -894,15 +992,13 @@ function addToCart(event, productId, productName) {
     .catch(error => {
         console.error('Add to Cart Error:', error);
         Swal.fire({
-            text: 'An error occurred while adding the product to cart.',
+            text: error.message || 'An error occurred while adding the product to cart.',
             icon: 'error'
         });
     });
 
     return false;
 }
-   
-   
    </script>
     
     <script>
@@ -936,7 +1032,12 @@ function addToCart(event, productId, productName) {
                 });
             });
         });
-        
+       
+
+function showLoginPrompt(){
+    window.location.href ="/login"
+}
+
     </script>
     <script src="js/jquery-1.12.1.min.js"></script>
     <script src="js/popper.min.js"></script>
@@ -960,22 +1061,7 @@ function addToCart(event, productId, productName) {
     <script src="js/theme.js"></script>
     <script src="js/custom.js"></script>
 
-    <!-- <script>
-        const availability = "Out of Stock"; // Dynamic status from backend or database
-        const availabilityElement = document.getElementById("availability");
-        const addToCartButton = document.getElementById("addToCart");
-
-        if (availability === "Out of Stock" || availability === "Sold Out" || availability === "Unavailable") {
-            availabilityElement.textContent = availability;
-            addToCartButton.disabled = true;
-            addToCartButton.textContent = "Not Available";
-            addToCartButton.style.backgroundColor = "gray";
-        } else {
-            availabilityElement.textContent = "In Stock";
-            addToCartButton.disabled = false;
-        }
-
-       </script> -->
+    
 
     </body>
 

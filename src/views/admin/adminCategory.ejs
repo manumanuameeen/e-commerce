@@ -44,26 +44,32 @@
                         <i class="fas fa-box"></i>
                         <span>Products</span>
                     </a>
-                <!-- </li>
+                </li>
                 <li class="menu-item">
-                    <a href="/admin/coupons" class="menu-link">
+                    <a href="/admin/coupon" class="menu-link">
                         <i class="fas fa-gift"></i>
                         <span>Coupons</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/admin/banners" class="menu-link">
+                    <a href="/admin/offer" class="menu-link">
                         <i class="fas fa-image"></i>
-                        <span>Banners</span>
+                        <span>Add-Offer</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="/admin/orders" class="menu-link">
+                    <a href="/admin/offer-list" class="menu-link">
+                        <i class="fas fa-image"></i>
+                        <span>Offer</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/admin/order" class="menu-link">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Orders</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a href="/admin/reports" class="menu-link">
                         <i class="fas fa-chart-line"></i>
                         <span>Reports</span>
@@ -98,7 +104,7 @@
                 <h2 class="content-title">Category</h2>
             </div>
 
-            <!-- Search Bar -->
+            <!-- Search Bar
             <div class="search-container">
                 <form action="/admin/category/" method="get">
                     <div class="search-input-group">
@@ -106,7 +112,7 @@
                         <button class="btn btn-primary" type="submit">Search</button>
                     </div>
                 </form>
-            </div>
+            </div> -->
 
             <div class="card">
                 <div class="card-body">
@@ -141,8 +147,8 @@
                                             <th class="text-center">#</th>
                                             <th>Name</th>
                                             <th>Description</th>
-                                            <th>Offer Price</th>
-                                            <th>Offer</th>
+                                            <!-- <th>Offer%</th> -->
+                                            <!-- <th>Offer</th>/ -->
                                             <th>Status</th>
                                             <th>Actions</th>
 
@@ -160,30 +166,14 @@
                                                 <td class="text-start">
                                                     <%=category.description%>
                                                 </td>
-                                                <td>
-                                                    <% if (category.categoryOffer) { %>
-                                                        <%= category.categoryOffer %>
+                                                <!-- <td>
+                                                    <% if (category.offers) {%>
+                                                        <%= category.offers.discount %>
                                                             <% }else{%>
                                                                 0%
                                                                 <%} %>
-                                                </td>
-                                                <td class="text-start">
+                                                </td> -->
 
-
-                                                    <% if (category.categoryOffer===0) { %>
-                                                        <button class="btn btn-info text-white"
-                                                            onclick="addOffer('<%=category._id%>')">Add Offer</button>
-                                                        <% } else { %>
-
-                                                            <button class="btn btn-info text-white"
-                                                                onclick="removeOffer('<%=category._id%>')">Remove
-                                                                Offer</button>
-
-                                                            <% } %>
-
-
-
-                                                </td>
                                                 <td class="text-start">
                                                     <% if (category.isListed) { %>
                                                         <span class="badge alert-success">Listed</span>
@@ -275,7 +265,7 @@
                     .then((response) => {
                         return response.json().then(data => {
                             if (!response.ok) {
-                                throw new Error(data.error || "Something went wrong");
+                                throw new Error("Category already exists");
                             }
                             return data;
                         });

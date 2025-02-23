@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const { Schema } = mongoose
+const { Schema } = mongoose;
 
 const CategorySchema = new Schema({
     name: {
@@ -17,14 +17,13 @@ const CategorySchema = new Schema({
     },
     categoryOffer: {
         type: Number,
-        defualt: 0,
+        default: 0, 
     },
-    // createdAt: {
-    //     type: Date,
-    //     defualt: Date.now
-    // }
-},{timestamps:true})
+    offers: [{
+        type: Schema.Types.ObjectId,
+        ref: "Offer", 
+    }],
+}, { timestamps: true });
 
-const Category = mongoose.model("Category", CategorySchema)
-
+const Category = mongoose.model("Category", CategorySchema);
 export default Category;

@@ -5,55 +5,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Order Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-4xl mx-auto bg-white p-6 shadow-md rounded-lg">
-        <h1 class="text-2xl font-semibold mb-4">Order Details</h1>
-        
-        <div class="border p-4 rounded-lg mb-4">
-            <p><strong>Order ID:</strong> <%= order._id %> </p>
-            <p><strong>Status:</strong> <span class="text-red-500"><%= order.status %></span></p>
-            <p><strong>Placed On:</strong> <%= new Date(order.createdAt).toDateString() %> </p>
-            <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
-        </div>
-        
-        <h2 class="text-xl font-semibold mb-3">Items</h2>
-        <div class="border p-4 rounded-lg">
-            <table class="w-full border-collapse border border-gray-300">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border border-gray-300 px-4 py-2">Image</th>
-                        <th class="border border-gray-300 px-4 py-2">Name</th>
-                        <th class="border border-gray-300 px-4 py-2">Sale Price</th>
-                        <th class="border border-gray-300 px-4 py-2">Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% order.orderIteams.forEach(item => { %>
-                        <tr>
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                <div class="w-16 h-16 flex-shrink-0">
-                                    <img src="/uploads/re-image/<%=item.product.productImage[0]%>"
-                                        alt="<%= item.product.productName %>" class="w-full h-full object-cover rounded-lg">
-                                </div>
-                            </td>
-                            <td class="border border-gray-300 px-4 py-2"><%= item.product.productName %></td>
-                            <td class="border border-gray-300 px-4 py-2">$<%= item.price %></td>
-                            <td class="border border-gray-300 px-4 py-2"><%= item.quantity %></td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-        </div>
-        
-        <h2 class="text-xl font-semibold mt-6">Summary</h2>
-        <div class="border p-4 rounded-lg">
-            <p><strong>Subtotal:</strong> $<%= order.totalPrice %></p>
-            <p><strong>Discount:</strong> -$<%= order.discount %></p>
-            <p class="font-bold text-lg"><strong>Total:</strong> $<%= order.finalAmount %></p>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Navigation Button -->
+        <div class="mb-6">
+            <button onclick="window.location.href='/admin/order'" 
+                class="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Orders
+            </button>
         </div>
 
-        <button class="mt-6 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-900" onclick="window.location.href='/admin/order'">Go to orders</button>
+        <!-- Header Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                <span class="border-b-2 border-amber-500 pb-2">Order Details</span>
+            </h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-hashtag text-amber-600 w-8"></i>
+                        <span class="text-gray-600">Order ID:</span>
+                        <span class="ml-2 font-semibold text-gray-900"><%order._id%></span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-amber-600 w-8"></i>
+                        <span class="text-gray-600">Placed On:</span>
+                        <span class="ml-2 font-semibold text-gray-900"><%= new Date(order.createdAt).toDateString() %></span>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-circle-check text-amber-600 w-8"></i>
+                        <span class="text-gray-600">Status:</span>
+                        <span class="ml-2 px-4 py-1 rounded-full text-sm font-semibold 
+                            <%= order.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' :
+                               order.status === 'Pending' ? 'bg-amber-100 text-amber-800' :
+                               'bg-red-100 text-red-800' %>">
+                            <%= order.status %>
+                        </span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-credit-card text-amber-600 w-8"></i>
+                        <span class="text-gray-600">Payment Method:</span>
+                        <span class="ml-2 font-semibold text-gray-900"><%= order.paymentMethod %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-4">Order Items</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Product</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Details</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">Price</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">Color</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">Quantity</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900">status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% order.orderIteams.forEach(item => { %>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="w-32 h-32 rounded-lg overflow-hidden shadow-md">
+                                        <img src="/uploads/re-image/<%=item.productImage[0]%>"
+                                            alt="<%= item.product.productName %>"
+                                            class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-200">
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <h3 class="text-lg font-semibold text-gray-900"><%= item.product.productName %></h3>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-xl font-bold text-amber-600">₹<%= item.price %></span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-lg font-semibold text-gray-900"><%= item.color %></span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="px-4 py-2 bg-gray-200 text-gray-800 rounded-full font-medium">
+                                        <%= item.quantity %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-circle-check text-amber-600 w-8"></i>
+                                        <!-- <span class="text-gray-600">Status:</span> -->
+                                        <span class="ml-2 px-4 py-1 rounded-full text-sm font-semibold 
+                                            <%= item.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' :
+                                               item.status === 'Pending' ? 'bg-amber-100 text-amber-800' :
+                                               'bg-red-100 text-red-800' %>">
+                                            <%= item.status %>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Order Summary</h2>
+                <div class="w-16 border-t-2 border-amber-500"></div>
+            </div>
+            <div class="space-y-4 max-w-md ml-auto bg-gray-50 p-6 rounded-lg">
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span class="font-semibold text-gray-900">₹<%= order.totalPrice %></span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-gray-600">Discount</span>
+                    <span class="font-semibold text-emerald-600">-₹<%= order.discount %></span>
+                </div>
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-gray-900">Total</span>
+                        <span class="text-xl font-bold text-amber-600">₹<%= order.finalAmount %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

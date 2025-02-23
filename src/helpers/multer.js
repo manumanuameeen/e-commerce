@@ -8,7 +8,6 @@ const __dirname = path.dirname(__filename);
 
 const uploadDir = path.join(__dirname, '../public/uploads/re-image');
 
-// Create upload directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }

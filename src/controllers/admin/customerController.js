@@ -5,6 +5,10 @@ import User from "../../models/userSchema.js";
 
 const customerinfo = async (req, res) => {
 
+    if (!req.session.admin) {
+        return res.redirect("/admin/login");
+    }
+
     try {
 
 

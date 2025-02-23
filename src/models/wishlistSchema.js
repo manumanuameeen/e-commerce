@@ -14,6 +14,7 @@ const wishlistSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Product",
         },
+        
         addedOn:{
             type:Date,
             default:Date.now,

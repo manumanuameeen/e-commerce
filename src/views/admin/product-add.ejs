@@ -102,14 +102,14 @@
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="regularPrice" class="form-label">Regular price</label>
-                                    <input name="regularPrice" placeholder="$" type="text" class="form-control" id="regularPrice" />
+                                    <input name="regularPrice" placeholder="₹" type="text" class="form-control" id="regularPrice" />
                                     <div id="regularPrice-error" class="error-message"></div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="mb-4">
                                     <label for="salePrice" class="form-label">Sale price</label>
-                                    <input name="salePrice" placeholder="$" type="text" class="form-control" id="salePrice" />
+                                    <input name="salePrice" placeholder="₹" type="text" class="form-control" id="salePrice" />
                                     <div id="salePrice-error" class="error-message"></div>
                                 </div>
                             </div>
@@ -439,7 +439,7 @@ function validateForm() {
         }
     }
 
-    // Compare regular price and sale price
+  
     const regularPrice = parseFloat(document.getElementById('regularPrice').value);
     const salePrice = parseFloat(document.getElementById('salePrice').value);
     if (!isNaN(regularPrice) && !isNaN(salePrice) && regularPrice <= salePrice) {

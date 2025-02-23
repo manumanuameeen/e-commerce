@@ -15,7 +15,7 @@ import {
 import {
     loadlogin,
     login,
-    loaddashboard,
+    loadDashboard,
     loadPageerror,
     logout,
 
@@ -64,14 +64,37 @@ import {
     loadOrder,
     updateOrderStatus,
     orderDetails,
-
+    handleReturnRequest
 } from "../controllers/admin/orderManagement.js"
+
+
+
+
+import { 
+
+    loadCoupon,
+    createCoupon,
+    deleteCoupon,
+    editCoupon,
+    
+ } from "../controllers/admin/couponController.js";
+
+import{
+    LoadOffer,
+    addOffer,
+    offerList,
+    removeOffer,
+    editOffer,
+
+} from "../controllers/admin/offerController.js"
+
+
 
 router.get('/pageerror', loadPageerror)
 //Login  management
 router.get('/login', loadlogin)
 router.post('/login', login)
-router.get('/', adminAuth, loaddashboard)
+router.get('/', adminAuth, loadDashboard)
 router.get("/logout", logout)
 //coustomer Mangemanet
 router.get("/users", adminAuth, customerinfo);
@@ -86,8 +109,7 @@ router.get('/listCategory', adminAuth, getListCategory)
 router.get('/unListCategory', adminAuth, getunListCategory)
 router.get("/edit-Category", adminAuth, getEditcategory)
 router.post("/edit-Category/:id", adminAuth, editCategory);
-
-
+ 
 //products management
 router.get("/addProducts", adminAuth, getProductAddPage)
 router.post("/addProducts", uploads.any(), adminAuth, addProducts)
@@ -104,5 +126,18 @@ router.post("/deleteImage",adminAuth,deleteSingleImage)
 router.get("/order", adminAuth, loadOrder);
 router.post("/order/:orderId", adminAuth, updateOrderStatus);
 router.get('/orderDetails/:id',adminAuth,orderDetails)
+router.post('/return-request/:orderId', adminAuth, handleReturnRequest);
+ 
+//coupon mangement 
+router.get('/coupon',adminAuth,loadCoupon)
+router.post('/coupon',adminAuth,createCoupon)
+router.delete('/coupon/:couponId',adminAuth,deleteCoupon)
+router.put('/coupon/:couponId', editCoupon); 
 
+//offer management
+router.get("/offer",adminAuth,LoadOffer)
+router.post("/offer",adminAuth,addOffer)
+router.get("/offer-list",adminAuth,offerList)
+router.delete("/remove-offer/:Id",adminAuth,removeOffer)
+router.put('/update-offer/:id',editOffer);
 export default router;  

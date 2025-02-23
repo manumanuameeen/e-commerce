@@ -1,12 +1,913 @@
 <%- include('../partials/admin/header') %>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h2>Welcome to Dashboard</h2>
-        <p>Manage your content here.</p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .table-wrapper {
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .has-scroll::after {
+            content: '→';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+        }
+
+        .session-warning {
+            z-index: 1060;
+        }
+
+        .product-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .product-item:hover {
+            background: #e9ecef;
+        }
+
+        .product-thumb {
+            border-radius: 4px;
+        }
+
+        .product-meta {
+            font-size: 0.875rem;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-none"
+        style="opacity: 0.8; z-index: 1050;">
+        <div class="position-absolute top-50 start-50 translate-middle text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading data...</p>
+        </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
+
+
+    <div class="main-content container py-4">
+        <br><br>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Admin Dashboard</h2>
+            <div class="export-buttons">
+                <button class="btn btn-outline-primary me-2" onclick="handleExport('pdf')" id="pdfButton">
+                    <i class="bi bi-file-pdf"></i> Export PDF
+                </button>
+                <button class="btn btn-outline-success" onclick="handleExport('excel')" id="excelButton">
+                    <i class="bi bi-file-excel"></i> Export Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Report Filter Form -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form id="reportForm" action="/admin/" method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="reportType" class="form-label">Report Type</label>
+                        <select name="reportType" id="reportType" class="form-select"
+                            onchange="handleReportTypeChange()">
+                            <option value="daily" <%=reportType==='daily' ? 'selected' : '' %>>Daily</option>
+                            <option value="weekly" <%=reportType==='weekly' ? 'selected' : '' %>>Weekly</option>
+                            <option value="monthly" <%=reportType==='monthly' ? 'selected' : '' %>>Monthly</option>
+                            <option value="yearly" <%=reportType==='yearly' ? 'selected' : '' %>>Yearly</option>
+                            <option value="custom" <%=reportType==='custom' ? 'selected' : '' %>>Custom Range</option>
+                        </select>
+                    </div>
+
+                    <div id="customDateRange" class="col-md-8 row" <%=reportType !=='custom' ? 'style="display: none;"'
+                        : '' %>>
+                        <div class="col-md-6">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" name="startDate" id="startDate" class="form-control"
+                                value="<%= startDate || '' %>" max="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" name="endDate" id="endDate" class="form-control"
+                                value="<%= endDate || '' %>" max="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary" id="generateReport">
+                            <span class="spinner-border spinner-border-sm d-none" role="status"
+                                aria-hidden="true"></span>
+                            Generate Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+        <!-- Sales Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted mb-3">Total Sales (Delivered)</h5>
+                        <h3 class="mb-2" id="totalSales">₹<%= (report.totalSales || 0).toFixed(2) %>
+                        </h3>
+                        <p class="card-text text-success mb-0">
+                            <i class="bi bi-graph-up"></i>
+                            <span id="deliveredOrders">
+                                <%= report.deliveredOrders || 0 %>
+                            </span> delivered orders
+                        </p>
+                        <p class="card-text text-muted small">
+                            <span id="totalOrders">Total Orders: <%= report.totalOrders || 0 %></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted mb-3">Total Discounts (Delivered)</h5>
+                        <h3 class="mb-2 text-danger" id="totalDiscounts">-₹<%= (report.totalDiscounts || 0).toFixed(2)
+                                %>
+                        </h3>
+                        <p class="card-text mb-0">
+                            <i class="bi bi-tag"></i>
+                            <span id="discountedOrders">
+                                <%= report.discountedOrders || 0 %>
+                            </span> orders with discounts
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted mb-3">Net Sales (Delivered)</h5>
+                        <h3 class="mb-2 text-success" id="netSales">₹<%= (report.netSales || 0).toFixed(2) %>
+                        </h3>
+                        <p class="card-text mb-0">
+                            <i class="bi bi-currency-dollar"></i>
+                            After discounts & coupons
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Order Status Summary -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Status Summary</h5>
+                        <div class="row">
+                            <% const statuses=["Pending", "Processing" , "Shipped" , "Delivered" , "Cancelled"
+                                , "Return Request" , "Returned" , "Rejected" ] %>
+                                <% statuses.forEach(status=> { %>
+                                    <div class="col-md-3 col-sm-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-subtitle mb-2 text-muted">
+                                                    <%= status %>
+                                                </h6>
+                                                <h4 class="mb-0">
+                                                    <%= report.statusCounts[status] || 0 %>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Detailed Sales Report Table -->
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Detailed Sales Report</h5>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshTable()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order ID</th>
+                                <th>Products</th>
+                                <th class="text-end">Gross Amount</th>
+                                <th class="text-end">Discount</th>
+                                <th class="text-end">Net Amount</th>
+                                <th>Coupon Used</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Sales & Orders Trend</h5>
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Payment Methods</h5>
+                <canvas id="paymentMethodsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Top 10 Products</h5>
+                <canvas id="topProductsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Top Categories</h5>
+                <canvas id="topCategoriesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Top Brands Performance</h5>
+                <canvas id="topBrandsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+                        <tbody>
+                            <% if (report.orders && report.orders.length> 0) { %>
+                                <% report.orders.forEach(order=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= new Date(order.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <%= order._id || 'N/A' %>
+                                        </td>
+                                        <td>
+                                            <div class="product-list">
+                                                <% order.items.forEach(item=> { %>
+                                                    <div
+                                                        class="product-item d-flex align-items-center mb-2 p-2 border-bottom">
+                                                        <div class="product-details">
+                                                            <div class="product-name">
+                                                                <%= item.productName %>
+                                                            </div>
+                                                            <div class="product-meta">
+                                                                <span class="text-muted">Qty: <%= item.quantity %>
+                                                                </span>
+                                                                <span class="text-muted mx-2">₹<%= item.price %></span>
+                                                                <!-- <span class="badge <%= item.productStatus === 'Cancelled' ? 'bg-danger' : 'bg-success' %>">
+                        <%= item.productStatus %>
+                    </span> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% }) %>
+                                            </div>
+
+                                        </td>
+                                        <td class="text-end">₹<%= (order.totalAmount || 0).toFixed(2) %>
+                                        </td>
+                                        <td class="text-end text-danger">-₹<%= (order.discount || 0).toFixed(2) %>
+                                        </td>
+                                        <td class="text-end">₹<%= (order.finalAmount || 0).toFixed(2) %>
+                                        </td>
+                                        <td>
+                                            <%= order.couponCode || 'None' %>
+                                        </td>
+                                        <td>
+                                            <span class="badge <%= order.status === 'Delivered' ? 'bg-success' : 
+                                        order.status === 'Cancelled' ? 'bg-danger' : 
+                                        'bg-warning' %>">
+                                                <%= order.status %>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="8" class="text-center">No orders found for the selected
+                                                    period</td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="3">Totals</th>
+                                <th class="text-end">₹<%= (report.totalSales || 0).toFixed(2) %>
+                                </th>
+                                <th class="text-end text-danger">-₹<%= (report.totalDiscounts || 0).toFixed(2) %>
+                                </th>
+                                <th class="text-end">₹<%= ((report.totalSales || 0) - (report.totalDiscounts ||
+                                        0)).toFixed(2) %>
+                                </th>
+                                <th colspan="2"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div class="text-muted">
+                            Showing page <%= currentPage %> of <%= totalPages %>
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination mb-0">
+                                <% if (hasPrevPage) { %>
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                            href="?page=<%= prevPage %>&reportType=<%= reportType %><%= startDate ? `&startDate=${startDate}` : '' %><%= endDate ? `&endDate=${endDate}` : '' %>">
+                                            Previous
+                                        </a>
+                                    </li>
+                                    <% } %>
+
+                                        <% pages.forEach(page=> { %>
+                                            <% if (page==='...' ) { %>
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                                <% } else { %>
+                                                    <li class="page-item <%= page === currentPage ? 'active' : '' %>">
+                                                        <a class="page-link"
+                                                            href="?page=<%= page %>&reportType=<%= reportType %><%= startDate ? `&startDate=${startDate}` : '' %><%= endDate ? `&endDate=${endDate}` : '' %>">
+                                                            <%= page %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                                        <% }); %>
+
+                                                            <% if (hasNextPage) { %>
+                                                                <li class="page-item">
+                                                                    <a class="page-link"
+                                                                        href="?page=<%= nextPage %>&reportType=<%= reportType %><%= startDate ? `&startDate=${startDate}` : '' %><%= endDate ? `&endDate=${endDate}` : '' %>">
+                                                                        Next
+                                                                    </a>
+                                                                </li>
+                                                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('reportForm');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const today = new Date().toISOString().split('T')[0];
+
+            const validateDateRange = async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const reportType = document.getElementById('reportType').value;
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                if (reportType === 'custom') {
+                    if (!startDate || !endDate) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Date Selection Required',
+                            text: 'Please select both start and end dates for custom range',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                        return false;
+                    }
+
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    const currentDate = new Date();
+
+                    start.setHours(0, 0, 0, 0);
+                    end.setHours(0, 0, 0, 0);
+                    currentDate.setHours(0, 0, 0, 0);
+
+                    if (start > end) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date Range',
+                            text: 'Start date cannot be later than end date',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                        endDateInput.value = startDate;
+                        return false;
+                    }
+
+                    if (start > currentDate || end > currentDate) {
+                        await Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date Selection',
+                            text: 'Cannot select future dates',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                        return false;
+                    }
+
+                    const oneYear = 365 * 24 * 60 * 60 * 1000;
+                    if (end - start > oneYear) {
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: 'Large Date Range',
+                            text: 'Date range cannot exceed 1 year',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        });
+                        return false;
+                    }
+                }
+
+                form.submit();
+            };
+
+            const validateDates = (e) => {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                if (startDate && endDate) {
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+
+                    if (end < start) {
+                        e?.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Date Range',
+                            text: 'End date cannot be before start date',
+                            confirmButtonColor: '#3085d6',
+                            allowOutsideClick: false
+                        }).then(() => {
+                            endDateInput.value = startDate;
+                        });
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            if (form) {
+                form.removeEventListener('submit', validateDateRange);
+                form.addEventListener('submit', validateDateRange);
+            }
+
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', function () {
+                    endDateInput.value = '';
+                    if (this.value) {
+                        endDateInput.min = this.value;
+                    }
+                });
+
+                endDateInput.addEventListener('change', function (e) {
+                    validateDates(e);
+                });
+
+                endDateInput.addEventListener('input', function (e) {
+                    if (startDateInput.value && this.value) {
+                        const start = new Date(startDateInput.value);
+                        const end = new Date(this.value);
+                        if (end < start) {
+                            e.preventDefault();
+                            this.value = startDateInput.value;
+                        }
+                    }
+                });
+
+                startDateInput.max = today;
+                endDateInput.max = today;
+            }
+
+            document.getElementById('reportType')?.addEventListener('change', function () {
+                const customDateRange = document.getElementById('customDateRange');
+                if (customDateRange) {
+                    customDateRange.style.display = this.value === 'custom' ? 'flex' : 'none';
+                    if (this.value !== 'custom') {
+                        startDateInput.value = '';
+                        endDateInput.value = '';
+                    }
+                }
+            });
+        });
+
+        function handleExport(type) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('d-none');
+
+            try {
+                if (type === 'pdf') {
+                    exportToPDF();
+                } else if (type === 'excel') {
+                    exportToExcel();
+                }
+            } finally {
+                setTimeout(() => {
+                    loadingOverlay.classList.add('d-none');
+                }, 1000);
+            }
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+
+            doc.setFontSize(16);
+            doc.text('Sales Report', 14, 15);
+            doc.setFontSize(10);
+
+            const reportType = document.getElementById('reportType').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            let periodText = `Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`;
+            if (reportType === 'custom') {
+                periodText += ` (${startDate} to ${endDate})`;
+            }
+            doc.text(periodText, 14, 25);
+
+            const totalSales = document.getElementById('totalSales').innerText;
+            const totalDiscounts = document.getElementById('totalDiscounts').innerText;
+            const netSales = document.getElementById('netSales').innerText;
+
+            doc.text(`Total Sales: ${totalSales}`, 14, 35);
+            doc.text(`Total Discounts: ${totalDiscounts}`, 14, 42);
+            doc.text(`Net Sales: ${netSales}`, 14, 49);
+
+            const table = document.getElementById('salesTable');
+            const tableData = [];
+            const headers = ['Date', 'Order ID', 'Products', 'Gross Amount', 'Discount', 'Net Amount', 'Coupon', 'Status'];
+            tableData.push(headers);
+
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const rowData = [];
+                rowData.push(row.cells[0].innerText);
+                rowData.push(row.cells[1].innerText);
+
+                const productList = [];
+                const products = row.cells[2].querySelectorAll('.product-item');
+                products.forEach(product => {
+                    const name = product.querySelector('.product-name').innerText;
+                    const meta = product.querySelector('.product-meta').innerText;
+                    productList.push(`${name} (${meta})`);
+                });
+                rowData.push(productList.join('\n'));
+
+                rowData.push(row.cells[3].innerText);
+                rowData.push(row.cells[4].innerText);
+                rowData.push(row.cells[5].innerText);
+                rowData.push(row.cells[6].innerText);
+                rowData.push(row.cells[7].innerText);
+
+                tableData.push(rowData);
+            });
+
+            doc.autoTable({
+                startY: 60,
+                head: [headers],
+                body: tableData.slice(1),
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [66, 139, 202] },
+                columnStyles: {
+                    2: { cellWidth: 80 }
+                }
+            });
+
+            doc.save('sales-report.pdf');
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById('salesTable');
+            const wb = XLSX.utils.book_new();
+
+            const data = [];
+            const headers = [
+                'Date',
+                'Order ID',
+                'Product Name',
+                'Quantity',
+                'Price',
+                'Gross Amount',
+                'Discount',
+                'Net Amount',
+                'Coupon Used',
+                'Status'
+            ];
+
+            data.push(headers);
+
+            data.push([
+                'SUMMARY',
+                '',
+                '',
+                '',
+                '',
+                document.getElementById('totalSales').innerText,
+                document.getElementById('totalDiscounts').innerText,
+                document.getElementById('netSales').innerText,
+                `Total Orders: ${document.getElementById('totalOrders').innerText}`,
+                `Discounted Orders: ${document.getElementById('discountedOrders').innerText}`
+            ]);
+
+            data.push([]);
+
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const date = row.cells[0].innerText;
+                const orderId = row.cells[1].innerText;
+                const grossAmount = row.cells[3].innerText;
+                const discount = row.cells[4].innerText;
+                const netAmount = row.cells[5].innerText;
+                const coupon = row.cells[6].innerText;
+                const status = row.cells[7].innerText;
+
+                const products = row.cells[2].querySelectorAll('.product-item');
+
+                products.forEach(product => {
+                    const productName = product.querySelector('.product-name').innerText;
+                    const meta = product.querySelector('.product-meta').innerText;
+                    const quantity = meta.match(/Qty: (\d+)/)?.[1] || '';
+                    const price = meta.match(/₹(\d+(\.\d+)?)/)?.[1] || '';
+
+                    data.push([
+                        date,
+                        orderId,
+                        productName,
+                        quantity,
+                        price,
+                        grossAmount.replace('₹', ''),
+                        discount.replace('-₹', ''),
+                        netAmount.replace('₹', ''),
+                        coupon,
+                        status
+                    ]);
+                });
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            const colWidths = [
+                { wch: 12 },
+                { wch: 25 },
+                { wch: 40 },
+                { wch: 10 },
+                { wch: 12 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 12 }
+            ];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+            XLSX.writeFile(wb, 'sales-report.xlsx');
+        }
+        
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+   
+    const salesTrendData = <%- JSON.stringify(salesTrend) %>;
+    const ctx1 = document.getElementById('salesTrendChart').getContext('2d');
+    
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: salesTrendData.map(item => item.date),
+            datasets: [
+                {
+                    label: 'Orders',
+                    type: 'bar',
+                    data: salesTrendData.map(item => item.orders),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y-axis-orders'
+                },
+                {
+                    label: 'Sales (₹)',
+                    type: 'line',
+                    data: salesTrendData.map(item => item.sales),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    yAxisID: 'y-axis-sales'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            scales: {
+                'y-axis-orders': {
+                    type: 'linear',
+                    position: 'left',
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Orders'
+                    }
+                },
+                'y-axis-sales': {
+                    type: 'linear',
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Sales Amount (₹)'
+                    }
+                }
+            }
+        }
+    });
+
+   
+    const paymentData = <%- JSON.stringify(paymentMethods) %>;
+    const ctx2 = document.getElementById('paymentMethodsChart').getContext('2d');
+    
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: paymentData.map(item => item.method),
+            datasets: [{
+                data: paymentData.map(item => item.total),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Sales by Payment Method'
+                }
+            }
+        }
+    });
+
+    const topProductsData = <%- JSON.stringify(topProducts) %>;
+const ctx3 = document.getElementById('topProductsChart').getContext('2d');
+
+new Chart(ctx3, {
+    type: 'bar',
+    data: {
+        labels: topProductsData.map(item => item.name),
+        datasets: [{
+            label: 'Sales Amount (₹)',
+            data: topProductsData.map(item => item.sales),
+            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }, {
+            label: 'Quantity Sold',
+            data: topProductsData.map(item => item.quantity),
+            backgroundColor: 'rgba(255, 159, 64, 0.8)',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        }
+    }
+});
+
+// Top Categories Chart
+const topCategoriesData = <%- JSON.stringify(topCategories) %>;
+const ctx4 = document.getElementById('topCategoriesChart').getContext('2d');
+
+new Chart(ctx4, {
+    type: 'pie',
+    data: {
+        labels: topCategoriesData.map(item => item.name),
+        datasets: [{
+            data: topCategoriesData.map(item => item.sales),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'right'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        return `${label}: ₹${value.toFixed(2)}`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+
+    
+});
+
+function refreshCharts() {
+    // Submit the form to refresh data
+    document.getElementById('reportForm').submit();
+}
+        
+        
+        </script>

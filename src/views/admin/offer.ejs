@@ -1,0 +1,409 @@
+<%- include('../partials/admin/header') %>
+<br><br><br><br>
+    <div class="main-content container py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Offer</h2>
+                </div>
+            </div>
+        </div>
+<br><br>
+        <div class="card">
+            <div class="card-body">
+                <form id="offerForm" action="/admin/offer" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Offer Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="type" class="form-label">Offer Type</label>
+                            <select class="form-select" id="type" name="type" required onchange="handleTypeChange()">
+                                <option value="">Select Type</option>
+                                <option value="product">Product Offer</option>
+                                <option value="category">Category Offer</option>
+                                <option value="referral">Referral Offer</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="discount" class="form-label">Discount Percentage</label>
+                            <input type="number" class="form-control" id="discount" name="discount" min="0" max="100"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="productSelectDiv" style="display: none;">
+                            <label for="productId" class="form-label">Select Product</label>
+                            <select class="form-select" id="productId" name="productId">
+                                <option value="">Select Product</option>
+                                <% products.forEach(product=> { %>
+                                    <option value="<%= product.productName %>" data-price="<%= product.salePrice %>">
+                                        <%= product.productName %> : ₹<%= product.salePrice %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="categorySelectDiv" style="display: none;">
+                            <label for="categoryId" class="form-label">Select Category</label>
+                            <select class="form-select" id="categoryId" name="categoryId">
+                                <option value="">Select Category</option>
+                                <% categories.forEach(category=> { %>
+                                    <option value="<%= category._id %>">
+                                        <%= category.name %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="referralDiv" style="display: none;">
+                            <label for="referralCode" class="form-label">Referral Code</label>
+                            <input type="text" class="form-control" id="referralCode" name="referralCode">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="datetime-local" class="form-control" id="endDate" name="endDate" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="discountedPriceDiv" style="display: none;">
+                            <label class="form-label">Discounted Price</label>
+                            <div class="form-control bg-light">₹<span id="discountedPrice">0.00</span></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Create Offer</button>
+                        <a href="/admin/offers" class="btn btn-light ml-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        
+     document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('offerForm');
+
+  
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Fix: Inverted validation logic
+        if (!validateForm()) {
+            return;
+        }
+
+        const formData = {
+            name: document.getElementById('name').value,
+            type: document.getElementById('type').value,
+            discount: document.getElementById('discount').value,
+            productId: document.getElementById('productId')?.value || null,
+            categoryId: document.getElementById('categoryId')?.value || null,
+            referralCode: document.getElementById('referralCode')?.value || null,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value
+        };
+
+        try {
+            const response = await fetch("/admin/offer", {  // Fix: Added /admin prefix
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"  // Fix: Corrected capitalization
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Offer Added',
+                    text: data.message || 'The new offer has been added successfully.',
+                    showConfirmButton: true
+                });
+                window.location.href = "/admin/offer"; 
+            } else {
+                throw new Error(data.message || 'Failed to add offer');
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to add offer. Please try again.',
+                showConfirmButton: true
+            });
+        }
+    });
+
+    const discountInput = document.getElementById('discount');
+    discountInput.addEventListener('input', function() {
+        let value = parseFloat(this.value);
+        if (value > 100) {
+            this.value = 100;
+        } else if (value < 0) {
+            this.value = 0;
+        }
+    });
+});
+
+
+function validateForm() {
+    const type = document.getElementById('type').value;
+    const discount = parseFloat(document.getElementById('discount').value);
+    const name = document.getElementById('name').value.trim();
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+
+    if (!name) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please enter an offer name'
+        });
+        return false;
+    }
+
+    if (!type) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please select an offer type'
+        });
+        return false;
+    }
+
+    if (isNaN(discount) || discount <= 0 || discount > 100) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Discount must be between 1 and 100'
+        });
+        return false;
+    }
+
+    if (!startDate || !endDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please select both start and end dates'
+        });
+        return false;
+    }
+
+    if (endDate < startDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'End date cannot be before start date'
+        });
+        return false;
+    }
+
+    // Type-specific validation
+    switch (type) {
+        case 'product':
+            if (!document.getElementById('productId').value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a product'
+                });
+                return false;
+            }
+            break;
+        case 'category':
+            if (!document.getElementById('categoryId').value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a category'
+                });
+                return false;
+            }
+            break;
+        case 'referral':
+            if (!document.getElementById('referralCode').value.trim()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please enter a referral code'
+                });
+                return false;
+            }
+            break;
+    }
+
+    return true;
+}
+        function validateDates() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+
+            if (endDate < startDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date Range',
+                    text: 'End date cannot be before start date'
+                });
+                document.getElementById('endDate').value = document.getElementById('startDate').value;
+                return false;
+            }
+            return true;
+        }
+
+        function handleTypeChange() {
+            const type = document.getElementById('type').value;
+            document.getElementById('productSelectDiv').style.display = type === 'product' ? 'block' : 'none';
+            document.getElementById('categorySelectDiv').style.display = type === 'category' ? 'block' : 'none';
+            document.getElementById('referralDiv').style.display = type === 'referral' ? 'block' : 'none';
+            document.getElementById('discountedPriceDiv').style.display = type === 'product' ? 'block' : 'none';
+
+      
+            document.getElementById('productId').value = '';
+            document.getElementById('categoryId').value = '';
+            document.getElementById('referralCode').value = '';
+            document.getElementById('discountedPrice').textContent = '0.00';
+        }
+
+        function calculateDiscountedPrice() {
+            const productSelect = document.getElementById('productId');
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+            if (productSelect.selectedIndex > 0) {
+                const originalPrice = parseFloat(productSelect.options[productSelect.selectedIndex].dataset.price);
+                const discountAmount = (originalPrice * discount) / 100;
+                const discountedPrice = originalPrice - discountAmount;
+                document.getElementById('discountedPrice').textContent = discountedPrice.toFixed(2);
+            }
+        }
+
+        document.getElementById('productId')?.addEventListener('change', calculateDiscountedPrice);
+        document.getElementById('discount')?.addEventListener('input', calculateDiscountedPrice);
+
+        function validateForm() {
+            const type = document.getElementById('type').value;
+            const discount = parseFloat(document.getElementById('discount').value);
+
+            if (!type) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select an offer type'
+                });
+                return false;
+            }
+
+            if (isNaN(discount) || discount < 0 || discount > 100) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Discount must be between 0 and 100'
+                });
+                return false;
+            }
+
+            if (type === 'product' && !document.getElementById('productId').value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a product'
+                });
+                return false;
+            }
+
+            if (type === 'category' && !document.getElementById('categoryId').value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a category'
+                });
+                return false;
+            }
+
+            if (type === 'referral' && !document.getElementById('referralCode').value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please enter a referral code'
+                });
+                return false;
+            }
+
+            return validateDates();
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById('offerForm');
+
+            from.addEventListener("submit", async function (e) {
+                e.preventDefault()
+
+
+                if (validateForm()) {
+                    return
+                }
+
+
+                const formData = {
+                    name: document.getElementById('name').value,
+                    type: document.getElementById('type').value,
+                    discount: document.getElementById('discount').value,
+                    productId: document.getElementById('productId')?.value || null,
+                    categoryId: document.getElementById('categoryId')?.value || null,
+                    referralCode: document.getElementById('referralCode')?.value || null,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value
+                };
+
+
+                try {
+                    const response = await fetch("/offer", {
+                        method: "POST",
+                        headers: {
+                            "content-Type": "application/json"
+                        },
+                        body: JSON.stringify(
+                            formData,
+                        )
+                    })
+                    const data = await response.json()
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: "offer added",
+                            text: data.message || 'The new offer has been added successfully.'
+                        }).then(() => {
+                            window.location.href = "/admin/offer"
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message || 'Something went wrong'
+                        });
+                    }
+                } catch (error) {
+                    console.log("error", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Network Error',
+                        text: 'Failed to connect to the server'
+                    });
+                }
+            })
+        })
+    </script>

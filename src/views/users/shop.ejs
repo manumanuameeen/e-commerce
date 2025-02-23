@@ -1,61 +1,38 @@
 <%- include('../partials/users/header') %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-      
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
 
-.add_cart_btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        .pagination-container a {
+            padding: 6px 6px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #333;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
 
-.add_cart_btn:hover {
-    background-color: #0056b3;
-}
+        .pagination-container a:hover {
+            background-color: #f5f5f5;
+        }
 
-.add-to-cart-form {
-    margin: 0;
-    padding: 0;
-}
+        .current-page {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+        }
 
-/* SweetAlert2 Custom Styles */
-.swal2-popup {
-    font-size: 1.rem;
-    border-radius: 15px;
-}
-
-.swal2-title {
-    font-size: 1.5rem;
-}
-
-.swal2-content {
-    font-size: 1.1rem;
-}
-
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translate3d(0, -20%, 0);
-    }
-    to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-.animated {
-    animation-duration: 0.5s;
-    animation-fill-mode: both;
-}
-
-.fadeInDown {
-    animation-name: fadeInDown;
-}
+        .page-link {
+            cursor: pointer;
+        }
 
         .add_cart_btn {
             width: 100%;
@@ -67,11 +44,66 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
+
         .add_cart_btn:hover {
             background-color: #0056b3;
         }
-      
+
+        .add-to-cart-form {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* SweetAlert2 Custom Styles */
+        .swal2-popup {
+            font-size: 1.rem;
+            border-radius: 15px;
+        }
+
+        .swal2-title {
+            font-size: 1.5rem;
+        }
+
+        .swal2-content {
+            font-size: 1.1rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -20%, 0);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .animated {
+            animation-duration: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        .fadeInDown {
+            animation-name: fadeInDown;
+        }
+
+        .add_cart_btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add_cart_btn:hover {
+            background-color: #0056b3;
+        }
+
         .single_product_menu select {
             max-height: 0;
             overflow-y: hidden;
@@ -108,543 +140,1012 @@
             color: #999;
             /* Optional: You can change the color to make it look lighter */
         }
+
         /* Product Top Bar Styles */
-.product_top_bar {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-}
+        .product_top_bar {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
 
-.single_product_menu {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        .single_product_menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.single_product_menu h5 {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-}
+        .single_product_menu h5 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
 
-.single_product_menu p {
-    margin: 0;
-    font-size: 16px;
-    color: #666;
-}
+        .single_product_menu p {
+            margin: 0;
+            font-size: 16px;
+            color: #666;
+        }
 
-.single_product_menu p span {
-    color: #007bff;
-    font-weight: bold;
-}
+        .single_product_menu p span {
+            color: #007bff;
+            font-weight: bold;
+        }
 
-/* Sort Dropdown Styles */
-.nice-select {
-    min-width: 200px;
-    height: 40px;
-    line-height: 38px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 0 15px;
-    background: #fff;
-    cursor: pointer;
-    position: relative;
-    z-index: 100;
-}
+        /* Sort Dropdown Styles */
+        .nice-select {
+            min-width: 200px;
+            height: 40px;
+            line-height: 38px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0 15px;
+            background: #fff;
+            cursor: pointer;
+            position: relative;
+            z-index: 100;
+        }
 
-.nice-select:after {
-    content: '\f107';
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-}
+        .nice-select:after {
+            content: '\f107';
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-.nice-select .list {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-top: 4px;
-    padding: 5px 0;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-}
+        .nice-select .list {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+            padding: 5px 0;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
 
-.nice-select.open .list {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+        .nice-select.open .list {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
 
-.nice-select .option {
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+        .nice-select .option {
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-.nice-select .option:hover {
-    background: #f8f9fa;
-}
+        .nice-select .option:hover {
+            background: #f8f9fa;
+        }
 
-/* Product Grid Styles */
-.single_product_item {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    margin-bottom: 30px;
-    overflow: hidden;
-}
+        /* Product Grid Styles */
+        .single_product_item {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
 
-.single_product_item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
+        .single_product_item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
 
-.single_product_item img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-}
+        .single_product_item img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
 
-.single_product_text {
-    padding: 20px;
-}
+        .single_product_text {
+            padding: 20px;
+        }
 
-.single_product_text h4 {
-    margin: 0 0 10px;
-    font-size: 18px;
-    color: #333;
-}
+        .single_product_text h4 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #333;
+        }
 
-.product-price {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
+        .product-price {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-.current-price {
-    font-size: 20px;
-    font-weight: bold;
-    color: #007bff;
-}
+        .current-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
 
-.original-price {
-    font-size: 16px;
-    color: #999;
-    text-decoration: line-through;
-}
+        .original-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+        }
 
-/* Pagination Styles */
-.pagination {
-    margin-top: 30px;
-}
+        /* Pagination Styles */
+        .pagination {
+            margin-top: 30px;
+        }
 
-.pagination .page-link {
-    padding: 8px 16px;
-    margin: 0 4px;
-    border-radius: 4px;
-    color: #333;
-    border: 1px solid #ddd;
-}
+        .pagination .page-link {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border-radius: 4px;
+            color: #333;
+            border: 1px solid #ddd;
+        }
 
-.pagination .page-link:hover {
-    background: #007bff;
-    color: #fff;
-    border-color: #007bff;
-}
+        .pagination .page-link:hover {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .product_top_bar {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .single_product_menu {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .nice-select {
-        width: 100%;
-        max-width: none;
-    }
-}
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .product_top_bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .single_product_menu {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .nice-select {
+                width: 100%;
+                max-width: none;
+            }
+
+        }
+
+        /* Sort Options Styling */
+        .sorting-aside .sorting-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sorting-aside .sorting-options button {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+        }
+
+        .sorting-aside .sorting-options button:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .sorting-aside .sorting-options button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Product Listing Styling */
+        .single_product_item {
+            position: relative;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .single_product_item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .single_product_item img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .single_product_text {
+            padding: 20px;
+        }
+
+        .single_product_text h4 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .product-price {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .current-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .original-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .wishlist-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .wishlist-icon:hover {
+            color: #ff4757;
+        }
+
+        /* Add these CSS styles */
+        .left_widgets .list li a {
+            display: block;
+            padding: 8px 12px;
+            color: #666;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            text-decoration: none;
+        }
+
+        .left_widgets .list li a:hover {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .left_widgets .list li a.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: 500;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .left_widgets .list li a.active::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        /* Optional: Add a subtle shadow to make it pop more */
+        .left_widgets .list li a.active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Left Sidebar Styling */
+        .left_sidebar_area {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sorting_aside {
+            margin-top: 20px;
+        }
+
+        .sorting_aside .filter-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .sorting_aside .sorting-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sorting_aside .sorting-options a {
+            text-decoration: none;
+        }
+
+        .sorting_aside .sorting-options button {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sorting_aside .sorting-options button:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            transform: translateX(5px);
+        }
+
+        .sorting_aside .sorting-options button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .sorting_aside .sorting-options button i {
+            font-size: 16px;
+        }
+
+
+        .shop-header {
+            justify-content: center;
+            padding-top: 400px;
+            padding-left: 200px;
+            padding-right: 200px;
+            height: 100.5px;
+            width: 100%;
+            background: #ffffff;
+            position: relative;
+            /* overflow: hidden; */
+            margin-bottom: 40px;
+        }
+
+        .animation-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            perspective: 2000px;
+            transform-style: preserve-3d;
+        }
+
+        .cube {
+            position: absolute;
+            transform-style: preserve-3d;
+        }
+
+        .cube__side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #717C89;
+        }
+
+        .shop-title {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            font-weight: 300;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .shop-title span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        .intro-lines {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            opacity: 0;
+        }
+
+        .codepen-logo__wrapper {
+            transform-style: preserve-3d;
+            perspective: 2000px;
+        }
+
+        .codepen-logo {
+            position: relative;
+            transform-style: preserve-3d;
+            margin: auto;
+        }
+
+        /* Main shop logo styling */
+        .shop-logo {
+            width: 200px;
+            height: 200px;
+            display: block;
+            margin: 0 auto;
+            /* Centers the logo */
+        }
+
+        /* Remove color from cube icon */
+        .shop-logo path {
+            stroke: black;
+            /* Black color */
+            fill: none;
+            /* No fill color */
+            stroke-width: 5;
+            /* Define stroke width */
+        }
+
+        /* Center the icon in the page */
+        .codepen-logo__wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: rgb(0, 0, 0);
+            border-color: black;
+            color: white;
+            /* Sets the text color to white */
+        }
+
+        /* Styling for the moving line (ticker) */
+        .moving-line {
+            width: 100%;
+            height: 20px;
+            /* Height of the line */
+            background-color: #ffffff;
+            /* Color of the line */
+            color: rgb(13, 12, 12);
+            /* Text color */
+            overflow: hidden;
+            position: relative;
+            font-size: 1.5rem;
+            white-space: nowrap;
+            /* Prevents text from breaking to the next line */
+        }
+
+        .moving-line p {
+            display: inline-block;
+            animation: moveLine 15s linear infinite;
+            /* Smooth continuous scrolling */
+            margin: 0;
+        }
+
+        .moving-line span {
+            margin-right: 50px;
+            /* Adjust to make space between messages */
+        }
+
+        /* Keyframe animation for continuous movement */
+        @keyframes moveLine {
+            0% {
+                transform: translateX(100%);
+                /* Start from the right */
+            }
+
+            100% {
+                transform: translateX(-100%);
+                /* Move to the left */
+            }
+        }
+
+        .moving-line span:nth-child(1) {
+            font-weight: bold;
+        }
+
+        .moving-line span:nth-child(2) {
+            font-weight: bold;
+        }
+
+        .moving-line span:nth-child(3) {
+            font-weight: bold;
+        }
+
+        .moving-line span:nth-child(4) {
+            font-weight: bold;
+            
+        }
+        .store_header_bg {
+            background: #f8f9fa;
+            padding: 50px 0;
+        }
+        .store_header_content {
+            text-align: center;
+        }
+        .store_header_content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .store_header_content p {
+            margin: 0;
+            color: #666;
+        }
+        .store_header_content p span {
+            margin: 0 10px;
+            color: #999;
+        }
+        .store_carousel_wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        .store_carousel {
+         
+            width: 400px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .carousel-item {
+            height: 200px;
+        }
+        .carousel-item img {
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
+        }
+        .carousel-indicators {
+            margin-bottom: 0.5rem;
+        }
+        .carousel-indicators button {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
     </style>
-    <!--================Home Banner Area =================-->
-    <!-- breadcrumb start-->
-    <section class="breadcrumb breadcrumb_bg">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="breadcrumb_iner">
-                        <div class="breadcrumb_iner_item">
-                            <h2>Shop </h2>
-                            <p>Home <span>-</span> Shop </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- breadcrumb start-->
-
-    <!--================Category Product Area =================-->
-    <section class="cat_product_area section_padding">
+     <br><br><br><br>
+     <section class="hero-carousel mb-8">
         <div class="container">
             <div class="row">
-                <div class="col-lg-3">
-                    <div class="left_sidebar_area">
-                        <aside class="left_widgets p_filter_widgets">
-                            <div class="l_w_title">
-                                <h3>Browse Categories</h3>
-                            </div>
-                            <div class="widgets_inner">
-                                <ul class="list">
-                                    <% for (let i=0; i < categories.length; i++) { %>
-                                        <li class="fil"><a href="/filter?category=<%=categories[i]._id%>">
-                                                <%= categories[i].name %>
-                                            </a></li>
-                                        <% } %>
-                                </ul>
-                            </div>
-
-                        </aside>
-
-                        <!-- <aside class="left_widgets p_filter_widgets">
-                            <div class="l_w_title">
-                                <h3>Product filters</h3>
-                            </div>
-                            <div class="widgets_inner">
-                                <ul class="list">
-                                    <%for(let i=0 ;i <products.length;i++){%>
-                                        <li><a href="">
-                                                <%=products[i].productName %>
-                                            </a></li>
-                                        <%}%>
-                                </ul>
-
-                            </div>
-                        </aside> -->
-
-                        <!-- <aside class="left_widgets p_filter_widgets">
-                            <div class="l_w_title">
-                                <h3>Color Filter</h3>
-                            </div>
-                            <div class="widgets_inner">
-                                <ul class="list">
-                                    <%for(i=0;i<products.length;i++){%>
-                                        <li><a href="">
-                                                <%=products[i].color%>
-                                            </a></li>
-                                        <%}%>
-                                </ul>
-                            </div>
-                        </aside> -->
-
-                        <aside class="left_widgets p_filter_widgets price_rangs_aside">
-                            <div class="price-filter">
-                                <div class="filter-title">Filter by Price</div>
-                                <form id="price-filter-form">
-                                    <div class="price-options">
-                                        <a href="/filterPrice?gt=0&lt=40000"><button type="button"
-                                                class="price-button">under ₹40000</button></a>
-                                        <a href="/filterPrice?gt=40000&lt=50000"><button type="button"
-                                                class="price-button">₹50000 - ₹60000</button></a>
-                                        <a href="/filterPrice?gt=50000&lt=60000"><button type="button"
-                                                class="price-button">₹60000- ₹70000</button></a>
-                                        <a href="/filterPrice?gt=60000&lt=700000"><button type="button"
-                                                class="price-button">₹70000 ₹80000</button></a>
-                                    </div>
-                                </form>
-                            </div>
-                        </aside>
-
-
-                    </div>
-                </div>
-                <div class="col-lg-9">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="product_top_bar d-flex justify-content-between align-items-center">
-                                <div class="single_product_menu">
-                                    <p><span><%= products.length%></span> Products Found</p>
-                                </div>
-                                <div class="single_product_menu d-flex">
-                                    <h5>Sort by:</h5>
-                                    <select class="nice-select" onchange="window.location.href=this.value">
-                                        <option value="/shop?sort=newest" <%= currentSort === 'newest' ? 'selected' : '' %>>New Arrivals</option>
-                                        <option value="/shop?sort=featured" <%= currentSort === 'featured' ? 'selected' : '' %>>Featured</option>
-                                        <option value="/shop?sort=popularity" <%= currentSort === 'popularity' ? 'selected' : '' %>>Popularity</option>
-                                        <option value="/shop?sort=price-asc" <%= currentSort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
-                                        <option value="/shop?sort=price-desc" <%= currentSort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
-                                        <option value="/shop?sort=rating" <%= currentSort === 'rating' ? 'selected' : '' %>>Average Rating</option>
-                                        <option value="/shop?sort=name-asc" <%= currentSort === 'name-asc' ? 'selected' : '' %>>Name: A to Z</option>
-                                        <option value="/shop?sort=name-desc" <%= currentSort === 'name-desc' ? 'selected' : '' %>>Name: Z to A</option>
-                                    </select>
-                                </div>
-                                <div class="single_product_menu d-flex">
-                                    <div class="top_pageniation">
-                                        <% for(let i = 1; i <= totalPages; i++) { %>
-                                            <a href="/shop?page=<%= i %>&sort=<%= currentSort %>" 
-                                               class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-  <div class="container">
-    <div class="row">
-        <% for (let i = 0; i < products.length; i++) { %>
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="single_product_item">
-                    <a href="/productDetails?id=<%= products[i]._id %>">
-                        <img src="/uploads/re-image/<%= products[i].productImage[0] %>" class="img-fluid">
-                        <div class="single_product_text">
-                            <h4><%= products[i].productName %></h4>
-                            <div class="product-price">
-                                <span class="current-price">₹<%= products[i].salePrice.toLocaleString('en-IN') %></span>
-                                <span class="original-price">₹<%= products[i].regularPrice.toLocaleString('en-IN') %></span>
-                            </div>
-                        </div>
-                    </a>
-                    <!-- <form class="add-to-cart-form" onsubmit="return addToCart(event, '<%= products[i]._id %>', '<%= products[i].productName %>')">
-                        <input type="hidden" name="productId" value="<%= products[i]._id %>">
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit" class="add_cart_btn">
-                            + add to cart <i class="ti-heart"></i>
-                        </button>
-                    </form> -->
+                <div class="col-lg-6">
+                    <h1 class="display-4 mb-4">Shop Collection</h1>
+                    <p class="text-muted mb-4">Home <span class="mx-2">-</span> shop</p>
                 </div>
             </div>
-        <% } %>
-    </div>
-</div>
-
-
-
-                        <div class="col-lg-12">
-                            <div class="pageination">
-                                <nav aria-label="Page navigation example">
-                                    <ul class="pagination justify-content-center">
-                                        <li class="page-item">
-                                            <a class="page-link" href="#" aria-label="Previous">
-                                                <i class="ti-angle-double-left"></i>
-                                            </a>
-                                        </li>
-                                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">6</a></li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#" aria-label="Next">
-                                                <i class="ti-angle-double-right"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
+            
+            <!-- Main Featured Carousel -->
+            <div id="mainCarousel" class="carousel slide mb-8" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-indicators">
+                    <% for(let i = 0; i < Math.min(products.length, 3); i++) { %>
+                        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="<%=i%>" 
+                            class="<%= i === 0 ? 'active' : '' %>"></button>
+                    <% } %>
+                </div>
+                <div class="carousel-inner rounded-lg overflow-hidden">
+                    <% for(let i = 0; i < Math.min(products.length, 3); i++) { %>
+                        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                            <div class="featured-slide" style="height: 500px; background: linear-gradient(45deg, #f3f4f6, #e5e7eb); position: relative;">
+                                <div class="slide-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; padding: 2rem;">
+                                    <h2 class="display-5 mb-4" style="color: #1f2937;"><%= products[i].productName %></h2>
+                                    <p class="lead mb-4" style="color: #4b5563;">Experience premium quality and style</p>
+                                    <h3 class="mb-4" style="color: #2563eb;">₹<%= products[i].salePrice %></h3>
+                                    <button class="btn btn-primary px-4 py-2">Shop Now</button>
+                                </div>
+                                <!-- Decorative Elements -->
+                                <div class="decorative-circle" style="position: absolute; width: 150px; height: 150px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); top: 20%; left: 20%;"></div>
+                                <div class="decorative-circle" style="position: absolute; width: 100px; height: 100px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); bottom: 15%; right: 25%;"></div>
                             </div>
                         </div>
+                    <% } %>
                 </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
-        </div>
         </div>
     </section>
-    <!--================End Category Product Area =================-->
+        <!-- breadcrumb end-->
 
-
-    <!-- product_list part end -->
-
-    <!--::footer_part start::-->
-    <footer class="footer_part">
-        <div class="container">
-            <div class="row justify-content-around">
-                <div class="col-sm-6 col-lg-2">
-                    <div class="single_footer_part">
-                        <h4>Top Products</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="">Managed Website</a></li>
-                            <li><a href="">Manage Reputation</a></li>
-                            <li><a href="">Power Tools</a></li>
-                            <li><a href="">Marketing Service</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-2">
-                    <div class="single_footer_part">
-                        <h4>Quick Links</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="">Jobs</a></li>
-                            <li><a href="">Brand Assets</a></li>
-                            <li><a href="">Investor Relations</a></li>
-                            <li><a href="">Terms of Service</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-2">
-                    <div class="single_footer_part">
-                        <h4>Features</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="">Jobs</a></li>
-                            <li><a href="">Brand Assets</a></li>
-                            <li><a href="">Investor Relations</a></li>
-                            <li><a href="">Terms of Service</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-2">
-                    <div class="single_footer_part">
-                        <h4>Resources</h4>
-                        <ul class="list-unstyled">
-                            <li><a href="">Guides</a></li>
-                            <li><a href="">Research</a></li>
-                            <li><a href="">Experts</a></li>
-                            <li><a href="">Agencies</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-lg-4">
-                    <div class="single_footer_part">
-                        <h4>Newsletter</h4>
-                        <p>Heaven fruitful doesn't over lesser in days. Appear creeping
-                        </p>
-                        <div id="mc_embed_signup">
-                            <form target="_blank"
-                                action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
-                                method="get" class="subscribe_form relative mail_part">
-                                <input type="email" name="email" id="newsletter-form-email" placeholder="Email Address"
-                                    class="placeholder hide-on-focus" onfocus="this.placeholder = ''"
-                                    onblur="this.placeholder = ' Email Address '">
-                                <button type="submit" name="submit" id="newsletter-submit"
-                                    class="email_icon newsletter-submit button-contactForm">subscribe</button>
-                                <div class="mt-10 info"></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="copyright_part">
+        <!--================Category Product Area =================-->
+        <section class="cat_product_area section_padding">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-8">
-                        <div class="copyright_text">
-                            <P><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                Copyright &copy;
-                                <script>document.write(new Date().getFullYear());</script> All rights reserved | This
-                                template is made with <i class="ti-heart" aria-hidden="true"></i> by <a
-                                    href="https://colorlib.com" target="_blank">Colorlib</a>
-                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                            </P>
+                    <div class="col-lg-3">
+                        <div class="left_sidebar_area">
+                            <!-- Categories Filter -->
+                            <aside class="left_widgets p_filter_widgets">
+                                <div class="l_w_title">
+                                    <h3>Browse Categories</h3>
+                                </div>
+                                <div class="widgets_inner">
+                                    <ul class="list">
+                                        <li><a href="/shop">All Categories</a></li>
+                                        <% for (let category of categories) { %>
+                                            <li>
+                                                <a href="/shop?category=<%= category._id %><%= sort ? `&sort=${sort}` : '' %>"
+                                                    class="<%= query?.category === category._id.toString() ? 'active' : '' %>">
+                                                    <%= category.name %>
+                                                </a>
+                                            </li>
+                                            <% } %>
+                                    </ul>
+                                </div>
+                            </aside>
+
+                            <!-- Sort Options -->
+                            <aside class="left_widgets p_filter_widgets sorting_aside">
+                                <div class="filter-title">Sort by</div>
+                                <div class="sorting-options">
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'newest'}).toString() %>">
+                                        <button type="button" class="<%= currentSort === 'newest' ? 'active' : '' %>">
+                                            <i class="ti-star"></i> New Arrivals
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-asc'}).toString() %>">
+                                        <button type="button"
+                                            class="<%= currentSort === 'price-asc' ? 'active' : '' %>">
+                                            <i class="ti-arrow-up"></i> Price: Low to High
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-desc'}).toString() %>">
+                                        <button type="button"
+                                            class="<%= currentSort === 'price-desc' ? 'active' : '' %>">
+                                            <i class="ti-arrow-down"></i> Price: High to Low
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-asc'}).toString() %>">
+                                        <button type="button" class="<%= currentSort === 'name-asc' ? 'active' : '' %>">
+                                            <i class="ti-sort-alpha-asc"></i> Name: A to Z
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-desc'}).toString() %>">
+                                        <button type="button"
+                                            class="<%= currentSort === 'name-desc' ? 'active' : '' %>">
+                                            <i class="ti-sort-alpha-desc"></i> Name: Z to A
+                                        </button>
+                                    </a>
+                                </div>
+                            </aside>
+
+                            <!-- Price Filter -->
+                            <aside class="left_widgets p_filter_widgets sorting_aside">
+                                <div class="filter-title">Price Range</div>
+                                <div class="sorting-options price-filter">
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: 'below-1500'}).toString() %>">
+                                        <button type="button" class="<%= price === 'below-1500' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> Below ₹30,000
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '1500-2000'}).toString() %>">
+                                        <button type="button" class="<%= price === '1500-2000' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> ₹30,000 - ₹50,000
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '2000-2500'}).toString() %>">
+                                        <button type="button" class="<%= price === '2000-2500' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> ₹50,000 - ₹70,000
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '2500-3000'}).toString() %>">
+                                        <button type="button" class="<%= price === '2500-3000' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> ₹70,000 - ₹90,000
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '3000-4000'}).toString() %>">
+                                        <button type="button" class="<%= price === '3000-4000' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> ₹90,000 - ₹110,000
+                                        </button>
+                                    </a>
+                                    <a
+                                        href="/shop?<%= new URLSearchParams({...queryParams, price: 'Above4000'}).toString() %>">
+                                        <button type="button" class="<%= price === 'Above4000' ? 'active' : '' %>">
+                                            <i class="ti-money"></i> Above ₹110,000
+                                        </button>
+                                    </a>
+                                </div>
+                            </aside>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="footer_icon social_icon">
-                            <ul class="list-unstyled">
-                                <li><a href="#" class="single_social_icon"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="#" class="single_social_icon"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="#" class="single_social_icon"><i class="fas fa-globe"></i></a></li>
-                                <li><a href="#" class="single_social_icon"><i class="fab fa-behance"></i></a></li>
-                            </ul>
+
+                    <!-- Product Display Area -->
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="product_top_bar d-flex justify-content-between align-items-center">
+                                    <!-- Search Form -->
+                                    <div class="single_product_menu d-flex">
+                                        <form action="/shop" method="GET" class="d-flex">
+                                            <input type="text" name="search" class="form-control"
+                                                placeholder="Search products..." value="<%= searchQuery || '' %>">
+                                            <button type="submit" class="btn btn-primary ml-2">Search</button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Product Count -->
+                                    <div class="single_product_menu">
+                                        <p><span>
+                                                <%= products.length %>
+                                            </span> Products Found</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Grid -->
+                        <div class="row">
+                            <% if (products.length===0) { %>
+                                <div class="col-12 text-center py-5">
+                                    <h3>No products found</h3>
+                                </div>
+                                <% } else { %>
+                                    <% products.forEach(product=> { %>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                            <div class="single_product_item">
+                                                <a href="/productDetails?id=<%= product._id %>">
+                                                    <img src="/uploads/re-image/<%= product.productImage[0] %>"
+                                                        alt="<%= product.productName %>" class="img-fluid">
+                                                    <div class="single_product_text">
+                                                        <h4>
+                                                            <%= product.productName %>
+                                                        </h4>
+                                                        <div class="product-price">
+                                                            <span class="current-price">₹<%=
+                                                                    product.salePrice.toLocaleString('en-IN') %></span>
+                                                            <% if (product.regularPrice> product.salePrice) { %>
+                                                                <span class="original-price">₹<%=
+                                                                        product.regularPrice.toLocaleString('en-IN') %>
+                                                                </span>
+                                                                <% } %>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <button class="add-to-cart-btn"
+                                                    onclick="addToWishlist('<%= product._id %>')"
+                                                    data-product-id="<%= product._id %>">
+                                                    Add to Wishlist
+                                                </button>
+
+                                                <i class="ti-heart wishlist-icon"
+                                                    onclick="addToWishlist('<%= product._id %>')"></i>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <% } %>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <% if (currentPage> 1) { %>
+                                <a href="?page=<%= currentPage - 1 %><%= search ? `&search=${search}` : '' %>"
+                                    class="page-link">&laquo; Previous</a>
+                                <% } %>
+
+                                    <% for (let i=1; i <=totalPages; i++) { %>
+                                        <% if (i===currentPage) { %>
+                                            <span class="current-page">
+                                                <%= i %>
+                                            </span>
+                                            <% } else { %>
+                                                <a href="?page=<%= i %><%= search ? `&search=${search}` : '' %>"
+                                                    class="page-link">
+                                                    <%= i %>
+                                                </a>
+                                                <% } %>
+                                                    <% } %>
+
+                                                        <% if (currentPage < totalPages) { %>
+                                                            <a href="?page=<%= currentPage + 1 %><%= search ? `&search=${search}` : '' %>"
+                                                                class="page-link">Next &raquo;</a>
+                                                            <% } %>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </footer>
-    <!--::footer_part end::-->
+        </section>
 
-    <!-- jquery plugins here-->
-    <script src="js/jquery-1.12.1.min.js"></script>
-    <!-- popper js -->
-    <script src="js/popper.min.js"></script>
-    <!-- bootstrap js -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- easing js -->
-    <script src="js/jquery.magnific-popup.js"></script>
-    <!-- swiper js -->
-    <script src="js/swiper.min.js"></script>
-    <!-- swiper js -->
-    <script src="js/masonry.pkgd.js"></script>
-    <!-- particles js -->
-    <script src="js/owl.carousel.min.js"></script>
-    <script src="js/jquery.nice-select.min.js"></script>
-    <!-- slick js -->
-    <script src="js/slick.min.js"></script>
-    <script src="js/jquery.counterup.min.js"></script>
-    <script src="js/waypoints.min.js"></script>
-    <script src="js/contact.js"></script>
-    <script src="js/jquery.ajaxchimp.min.js"></script>
-    <script src="js/jquery.form.js"></script>
-    <script src="js/jquery.validate.min.js"></script>
-    <script src="js/mail-script.js"></script>
-    <script src="js/stellar.js"></script>
-    <script src="js/price_rangs.js"></script>
-    <!-- custom js -->
-    <script src="js/custom.js"></script>
-    </body>
+        <!-- Footer -->
+        <%- include('../partials/users/footer') %>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    </html>
-    
-<!-- Add SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+            <script>
 
-<script>
-// function addToCart(event, productId, productName) {
-//     event.preventDefault();
-    
+
+
+
+                function addToWishlist(productId) {
+                    fetch("/addWishlist", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            productId: productId
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: data.message,
+                                    showConfirmButton: true,
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: data.message,
+                                    showConfirmButton: true,
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error adding to wishlist',
+                                text: 'Something went wrong. Please try again.',
+                                showConfirmButton: true,
+                            });
+                        });
+                } </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+            <script>
+                // Register Cube component
+                Vue.component('cube', {
+                    template: `
+                    <div class="cube">
+                        <div class="cube__side cube__side--front"></div>
+                        <div class="cube__side cube__side--back"></div>
+                        <div class="cube__side cube__side--top"></div>
+                        <div class="cube__side cube__side--bottom"></div>
+                        <div class="cube__side cube__side--left"></div>
+                        <div class="cube__side cube__side--right"></div>
+                    </div>
+                `,
+                    props: {
+                        x: { default: 0 }, y: { default: 0 }, z: { default: 0 },
+                        w: { default: 100 }, h: { default: 100 }, d: { default: 100 },
+                        rx: { default: 0 }, ry: { default: 0 }, rz: { default: 0 },
+                        color: { default: '#717C89' }
+                    },
+                    mounted() {
+                        const el = this.$el;
+                        gsap.set(el.querySelectorAll('.cube__side'), {
+                            background: this.color,
+                            transformStyle: 'preserve-3d'
+                        });
+
+                        gsap.set(el, {
+                            width: this.w,
+                            height: this.h,
+                            transformStyle: 'preserve-3d',
+                            x: this.x,
+                            y: this.y,
+                            z: this.z,
+                            rotationX: this.rx,
+                            rotationY: this.ry,
+                            rotationZ: this.rz
+                        });
+                    }
+                });
+
+                // Initialize Vue app
+                new Vue({
+                    el: '#animation-app',
+                    mounted() {
+                        // Animate title
+                        const letters = document.querySelectorAll('.shop-title span');
+                        gsap.to(letters, {
+                            y: 0,
+                            opacity: 1,
+                            duration: 1,
+                            stagger: 0.1,
+                            ease: 'back.out(1.7)',
+                            delay: 0.5
+                        });
+
+                        // Initialize 3D animation
+                        const wrapper = document.querySelector('.codepen-logo__wrapper');
+                        gsap.set(wrapper, { transformStyle: 'preserve-3d' });
+
+                        gsap.fromTo(wrapper,
+                            {
+                                scale: 0,
+                                rotationX: -90
+                            },
+                            {
+                                scale: 1,
+                                rotationX: -45,
+                                rotationY: 37,
+                                rotationZ: -32,
+                                duration: 2,
+                                ease: 'power4.out',
+                                delay: 0.2
+                            }
+                        );
+
+                        // Add mouse movement effect
+                        document.addEventListener('mousemove', (e) => {
+                            const { clientX, clientY } = e;
+                            const x = (clientX - window.innerWidth / 2) * 0.05;
+                            const y = (clientY - window.innerHeight / 2) * 0.05;
+
+                            gsap.to(wrapper, {
+                                rotationY: 37 + x,
+                                rotationX: -45 + y,
+                                duration: 1,
+                                ease: 'power2.out'
+                            });
+                        });
+                    }
+                });
+
+
+
+                document.addEventListener('DOMContentLoaded', function() {
    
-    
-//     fetch('/addToCart', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//             productId: productId,
-//             quantity: 1
-//         })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.status) {
-//             Swal.fire({
-//                 text: 'Product added to cart',
-//                 icon: 'success',
-//                 showConfirmButton: false,
-//                 timer: 1500
-//             });
-//         } else {
-//             Swal.fire({
-//                 text: 'Failed to add product',
-//                 icon: 'error'
-//             });
-//         }
-//     })
-//     .catch(error => {
-//         Swal.fire({
-//             text: 'Something went wrong',
-//             icon: 'error'
-//         });
-//     });
-    
-//     return false;
-// }
-</script>
+    var carousel = new bootstrap.Carousel(document.getElementById('storeCarousel'), {
+        interval: 3000,
+        wrap: true,      
+        pause: false    
+    });
+});
+            </script>

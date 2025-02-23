@@ -1,11 +1,14 @@
-import { query } from "express";
+
 import Category from "../../models/categorySchema.js";
 import Product from "../../models/productSchema.js"
-import { name } from "ejs";
+
 
 const categoryInfo = async (req, res) => {
     try {
-        // Fixed the typo here - changed req, query.page to req.query.page
+        if (!req.session.admin) {
+            return res.redirect("/admin/login");
+        }
+
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
         const skip = (page - 1) * limit;
@@ -13,7 +16,10 @@ const categoryInfo = async (req, res) => {
         const categoryData = await Category.find({})
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit);
+            .limit(limit).populate({
+                path:'offers',
+                select:"name,discount"
+            })
 
         const totalCategories = await Category.countDocuments();
         const totalPages = Math.ceil(totalCategories / limit);
@@ -42,7 +48,7 @@ const addCategory = async (req, res) => {
         }
 
         const newCategory = new Category({
-            name,
+            name:name.toLowerCase(),
             description,
         });
         await newCategory.save();

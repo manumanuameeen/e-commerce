@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<%- include('../partials/admin/header') %>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +6,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         /* General Reset */
         body,
@@ -231,131 +230,15 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="brand">
-            <img src="/img/logo.png" alt="Aranoz Logo">
-        </div>
-        <ul class="menu">
-            <li class="menu-item">
-                <a href="/admin" class="menu-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/admin/users" class="menu-link">
-                    <i class="fas fa-users"></i>
-                    <span>Customers</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/admin/category" class="menu-link">
-                    <i class="fas fa-list"></i>
-                    <span>Category</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/admin/addProducts" class="menu-link">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Add Product</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/admin/products" class="menu-link">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/admin/order" class="menu-link active">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="col-nav">
-            <ul class="nav">
-                <li class="dropdown nav-item">
-                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
-                        aria-expanded="false">
-                        <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User">
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="/admin/login">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Logout
-                        </a>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
+   
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold">Orders</h1>
-            <!-- <button class="bg-purple-600 text-white px-4 py-2 rounded-md">
-                Create order
-            </button> -->
         </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <!-- Total Orders -->
-            <div class="card p-4">
-                <div class="space-y-1">
-                    <p class="text-sm text-gray-500">Total Orders</p>
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">21</h2>
-                        <span class="badge badge-success">+25.2% last week</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Order Items -->
-            <div class="card p-4">
-                <div class="space-y-1">
-                    <p class="text-sm text-gray-500">Order Items</p>
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">15</h2>
-                        <span class="badge badge-success">+15.7% last week</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Returns Orders -->
-            <div class="card p-4">
-                <div class="space-y-1">
-                    <p class="text-sm text-gray-500">Returns Orders</p>
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">0</h2>
-                        <span class="badge badge-pending">-2.5% last week</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fulfilled Orders -->
-            <div class="card p-4">
-                <div class="space-y-1">
-                    <p class="text-sm text-gray-500">Fulfilled Orders</p>
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">12</h2>
-                        <span class="badge badge-success">+12.5% last week</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Orders Table -->
-        <!-- orders.ejs -->
+<br>
+      
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -363,78 +246,87 @@
                         <th>Order ID</th>
                         <th>Date</th>
                         <th>Customer</th>
-                        <th>Total</th>
+                        <!-- <th>Total</th> -->
                         <th>Status</th>
+                        <th>Return Request</th>
                         <th>Actions</th>
+                        <th>view order</th>
+                        
+
                     </tr>
                 </thead>
                 <tbody>
-                    <% orders.forEach(order=> { %>
-                        <tr>
-                            <td>
-                                <%= order.orderId %>
-                            </td>
-                            <td>
-                                <%= formatDate(order.createdOn) %>
-                            </td>
-                            <td>
-                                <%= order.address.address[0]?.name || 'N/A' %>
-                            </td>
-                            <td>₹<%= order.totalPrice %>
-                            </td>
-                            <td>
-                                <form class="status-form" data-order-id="<%= order._id %>">
-                                    <select name="status" class="form-select status-select">
-
-                                        <option value="Pending" <%=order.status==='Pending' ? 'selected' : '' %>>Pending
-                                        </option>
-                                        <option value="Processing" <%=order.status==='Processing' ? 'selected' : '' %>
-                                            >Processing</option>
-                                        <option value="Shipped" <%=order.status==='Shipped' ? 'selected' : '' %>>Shipped
-                                        </option>
-                                        <option value="Delivered" <%=order.status==='Delivered' ? 'selected' : '' %>
-                                            >Delivered</option>
-                                        <option value="Cancelled" <%=order.status==='Cancelled' ? 'selected' : '' %>
-                                            >Cancelled</option>
-                                    </select>
-                                </form>
-                            </td>
-                            <td>
-                                <form">
-
-
-                                    <button type="submit" class="btn btn-danger cancel-btn"
-                                        onclick="viewDetailes('<%=order._id %>')">
-                                        view detailes
+                    <% orders.forEach(order => { %>
+                    <tr>
+                        <td><%= order.orderId %></td>
+                        <td><%= formatDate(order.createdAt) %></td>
+                        <td>
+                         <%=user.name%>
+                        </td>
+                        <td>
+                         <%=order.status%>
+                        </td>
+                        <!-- <td>₹<%= order.totalPrice %></td> -->
+                        <td>
+                            <form class="status-form" data-order-id="<%= order._id %>">
+                                <select name="status" class="form-select status-select <%= order.status.toLowerCase() %>">
+                                    <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                    <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                    <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                    <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <% if (order.returnRequest) { %>
+                                <% if (order.returnRequest.status === 'Requested') { %>
+                                    <button class="btn btn-info" 
+                                            onclick="viewReturnRequest('<%= order._id %>', `<%= order.returnRequest.reason %>`)">
+                                        View Request
                                     </button>
-                                    </form>
-                            </td>
-                        </tr>
-                        <% }) %>
+                                <% } else { %>
+                                    <span class="badge <%= order.returnRequest.status === 'Approved' ? 'bg-success' : 'bg-danger' %>">
+                                        <%= order.returnRequest.status %>
+                                    </span>
+                                <% } %>
+                            <% } else { %>
+                                <span class="text-muted">No Request</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="viewDetailes('<%= order._id %>')">
+                                View Details
+                            </button>
+                        </td>
+                    </tr>
+                    <% }) %>
                 </tbody>
             </table>
-
-
         </div>
         <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
                         <% for (let i=1; i <=totalPages; i++) { %>
-                            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                                <a class="page-link" href="?page=<%= i %>">
-                                    <%= i %>
-                                </a>
-                            </li>
-                            <% } %>
+                        <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                        <% } %>
                     </ul>
                 </nav>
             </div>
         </div>
-
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -492,8 +384,16 @@
                                     timerProgressBar: true
                                 });
 
-                                updateStatusUI(orderId, newStatus);
-                            } else {
+                                function updateStatusUI(orderId, newStatus) {
+   
+    const statusSelect = document.querySelector(`.status-form[data-order-id="${orderId}"] .status-select`);
+    if (statusSelect) {
+       
+        statusSelect.classList.remove('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned');
+        
+        statusSelect.classList.add(newStatus.toLowerCase());
+    }
+}                            } else {
                                 throw new Error(data.message || 'Error updating status');
                             }
                         } catch (error) {
@@ -508,37 +408,168 @@
                             select.value = select.getAttribute('data-previous-value');
                         }
                     } else {
-                        // If user cancels, revert to previous value
+                     
                         select.value = select.getAttribute('data-previous-value');
                     }
                 });
 
-                // Store the previous value when focusing on select
+             
                 select.addEventListener('focus', function () {
                     this.setAttribute('data-previous-value', this.value);
                 });
             });
 
             function updateStatusUI(orderId, newStatus) {
-                // Update status color if you have status indicators
-                const statusElement = document.querySelector(`[data-status-id="${orderId}"]`);
+              
+                const statusElement = document.querySelector(`[data-status-id=${orderId}]`);
                 if (statusElement) {
-                    // Remove all existing status classes
+              
                     statusElement.classList.remove('pending', 'processing', 'shipped', 'delivered', 'cancelled');
-                    // Add new status class
+                
                     statusElement.classList.add(newStatus.toLowerCase());
                 }
             }
         });
 
 
-        async function viewDetailes(orderId) {
-            console.log("id", orderId);
+        function viewDetailes(orderId) {
+    window.location.href = `/admin/orderDetails/${orderId}`;
+}
 
-            window.location.href = `/admin/orderDetails/${orderId}`
+
+
+
+
+  
+  
+    
+    function removeOffer(offerId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/remove-offer/${offerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire('Deleted!', data.message, 'success');
+                    location.reload();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire('Error!', error.message || 'Something went wrong!', 'error');
+            }
         }
+    });
+}
+
+
+
+
+
+
+
+
+
+async function viewReturnRequest(orderId, reason) {
+    const { value: formValues } = await Swal.fire({
+        title: 'Return Request Details',
+        html: `
+            <div class="mb-3">
+                <label class="form-label"><strong>Customer's Reason:</strong></label>
+                <p>${reason}</p>
+            </div>
+            <div class="mb-3">
+                <label for="admin-note" class="form-label">Admin Note:</label>
+                <textarea id="admin-note" class="form-control" placeholder="Enter your response note..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Action:</label>
+                <select id="return-status" class="form-select">
+                    <option value="Approved">Approve Return</option>
+                    <option value="Rejected">Reject Return</option>
+                </select>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        cancelButtonText: 'Cancel',
+        preConfirm: () => {
+            const status = document.getElementById('return-status').value;
+            const adminNote = document.getElementById('admin-note').value;
+            
+            if (!adminNote.trim()) {
+                Swal.showValidationMessage('Please enter an admin note');
+                return false;
+            }
+            
+            return { status, adminNote };
+        }
+    });
+
+    if (formValues) {
+        try {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Handling return request',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const response = await fetch(`/admin/return-request/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: formValues.status,
+                    adminNote: formValues.adminNote
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    title: 'Success!',
+                    text: data.message,
+                    icon: 'success',
+                    timer: 2000
+                });
+               
+                location.reload();
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: error.message || 'Something went wrong!',
+                icon: 'error'
+            });
+        }
+    }
+}
+
 
     </script>
+
 </body>
 
 </html>

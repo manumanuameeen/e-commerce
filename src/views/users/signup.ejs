@@ -1,160 +1,234 @@
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.26/bootstrap-4.min.css">
 <%- include('../partials/users/header') %>
 
-
 <style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #ffffff;
+        color: #000000;
+    }
 
-    .error-message{
-        color: red;
+    .header-section {
+        text-align: center;
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+
+    .header-section h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .header-section p {
+        color: #62636c;
+        font-size: 16px;
+    }
+
+    .signup-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    .signin-section, .signup-section {
+        flex: 1;
+        padding: 40px;
+        border: 1px solid #000000;
+        border-radius: 8px;
+    }
+
+    .signin-section {
+        text-align: center;
+    }
+
+    .signin-section h2, .signup-section h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .signin-section p {
+        margin-bottom: 30px;
+        color: #000000;
+    }
+
+    .button1 {
+        border-radius: 5px;
+        background-color: #e02323;
+        color: #ffffff;
+        /* border: 1px solid #000000; */
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+
+        display: inline-block;
+    }
+
+    .button1:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    .button2 {
+        background-color: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .button2:hover {
+        background-color: #62636c;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .error-message {
+        color: #cb0808;
         font-size: 0.75rem;
         display: none;
+        margin-top: 5px;
+    }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        background-color: #ffffff;
+        color: #cb0808;
+        text-decoration: underline;
+    }
+
+    .google-signup {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .google-signup p {
+        margin-bottom: 15px;
+        color: #62636c;
+    }
+
+    .btn-light {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        background-color: #ffffff;
+        border: 1px solid #000000;
+        color: #000000;
+        padding: 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-light:hover {
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        .signup-container {
+            flex-direction: column;
+        }
+        
+        .signin-section, .signup-section {
+            width: 100%;
+        }
     }
 </style>
-    <!-- breadcrumb start-->
-    <section class="breadcrumb breadcrumb_bg">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="breadcrumb_iner">
-                        <div class="breadcrumb_iner_item">
-                            <h2>Sign Up</h2>
-                            <p>Home <span>-</span> Sign Up</p>
-                        </div>
-                    </div>
+
+<div class="header-section">
+    <hr style="border: 1px solid ; width: 100%; color: #000000;">
+
+    <br><br><br><br><br>
+    <h1>Sign Up</h1>
+    <p>
+        <a href="/" style="color: inherit; text-decoration: none;">Home</a> - Sign Up
+    </p>
+</div>
+
+<div class="signup-container">
+    <div class="signin-section">
+        <br><br><br><br><br><br><br><br><br><br><br><br>
+        <h2>Already have an account?</h2>
+        <p>Sign in to your account to continue shopping and enjoy our latest offers!</p>
+        <a href="/login" class="button1"><strong>Sign In</strong></a>
+    </div>
+
+    <div class="signup-section">
+        <h2>Welcome!<br>Create Your Account</h2>
+        <form id="signform" class="row contact_form" action="/signup" method="post" novalidate="novalidate" autocomplete="off">
+            <% if (locals.message && message.length > 0) { %>
+                <div class="alert">
+                    <%= message %>
                 </div>
+            <% } %>
+            
+            <div class="form-group">
+                <input type="text" id="name" name="name" placeholder="Full Name" required>
+                <div id="error1" class="error-message"></div>
             </div>
-        </div>
-    </section>
-    <!-- breadcrumb end-->
 
-    <!--================Sign Up Part Area =================-->
-    <!-- <section class="login_part padding_top">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 col-md-6">
-                    <div class="login_part_text text-center">
-                        <div class="login_part_text_iner">
-                            <h2>Already have an account?</h2>
-                            <p>Sign in to your account to continue shopping and enjoy our latest offers!</p>
-                            <a href="/login" class="btn_3">Sign In</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="login_part_form">
-                        <div class="login_part_form_iner">
-                            <h3>Welcome! <br>Create Your Account</h3>
-                            <form id="signform" class="row contact_form" action="/signup" method="post"
-                                novalidate="novalidate"   autocomplete="off">
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="text" class="form-control" id="name" name="name" value=""
-                                        placeholder="Full Name" required>
-                                    <div id="error1" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="email" class="form-control" id="email" name="email" value=""
-                                        placeholder="Email Address" required>
-                                    <div id="error2" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="text" class="form-control" id="phone" name="phone" value=""
-                                        placeholder="Phone Number" required>
-                                    <div id="error3" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="password" class="form-control" id="password" name="password" value=""
-                                        placeholder="Password" >
-                                    <div id="error4" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="password" class="form-control" id="cPassword" name="cPassword"
-                                        value="" placeholder="Confirm Password" >
-                                    <div id="error5" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group">
-                                    <button  type="submit" value="submit" class="btn_3">Sign Up</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" placeholder="Email Address" required>
+                <div id="error2" class="error-message"></div>
             </div>
-        </div>
-    </section> -->
 
-
-
-    <section class="login_part padding_top">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 col-md-6">
-                    <div class="login_part_text text-center">
-                        <div class="login_part_text_iner">
-                            <h2>Already have an account?</h2>
-                            <p>Sign in to your account to continue shopping and enjoy our latest offers!</p>
-                            <a href="/login" class="btn_3">Sign In</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="login_part_form">
-                        <div class="login_part_form_iner">
-                            <h3>Welcome! <br>Create Your Account</h3>
-                            <form id="signform" class="row contact_form" action="/signup" method="post" novalidate="novalidate" autocomplete="off">
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="text" class="form-control" id="name" name="name" value="" placeholder="Full Name" required>
-                                    <div id="error1" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="email" class="form-control" id="email" name="email" value="" placeholder="Email Address" required>
-                                    <div id="error2" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="text" class="form-control" id="phone" name="phone" value="" placeholder="Phone Number" required>
-                                    <div id="error3" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="password" class="form-control" id="password" name="password" value="" placeholder="Password">
-                                    <div id="error4" class="error-message"></div>
-                                </div>
-                                <div class="col-md-12 form-group p_star">
-                                    <input type="password" class="form-control" id="cPassword" name="cPassword" value="" placeholder="Confirm Password">
-                                    <div id="error5" class="error-message"></div>
-                                </div>
-                                <% if (locals.message&&message.length>0) { %>
-                                    <div class="alert alert-danger text-center">
-                                            <p><%= message %></p>
-                                    </div>
-                                 <% } %>
-                                <div class="col-md-12 form-group">
-                                    <button type="submit" value="submit" class="btn_3">Sign Up</button>
-                                </div>
-                            </form>
-                           
-                            <div class="google-signup mt-3">
-                                <p>Or sign up with</p>
-                                <a href="/auth/google" class="btn btn-light btn-block d-flex align-items-center justify-content-center" style="border: 1px solid #ddd; text-decoration: none;">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Icon" style="width: 20px; margin-right: 10px;">
-                                    Sign Up with Google
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <input type="text" id="phone" name="phone" placeholder="Phone Number" required>
+                <div id="error3" class="error-message"></div>
             </div>
+
+            <div class="form-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <div id="error4" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="cPassword" name="cPassword" placeholder="Confirm Password" required>
+                <div id="error5" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="referralCode" name="referralCode" value="<%= locals.referralCode || '' %>" placeholder="Referral Code (Optional)">
+                <div id="error6" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="button2">Sign Up</button>
+            </div>
+        </form>
+
+        <div class="google-signup">
+            <p>Or sign up with</p>
+            <a href="/auth/google" class="btn-light">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Icon" style="width: 20px; margin-right: 10px;">
+                Sign Up with Google
+            </a>
         </div>
-    </section>
-    
-    <!--================Sign Up Part End =================-->
+    </div>
+</div>
 
-    <%- include('../partials/users/footer') %>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.9/dist/sweetalert2.min.js"></script>
-
-    <!-- <script> href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.26/bootstrap-4.min.css"></script> -->
-    <script>
-
-
+<script>
 const nameid = document.getElementById('name');
 const emailid = document.getElementById('email');
 const phoneid = document.getElementById('phone');
@@ -255,7 +329,6 @@ signform.addEventListener("submit", (e) => {
     passwordValidateChecking();
     confirmPasswordValidateChecking();
 
-   
     if (
         error1.innerHTML ||
         error2.innerHTML ||
@@ -266,6 +339,6 @@ signform.addEventListener("submit", (e) => {
         e.preventDefault();
     }
 });
-    </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.9/dist/sweetalert2.min.js"></script>
+</script>
 
+<%- include('../partials/users/footer') %>

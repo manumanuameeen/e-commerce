@@ -3,204 +3,520 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Success</title>
+    <title>Order Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
-        
+        :root {
+            --primary-color: #10b981;
+            --border-color: #e5e7eb;
+            --background-color: #f8fafc;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8fafc;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
             background: white;
-            padding: 40px;
             border-radius: 16px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 40px;
+            margin-bottom: 24px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         .success-icon {
-            width: 48px;
-            height: 48px;
-            background-color: #10b981;
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 24px;
+            animation: scaleIn 0.5s ease-out;
         }
 
         .checkmark {
             color: white;
-            font-size: 24px;
+            font-size: 40px;
         }
 
         h1 {
-            color: #333;
-            text-align: center;
-            font-size: 24px;
-            margin: 0 0 8px 0;
-            font-weight: 500;
+            font-size: 32px;
+            margin-bottom: 12px;
         }
 
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 40px;
+            color: var(--text-secondary);
+            font-size: 18px;
         }
 
         .section {
             margin-bottom: 32px;
-            padding: 24px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .section h2 {
-            font-size: 18px;
-            margin: 0 0 16px 0;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-            color: #333;
+        .section-header {
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 24px;
         }
 
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
         }
 
         .detail-item {
-            margin-bottom: 8px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
         }
 
-        .detail-item strong {
-            color: #555;
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
         }
 
         th, td {
-            padding: 12px;
+            padding: 16px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            color: #555;
+            background-color: #f9fafb;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 14px;
             font-weight: 500;
         }
 
-        .back-button {
-            display: block;
-            text-align: center;
-            margin-top: 24px;
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-delivered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .button {
             padding: 12px 24px;
-            background-color: #f3f4f6;
-            color: #333;
-            text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .button-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .button-secondary {
+            background-color: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            .button-container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="success-icon">
-            <span class="checkmark">✓</span>
-        </div>
-        <h1>Thank you for your purchase</h1>
-        <p class="subtitle">We've received your order and plan to ship it in 5-7 business days.</p>
-
-        <div class="section">
-            <h2>Order Details</h2>
-            <div class="details-grid">
-                <div class="detail-item">
-                    <strong>Order ID:</strong> <%= order.orderId %>
+        <div class="card" id="invoice-content">
+            <div class="success-header">
+                <div class="success-icon">
+                    <span class="checkmark">✓</span>
                 </div>
-                <div class="detail-item">
-                    <strong>Order Date:</strong> <%= order.createdOn.toLocaleString() %>
-                </div>
-                <div class="detail-item">
-                    <strong>Total Price:</strong> ₹<%= order.totalPrice %>
-                </div>
-                <div class="detail-item">
-                    <strong>Final Amount:</strong> ₹<%= order.finalAmount %>
-                </div>
-                <div class="detail-item">
-                    <strong>Discount:</strong> ₹<%= order.discount %>
-                </div>
-                <!-- <div class="detail-item">
-                    <strong>Coupon Applied:</strong> <%= order.couponApplied ? 'Yes' : 'No' %>
-                </div> -->
+                <h1>Order Confirmed!</h1>
+                <p class="subtitle">Thank you for your purchase. Your order has been successfully processed.</p>
             </div>
-        </div>
 
-    
-
-        <div class="section">
-            <h2>Payment Details</h2>
-            <div class="details-grid">
-                <div class="detail-item">
-                    <strong>Payment Method:</strong> <%= order.paymentMethod %>
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Order Details</h2>
                 </div>
-                <div class="detail-item">
-                    <strong>Status:</strong> <%= order.status %>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Order ID</div>
+                        <div class="detail-value">#<%= order.orderId %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Order Date</div>
+                        <div class="detail-value"><%= new Date(order.createdAt).toLocaleDateString() %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Method</div>
+                        <div class="detail-value"><%= order.paymentMethod %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Amount</div>
+                        <div class="detail-value">₹<%= order.totalPrice.toFixed(2) %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Discount</div>
+                        <div class="detail-value">₹<%= order.discount.toFixed(2) %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Final Amount</div>
+                        <div class="detail-value">₹<%= order.finalAmount.toFixed(2) %></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h2>Order Quantity</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% order.orderIteams.forEach(item => { %>
-                        <tr>
-                            <td><%= item.quantity %></td>
-                            <td>₹<%= item.price %></td>
-                            <td>₹<%= item.price * item.quantity %></td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Order Summary</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.orderIteams.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.productName %></td>
+                                    <td><%= item.quantity %></td>
+                                    <td>₹<%= item.price.toFixed(2) %></td>
+                                    <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                                    <td>
+                                        <span class="status-badge <%= item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' : 'status-delivered' %>">
+                                            <%= item.status %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-        <a href="/" class="back-button">Back to Home</a>
+            <div class="button-container">
+                <a href="/" class="button button-secondary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Back to Home
+                </a>
+                <button id="downloadInvoice" class="button button-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Invoice
+                </button>
+            </div>
+        </div>
     </div>
+
+    <div id="toast" class="toast">
+        Preparing your invoice...
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    // Initialize jsPDF
+  // Initialize jsPDF
+// Initialize jsPDF
+// Initialize jsPDF
+window.jsPDF = window.jspdf.jsPDF;
+
+function exportToPDF() {
+    const doc = new jsPDF();
+    
+    try {
+        // Define colors
+        const greyColor = [128, 128, 128];
+        const lightGreyBg = [245, 245, 245];
+        
+        doc.setFillColor(...lightGreyBg);
+        doc.rect(0, 0, 210, 15, 'F');
+        
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Aranoz', 15, 35);
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Perinthalmanna', 15, 45);
+        doc.text('Kerala, 679322', 15, 50);
+        doc.text('Contact: +91 8075973591', 15, 55);
+        doc.text('Email: aranoz@gmail.com', 15, 60);
+        
+        // Invoice Details - Left side
+        doc.setFont('helvetica', 'bold');
+        const currentDate = new Date().toLocaleDateString();
+        doc.text(`Date: ${currentDate}`, 15, 75);
+        const orderId = document.querySelector('.detail-value').textContent;
+        doc.text(`Invoice No: ${orderId}`, 15, 80);
+        
+        // Add "INVOICE" text centered at top
+        doc.setFontSize(24);
+        doc.setTextColor(...greyColor);
+        doc.text('INVOICE', doc.internal.pageSize.width/2, 30, { align: 'center' });
+        
+        // Billing and Shipping Sections with columns
+        doc.setFillColor(...lightGreyBg);
+        doc.rect(15, 95, 180, 7, 'F');
+        
+        doc.setFontSize(11);
+        doc.setTextColor(...greyColor);
+        doc.text('BILLING & SHIPPING DETAILS', 17, 100);
+        
+        // Details content in columns
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        
+       
+        const billingDetails = {
+            name: document.querySelector('[data-customer-name]')?.dataset.customerName || '<%=user.name%>',
+            houseName: document.querySelector('[data-house-name]')?.dataset.houseName || 'House/Building',
+            street: document.querySelector('[data-street]')?.dataset.street || '',
+            
+          
+        };
+        
+        // Column 1 - From
+        doc.setFont('helvetica', 'bold');
+        doc.text('From:', 15, 115);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Aranoz Company', 15, 125);
+        doc.text('123 Business District', 15, 130);
+        doc.text('Perinthalmanna, Kerala', 15, 135);
+        doc.text('Phone: +91 8075973591', 15, 140);
+        
+        // Column 2 - Bill To
+        doc.setFont('helvetica', 'bold');
+        doc.text('Bill To:', 105, 115);
+        doc.setFont('helvetica', 'normal');
+        
+        // doc.text(billingDetails.name, 105, 125);
+        // doc.text(billingDetails.houseName, 105, 130);
+        // doc.text(billingDetails.street, 105, 135);
+        // doc.text(`${billingDetails.city}, ${billingDetails.state}`, 105, 140);
+        // doc.text(`PIN: ${billingDetails.pincode}`, 105, 145);
+        // doc.text(`Phone: ${billingDetails.phone}`, 105, 150);
+       
+        // doc.setFillColor(...lightGreyBg);
+        // doc.rect(15, 165, 180, 10, 'F');
+        
+        // Table Headers
+        doc.setTextColor(...greyColor);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Product Description', 17, 172);
+        doc.text('Qty', 95, 172);
+        doc.text('Price', 130, 172);
+        doc.text('Total', 170, 172);
+        
+        // Get order items from the table
+        const table = document.querySelector('table');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        // Table Contents with alternating backgrounds
+        let yPos = 185;
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        
+        rows.forEach((row, index) => {
+            // Add alternating row backgrounds
+            if (index % 2 === 0) {
+                doc.setFillColor(250, 250, 250);
+                doc.rect(15, yPos - 5, 180, 10, 'F');
+            }
+            
+            const cells = row.querySelectorAll('td');
+            const productName = cells[0].textContent;
+            const quantity = cells[1].textContent;
+            const price = cells[2].textContent.replace('₹', '').trim();
+            const total = cells[3].textContent.replace('₹', '').trim();
+            
+            doc.text(productName, 17, yPos);
+            doc.text(quantity, 95, yPos);
+            doc.text(`₹ ${price}`, 130, yPos);
+            doc.text(`₹ ${total}`, 170, yPos);
+            
+            yPos += 10;
+        });
+        
+        // Summary Section
+        yPos += 10;
+        doc.setFillColor(...lightGreyBg);
+        doc.rect(110, yPos - 5, 85, 50, 'F');
+        
+        // Get pricing details from the page
+        const detailValues = document.querySelectorAll('.detail-value');
+        const totalPrice = detailValues[3].textContent.replace('₹', '').trim();
+        const discount = detailValues[4].textContent.replace('₹', '').trim();
+        const finalAmount = detailValues[5].textContent.replace('₹', '').trim();
+        
+        doc.setFont('helvetica', 'normal');
+        doc.text('Subtotal:', 115, yPos + 5);
+        doc.text(`₹ ${totalPrice}`, 170, yPos + 5);
+        
+        doc.text('Discount:', 115, yPos + 15);
+        doc.text(`₹ ${discount}`, 170, yPos + 15);
+        
+        doc.text('Shipping:', 115, yPos + 25);
+        doc.text('₹ 0.00', 170, yPos + 25);
+        
+        doc.setFont('helvetica', 'bold');
+        doc.text('Total Amount:', 115, yPos + 40);
+        doc.text(`₹ ${finalAmount}`, 170, yPos + 40);
+        
+        // Footer
+        doc.setFillColor(...lightGreyBg);
+        doc.rect(0, 277, 210, 20, 'F');
+        
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Thank you for shopping with Aranoz!', 15, 285);
+        doc.text('For support, contact: +91 8075973591 | aranoz@gmail.com', 15, 290);
+        
+        // Save the PDF
+        doc.save(`aranoz-invoice-${orderId.replace('#', '')}.pdf`);
+        
+        return true;
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        return false;
+    }
+}
+
+// Event listener
+document.getElementById('downloadInvoice').addEventListener('click', function() {
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    toast.textContent = 'Preparing your invoice...';
+    
+    setTimeout(() => {
+        try {
+            const success = exportToPDF();
+            toast.textContent = success ? 'Invoice downloaded successfully!' : 'Error generating invoice. Please try again.';
+        } catch (error) {
+            toast.textContent = 'Error generating invoice. Please try again.';
+            console.error('Error:', error);
+        }
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }, 100);
+});
+</script>
 </body>
 </html>
