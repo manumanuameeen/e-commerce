@@ -1,5 +1,33 @@
 <%- include('../partials/users/header') %>
     <style>
+        /* Main theme colors - black and white */
+        body {
+            background-color: #f8f9fc;
+        }
+        
+        .card {
+            border: 1px solid #ddd;
+            box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn_2 {
+            background: linear-gradient(45deg, #000000, #333333);
+            color: white !important;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .btn_2:hover {
+            background: linear-gradient(45deg, #333333, #000000);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Status badges - smaller size and with colors */
         .status-delivered {
             background-color: #28a745;
             color: white;
@@ -8,6 +36,11 @@
         .status-pending {
             background-color: #ffc107;
             color: black;
+        }
+        
+        .status-payment-pending {
+            background-color: #fd7e14;
+            color: white;
         }
 
         .status-processing {
@@ -26,15 +59,17 @@
         }
 
         .status-badge {
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 0.5rem;  /* Reduced size */
             border-radius: 0.25rem;
             font-weight: 500;
+            font-size: 0.75rem;  /* Smaller font */
             display: inline-block;
         }
 
-        .modal-body .wallet-balance-card {
-            background: linear-gradient(45deg, #000000, #6684dc);
-            box-shadow: 0 4px 15px rgba(78, 115, 223, 0.2);
+        /* Wallet styles */
+        .wallet-balance-card {
+            background: linear-gradient(45deg, #000000, #333333) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .modal-body .transaction-list {
@@ -52,6 +87,75 @@
 
         .modal-dialog {
             max-width: 700px;
+        }
+        
+        /* Scrollable orders list */
+        .orders-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+        }
+        
+        .order-item {
+            border-bottom: 1px solid #e3e6f0;
+            padding: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .order-item:hover {
+            background-color: #f8f9fc;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* User avatar and info styling */
+        .user_avatar img {
+            border: 3px solid #000;
+            padding: 3px;
+        }
+        
+        .user_info h4 {
+            color: #000;
+            font-weight: 600;
+        }
+        
+        /* Custom scrollbar */
+        .orders-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .orders-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .orders-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        .orders-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Active nav item */
+        .nav-link.active {
+            background-color: #000 !important;
+            color: white !important;
+            border-radius: 5px;
+        }
+        
+        /* Nav links */
+        .nav-link {
+            color: #000;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: #f8f9fc;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -98,7 +202,7 @@
                         <!-- Profile Details Tab -->
                         <div class="tab-pane fade show active" id="profile">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f8f9fc; border-bottom: 1px solid #e3e6f0;">
                                     <h4 class="mb-0">Profile Details</h4>
                                 </div>
                                 <div class="card-body">
@@ -122,28 +226,19 @@
                                                 style="max-width: 150px; margin-left: 10px;">
 
                                             <!-- Copy Button -->
-                                            <button class="btn btn-sm btn-primary ml-2" onclick="copyReferralCode()">
+                                            <button class="btn btn-sm btn-dark ml-2" onclick="copyReferralCode()">
                                                 <i class="fas fa-copy"></i>
                                             </button>
-
-                                            <!-- Paste Button -->
-                                            <!-- <button class="btn btn-sm btn-secondary ml-2" onclick="pasteReferralCode()">
-                                                <i class="fas fa-paste"></i>
-                                            </button> -->
                                         </div>
                                     </div>
 
                                     <!-- Edit Buttons Section -->
                                     <div class="edit-buttons mt-3">
-                                        <button class="btn btn-sm btn_2" data-toggle="modal"
-                                            data-target="#editProfileModal"
-                                            style="background: linear-gradient(45deg, #000000, #6684dc); margin-right: 10px;">
+                                        <button class="btn_2" style="margin-right: 10px;">
                                             <a style="text-decoration: none; color: white;" href="/update-email">Edit
                                                 Email</a>
                                         </button>
-                                        <button class="btn btn-sm btn_2" data-toggle="modal"
-                                            data-target="#editProfileModal"
-                                            style="background: linear-gradient(45deg, #000000, #6684dc)">
+                                        <button class="btn_2">
                                             <a style="text-decoration: none; color: white;" href="/update-name">Edit
                                                 Name</a>
                                         </button>
@@ -151,52 +246,51 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <!-- Orders Tab -->
-
-
                         <div class="tab-pane fade" id="orders">
                             <div class="card">
-                                <div class="card-header">
+                                <div class="card-header" style="background-color: #f8f9fc; border-bottom: 1px solid #e3e6f0;">
                                     <h4 class="mb-0">My Orders</h4>
                                 </div>
                                 <div class="card-body">
-                                    <% orders.forEach(item=> { %>
-                                        <div class="order-item mb-4">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <h5>Order <%=item.orderId%>
-                                                    </h5>
-                                                    <p class="mb-1">Date: <%=item.createdAt%>
-                                                    </p>
-                                                    <p class="mb-1">Status:
-                                                        <span class="status-badge <%= 
-                                    item.status.toLowerCase() === 'delivered' ? 'status-delivered' :
-                                    item.status.toLowerCase() === 'pending' ? 'status-pending' :
-                                    item.status.toLowerCase() === 'processing' ? 'status-processing' :
-                                    item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' :
-                                    item.status.toLowerCase() === 'returned' ? 'status-returned' : ''
-                                %>">
-                                                            <%=item.status%>
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <h5>₹<%=item.finalAmount.toFixed(2)%>
-                                                    </h5>
-                                                    <button class="btn_2"
-                                                        onclick="viewOrderDetails('<%=item.orderId%>')">View
-                                                        Details</button>
+                                    <!-- Orders container with scroll -->
+                                    <div class="orders-container">
+                                        <% orders.forEach(item=> { %>
+                                            <div class="order-item">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h5>Order <%=item.orderId%></h5>
+                                                        <p class="mb-1">Date: <%=item.createdAt%></p>
+                                                        <p class="mb-1">Status:
+                                                            <span class="status-badge <%= 
+                                                                item.status.toLowerCase() === 'delivered' ? 'status-delivered' :
+                                                                item.status.toLowerCase() === 'pending' ? 'status-pending' :
+                                                                item.status.toLowerCase() === 'processing' ? 'status-processing' :
+                                                                item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' :
+                                                                item.status.toLowerCase() === 'returned' ? 'status-returned' :
+                                                                item.status.toLowerCase() === 'payment pending' ? 'status-payment-pending' : ''
+                                                            %>">
+                                                                <%=item.status%>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <h5>₹<%=item.finalAmount.toFixed(2)%></h5>
+                                                        <button class="btn_2" onclick="viewOrderDetails('<%=item.orderId%>')">View Details</button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
                                         <% }) %>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- address -->
+                        
+                        <!-- Address Tab -->
                         <div class="tab-pane fade" id="address">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f8f9fc; border-bottom: 1px solid #e3e6f0;">
                                     <h4 class="mb-0">Address Book</h4>
                                     <a href="/addAddress" class="btn_2">Add New Address</a>
                                 </div>
@@ -225,38 +319,32 @@
                                                     </p>
                                                     <div class="mt-3">
                                                         <a href="/editAddress?id=<%= addressItem._id %>"
-                                                            class="btn btn-sm btn-outline-primary mr-2">Edit</a>
-                                                            <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete('<%= addressItem._id %>')">Delete</a>
-
+                                                            class="btn btn-sm btn-outline-dark mr-2">Edit</a>
+                                                        <a href="#" class="btn btn-sm btn-dark" onclick="confirmDelete('<%= addressItem._id %>')">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <% }); %>
-                                                <% } else { %>
-                                                    <p class="text-center">No address found. Add a new address.</p>
-                                                    <% } %>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <p class="text-center">No address found. Add a new address.</p>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
 
-
                         <!-- Wallet Tab -->
                         <div class="tab-pane fade" id="wallet">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f8f9fc; border-bottom: 1px solid #e3e6f0;">
                                     <h4 class="mb-0">My Wallet</h4>
-                                    <button class="btn_2" data-toggle="modal" data-target="#walletModal"
-                                        style='background: linear-gradient(45deg, #000000, #6684dc)'>
+                                    <button class="btn_2" data-toggle="modal" data-target="#walletModal">
                                         View Details
                                     </button>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-6">
-
-                                            <div class="wallet-balance-card bg-blue-500 text-white p-4 rounded"
-                                                style='background: linear-gradient(45deg, #000000, #6684dc)'>
-
+                                            <div class="wallet-balance-card text-white p-4 rounded">
                                                 <div class="d-flex align-items-center mb-3">
                                                     <i class="fas fa-wallet fa-2x mr-3"></i>
                                                     <div>
@@ -288,7 +376,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="wallet-details">
-                                            <div class="wallet-balance-card bg-primary text-white p-4 rounded mb-4">
+                                            <div class="wallet-balance-card text-white p-4 rounded mb-4">
                                                 <div class="d-flex align-items-center">
                                                     <i class="fas fa-wallet fa-3x mr-3"></i>
                                                     <div>
@@ -350,15 +438,12 @@
                                                             <% }}) %>
                                                                 <% } catch (error) { %>
                                                                     <div class="text-center py-4">
-                                                                        <i
-                                                                            class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
-                                                                        <p class="mb-0">Error loading transaction data
-                                                                        </p>
+                                                                        <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+                                                                        <p class="mb-0">Error loading transaction data</p>
                                                                     </div>
                                                                     <% } } else { %>
                                                                         <div class="text-center py-4">
-                                                                            <i
-                                                                                class="fas fa-history fa-3x text-muted mb-3"></i>
+                                                                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
                                                                             <p class="mb-0">No transactions found</p>
                                                                         </div>
                                                                         <% } %>
@@ -367,8 +452,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
@@ -379,10 +463,7 @@
         </div>
     </section>
 
-
     <script>
-
-
         function copyReferralCode() {
             let referralInput = document.getElementById("referralCode");
 
@@ -407,70 +488,55 @@
             });
         }
 
-
-
-
-    
-
-
-
-function confirmDelete(addressId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-           
-            fetch(`/deleteAddress/${addressId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                   
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire(
-                        'Deleted!',
-                        'The address has been deleted.',
-                        'success'
-                    ).then(() => {
-                       
-                        window.location.href = '/Profile';
+        function confirmDelete(addressId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#000',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/deleteAddress/${addressId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire(
+                                'Deleted!',
+                                'The address has been deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.href = '/Profile';
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'Failed to delete the address.',
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            error.message||'An error occurred.',
+                            'error'
+                        );
                     });
-                } else {
-                    console.log();
-                    
-                    Swal.fire(
-                        'Error!',
-                        'Failed to delete the address.',
-                        'error'
-                    );
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire(
-                    'Error!',
-                    error.message||'An error occurred.',
-                    'error'
-                );
             });
         }
-    });
-}
-
 
         function viewOrderDetails(orderId) {
-
-            window.location.href = `/order-details/${orderId}`
+            window.location.href = `/order-details/${orderId}`;
         }
-
     </script>
 
     <%- include('../partials/users/footer') %>

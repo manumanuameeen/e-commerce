@@ -1390,11 +1390,11 @@ async function verifyPayment(response, orderData, orderId) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                ...orderData,
-                ...response,
+                // ...orderData,
+                // ...response,
                 selectedCoupon:selectedCouponCode,
                 selectedAddress,
-                // orderId
+                orderId:orderId
             })
         });
         

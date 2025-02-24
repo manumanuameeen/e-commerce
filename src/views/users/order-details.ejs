@@ -44,32 +44,18 @@
     .cancel-item-btn:hover {
         background-color: #DC2626;
     }
-
-    #admin-message-box {
-        width: 300px;
-        padding: 10px;
-        background-color: #cce5ff;
-        border: 1px solid #b8daff;
-        position: relative;
-        border-radius: 5px;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    
+    .retry-payment-btn {
+        background-color: #F59E0B;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        transition: background-color 0.2s;
     }
 
-    #admin-message-box button {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        color: #004085;
-    }
-
-    #admin-message-box p {
-        color: #004085;
-        font-weight: bold;
-        margin: 0;
+    .retry-payment-btn:hover {
+        background-color: #D97706;
     }
 </style>
 </head>
@@ -145,14 +131,14 @@
                             <p class="text-sm text-gray-500">Color: <%= item.color %></p>
                         </div>
                     </div>
-                    <% if (item.status === 'Pending' || item.status === 'Processing'&&item.status !== 'Payment Pending') { %>
+                    <% if (item.status === 'Pending' || item.status === 'Processing' && item.status !== 'Payment Pending') { %>
                         <button
                             onclick="openItemCancellationModal('<%= item._id %>', '<%= item.productName %>', '<%= order.orderId %>', '/uploads/re-image/<%= item.product.productImage[0] %>')"
                             class="cancel-item-btn">
                             Cancel Item
                         </button>
-                    <% } else if (order.status === 'Payment Pending') { %>
-                        <button onclick="retryPayment('<%= order._id %>')" class="retry-payment-btn btn-danger" >
+                    <% } else if (item.status === 'Payment Pending') { %>
+                        <button onclick="initializeRetryPayment('<%= order._id %>', '<%= order.finalAmount %>')" class="retry-payment-btn">
                             Retry Payment
                         </button>
                     <% } else { %>
@@ -196,14 +182,12 @@
                         </button>
                     <% } %>
 
-
-                    <% if (order.status ==="Payment Pending") { %>
+                    <% if (order.status === "Payment Pending") { %>
                         <button 
-                        onclick="initializeRetryPayment('<%=order._id%>', '<%=order.finalAmount%>', `<%=order.razorpayKey%>`)" 
-                        class="btn btn-primary "
-                    >
-                        Retry Payment
-                    </button>
+                            onclick="initializeRetryPayment('<%= order._id %>', '<%= order.finalAmount %>')" 
+                            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
+                            Retry Payment
+                        </button>
                     <% } %>
                   
                 </div>
@@ -612,105 +596,111 @@
         }
     }
 
- 
-
-    
     async function initializeRetryPayment(orderId, amount) {
-    try {
-        const response = await fetch('/create-razorpay-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId })
-        });
-
-        const orderData = await response.json();
-        
-        if (!orderData.success) {
-            throw new Error(orderData.message || 'Failed to create order');
-        }
-
-        const options = {
-            key: orderData.razorpayKeyId,
-            amount: orderData.amount,
-            currency: "INR",
-            name: "Your Store",
-            description: "Order Payment Retry",
-            order_id: orderData.razorpayOrderId,
-            handler: function(response) {
-                verifyRetryPayment(orderId, response);
-            },
-            theme: { color: "#3399cc" }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
-        
-    } catch (error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message || 'Failed to initialize payment'
-        });
-    }
-}
-
-async function verifyRetryPayment(orderId, response) {
-    try {
-        const verifyResponse = await fetch('/verify-razorpay-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId,
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature
-            })
-        });
-
-        const data = await verifyResponse.json();
-
-        if (data.success) {
-            await Swal.fire({
-                icon: 'success',
-                title: 'Payment Successful',
-                text: 'Your order has been confirmed!'
+        try {
+            const response = await fetch('/create-razorpay-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId })
             });
-            window.location.reload();
-        } else {
-            throw new Error(data.message || 'Payment verification failed');
+
+            const orderData = await response.json();
+            
+            if (!orderData.success) {
+                throw new Error(orderData.message || 'Failed to create order');
+            }
+
+            const options = {
+                key: orderData.razorpayKeyId,
+                amount: orderData.amount,
+                currency: "INR",
+                name: "Your Store",
+                description: "Order Payment Retry",
+                order_id: orderData.razorpayOrderId,
+                handler: function(response) {
+                    verifyRetryPayment(orderId, response);
+                },
+                prefill: {
+                    name: orderData.customerName || "",
+                    email: orderData.customerEmail || "",
+                    contact: orderData.customerPhone || ""
+                },
+                theme: { color: "#F59E0B" },
+                modal: {
+                    ondismiss: function() {
+                        console.log("Payment window closed");
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(response) {
+                handlePaymentFailure(response, orderId);
+            });
+            rzp.open();
+            
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to initialize payment'
+            });
         }
-    } catch (error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Payment Failed',
-            text: error.message || 'Failed to verify payment'
-        });
     }
-}
 
+    async function verifyRetryPayment(orderId, response) {
+        try {
+            const verifyResponse = await fetch('/verify-razorpay-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId,
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature
+                })
+            });
 
+            const data = await verifyResponse.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful',
+                    text: 'Your order has been confirmed!'
+                });
+                window.location.reload();
+            } else {
+                throw new Error(data.message || 'Payment verification failed');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Payment Failed',
+                text: error.message || 'Failed to verify payment'
+            });
+        }
+    }
 
     function handlePaymentFailure(response, orderId) {
-    console.log("Payment failure:", response);
-    const failureMessage = response.error ? response.error.description : 'Payment failed';
-    
-    Swal.fire({
-        title: "Payment Failed",
-        text: `${failureMessage}. Would you like to try again?`,
-        icon: "error",
-        showCancelButton: true,
-        confirmButtonText: "Retry Payment",
-        cancelButtonText: "Maybe Later",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            initializeRetryPayment(orderId);
-        } else {
-            window.location.href = `/order-details/${orderId}`;
-        }
-    });
-}
+        console.log("Payment failure:", response);
+        const failureMessage = response.error ? response.error.description : 'Payment failed';
+        
+        Swal.fire({
+            title: "Payment Failed",
+            text: `${failureMessage}. Would you like to try again?`,
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonText: "Retry Payment",
+            cancelButtonText: "Maybe Later",
+            confirmButtonColor: "#F59E0B",
+            cancelButtonColor: "#d33"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                initializeRetryPayment(orderId);
+            }
+        });
+    }
 
     function showLoadingSpinner() {
         const spinner = document.getElementById('loading-spinner');
@@ -723,14 +713,10 @@ async function verifyRetryPayment(orderId, response) {
     }
 
     function showAlert(message, type) {
-
         const alertElement = document.createElement('div');
         alertElement.className = `alert alert-${type}`;
         alertElement.textContent = message;
         document.body.appendChild(alertElement);
         setTimeout(() => alertElement.remove(), 5000);
     }
-
-
-
 </script>
