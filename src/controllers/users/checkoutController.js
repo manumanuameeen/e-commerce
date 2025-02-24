@@ -815,7 +815,6 @@ const handlePaymentDismissal = async (req, res) => {
             return res.status(400).json({ success: false, message: "User session expired" });
         }
 
-        // Update existing order
         if (orderId) {
             const updatedOrder = await Order.findByIdAndUpdate(
                 orderId,

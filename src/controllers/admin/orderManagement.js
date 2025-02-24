@@ -11,6 +11,7 @@ import Address from "../../models/addressSchema.js";
 
 const loadOrder = async (req, res) => {
     try {
+
         //     if (!req.session.admin) {
         //     return res.redirect("/admin/login");
         // }
@@ -117,6 +118,14 @@ const updateOrderStatus = async (req, res) => {
         for (const item of order.orderIteams) {
             console.log("item is getting", item)
         }
+
+if(order.status==="Payment Pending"){
+    return res.status(400).json({
+        success:false,
+        message:"Payment Pending cannot be changed"
+    })
+}
+
         if (order.status === 'Delivered') {
             return res.status(400).json({
                 success: false,
