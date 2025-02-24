@@ -90,6 +90,9 @@ import{
 
 
 
+
+
+
 router.get('/pageerror', loadPageerror)
 //Login  management
 router.get('/login', loadlogin)
@@ -109,7 +112,6 @@ router.get('/listCategory', adminAuth, getListCategory)
 router.get('/unListCategory', adminAuth, getunListCategory)
 router.get("/edit-Category", adminAuth, getEditcategory)
 router.post("/edit-Category/:id", adminAuth, editCategory);
- 
 //products management
 router.get("/addProducts", adminAuth, getProductAddPage)
 router.post("/addProducts", uploads.any(), adminAuth, addProducts)

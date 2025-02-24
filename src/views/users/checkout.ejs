@@ -1077,23 +1077,23 @@
                         <div class="form-group">
                             <label for="pincode">Pincode</label>
                             <input type="number" class="form-control" id="pincode" name="pincode"
-                                placeholder="6-digit pincode" required>
+                            placeholder="6-digit pincode" required>
                         </div>
                     </div>
-
+                    
                     <div class="row">
                         <div class="form-group">
                             <label for="phone">Phone Number</label>
                             <input type="tel" class="form-control" id="phone" name="phone"
-                                placeholder="10-digit phone number" required>
+                            placeholder="10-digit phone number" required>
                         </div>
                         <div class="form-group">
                             <label for="altPhone">Alternate Phone (Optional)</label>
                             <input type="tel" class="form-control" id="altPhone" name="altPhone"
-                                placeholder="Alternate mobile number">
+                            placeholder="Alternate mobile number">
                         </div>
                     </div>
-
+                    
                     <button type="submit" class="place-order-btn">Add Address</button>
                 </form>
             </div>
@@ -1103,7 +1103,8 @@
         <script src="js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-
+            let selectedCouponCode = null;
+            
             document.addEventListener('DOMContentLoaded', function () {
 
                 const successMessage = '<%= successMessage %>';
@@ -1194,7 +1195,6 @@
                 initializeFormValidation();
             });
 
-            let selectedCouponCode = null;
 
             function initializeCouponHandlers() {
 
@@ -1381,6 +1381,8 @@ async function handleRazorpayPayment(orderData) {
 }
 
 async function verifyPayment(response, orderData, orderId) {
+    const selectedAddress = document.querySelector('input[name="address"]:checked')?.value;
+
     console.log("verifyPayment",response, orderData, orderId)
     try {
         showLoadingSpinner();
@@ -1390,7 +1392,9 @@ async function verifyPayment(response, orderData, orderId) {
             body: JSON.stringify({
                 ...orderData,
                 ...response,
-                orderId
+                selectedCoupon:selectedCouponCode,
+                selectedAddress,
+                // orderId
             })
         });
         
@@ -1440,6 +1444,9 @@ async function handlePaymentDismissal(orderId) {
         showAlert('Failed to save order', 'error');
     }
 }
+
+
+
 function handlePaymentFailure(response, orderId) {
     const failureMessage = response.error ? response.error.description : 'Payment failed';
     

@@ -111,14 +111,12 @@
                             'Cancelled': 'bg-red-100 text-red-800',
                             'Payment Pending': 'bg-orange-100 text-orange-800'
                         }; %>
-                        <span
-                            class="px-3 py-1 rounded-full text-sm <%= statusColors[order.status] || 'bg-gray-100 text-gray-800' %>">
+                        <span class="px-3 py-1 rounded-full text-sm <%= statusColors[order.status] || 'bg-gray-100 text-gray-800' %>">
                             <%= order.status %>
                         </span>
                     </div>
                 </div>
             </div>
-    
             <!-- Order Items -->
             <% order.orderIteams.forEach((item) => { %>
                 <div class="flex items-center p-6 border-b border-gray-100">
@@ -126,7 +124,6 @@
                         <img src="/uploads/re-image/<%= item.product.productImage[0] %>" alt="<%= item.productName %>"
                             class="w-full h-full object-cover">
                     </div>
-    
                     <div class="flex-1 ml-6">
                         <h3 class="font-medium text-gray-900"><%= item.productName %></h3>
                         <div class="mt-1 space-y-1">
@@ -135,6 +132,7 @@
                             <p class="text-sm text-gray-500">Status:
                                 <span class="<%= 
                                     item.status === 'Pending' ? 'text-yellow-600' : 
+                                    item.status === 'Payment Pending' ? 'text-orange-600' :
                                     item.status === 'Processing' ? 'text-blue-600' :
                                     item.status === 'Shipped' ? 'text-purple-600' :
                                     item.status === 'Delivered' ? 'text-green-600' :
@@ -147,7 +145,6 @@
                             <p class="text-sm text-gray-500">Color: <%= item.color %></p>
                         </div>
                     </div>
-    
                     <% if (item.status === 'Pending' || item.status === 'Processing'&&item.status !== 'Payment Pending') { %>
                         <button
                             onclick="openItemCancellationModal('<%= item._id %>', '<%= item.productName %>', '<%= order.orderId %>', '/uploads/re-image/<%= item.product.productImage[0] %>')"
@@ -155,7 +152,7 @@
                             Cancel Item
                         </button>
                     <% } else if (order.status === 'Payment Pending') { %>
-                        <button onclick="retryPayment('<%= order._id %>')" class="retry-payment-btn">
+                        <button onclick="retryPayment('<%= order._id %>')" class="retry-payment-btn btn-danger" >
                             Retry Payment
                         </button>
                     <% } else { %>
@@ -615,15 +612,7 @@
         }
     }
 
-    // function retryPayment(orderId) {
-    //     const orderData = {
-    //         selectedAddres: document.getElementById(`order-address-${orderId}`).value,
-    //         paymentMethod: 'razorpay',
-    //         selectedCoupon: document.getElementById(`order-coupon-${orderId}`).value || null
-    //     };
-
-    //     handleRazorpayPayment(orderData, orderId);
-    // }
+ 
 
     
     async function initializeRetryPayment(orderId, amount) {

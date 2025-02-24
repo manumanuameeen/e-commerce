@@ -10,7 +10,6 @@ const productDetails = async (req, res) => {
         const userData = await User.findById(userId);
         const productId = req.query.id;
 
-        // Check if productId exists
         if (!productId) {
             return res.redirect("/pageNotFound")
             console.log("the product id is not getting check that once again");

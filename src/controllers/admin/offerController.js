@@ -3,6 +3,7 @@ import Category from "../../models/categorySchema.js";
 import Offer from "../../models/offerScema.js";
 import { postAddAddress } from "../users/profileController.js";
 
+
 // const addOffer = async (req, res) => {
 //     try {
 //         const { name, type, discount, productId, categoryId, referralCode, startDate, endDate } = req.body;
@@ -280,11 +281,9 @@ const addOffer = async (req, res) => {
             
             const newOffer = await offerData.save();
             
-            // Compare with existing category offer
             const bestDiscount = Math.max(discount, product.categoryOffer || 0);
             product.productOffer = discount;
             
-            // Calculate new sale price based on best discount
             const discountedPrice = product.regularPrice - (product.regularPrice * bestDiscount / 100);
             product.salePrice = Number(discountedPrice.toFixed(2));
             
@@ -309,23 +308,19 @@ const addOffer = async (req, res) => {
             const productsInCategory = await Product.find({ category: categoryId });
             
             for (let product of productsInCategory) {
-                // Store original price if not already stored
                 if (!offerData.originalPrice) {
                     offerData.originalPrice = product.salePrice;
                 }
                 
-                // Compare category offer with existing product offer
                 const bestDiscount = Math.max(discount, product.productOffer || 0);
                 product.categoryOffer = discount;
                 
-                // Calculate new sale price based on best discount
                 const discountedPrice = product.regularPrice - (product.regularPrice * bestDiscount / 100);
                 product.salePrice = Number(discountedPrice.toFixed(2));
                 
                 await product.save();
             }
 
-            // Update category with new offer
             if (!category.offers) {
                 category.offers = [];
             }
@@ -340,17 +335,7 @@ const addOffer = async (req, res) => {
                 offer: newOffer 
             });
         }
-        
-        if (type === 'referral' && referralCode) {
-            offerData.referralCode = referralCode;
-            const newOffer = await offerData.save();
-            
-            return res.status(201).json({ 
-                success: true, 
-                message: 'Referral offer added successfully', 
-                offer: newOffer 
-            });
-        }
+       
 
         return res.status(400).json({ 
             success: false, 

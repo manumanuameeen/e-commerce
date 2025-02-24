@@ -30,7 +30,7 @@ const addProducts = async (req, res) => {
     try {
         const products = req.body;
         
-        if (!products.productName || !products.category || !products.regularPrice) {
+        if (!products.productName || !products.category || !products.regularPrice||!products.brand) {
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
@@ -39,7 +39,6 @@ const addProducts = async (req, res) => {
             return res.status(400).json({ success: false, message: "Product already exists" });
         }
 
-        // Process images
         const images = [];
         if (req.files && req.files.length > 0) {
             const uploadDir = path.join(__dirname, "../../public/uploads/re-image");
@@ -50,7 +49,6 @@ const addProducts = async (req, res) => {
                     const fileName = `${Date.now()}-${file.originalname}`;
                     const filePath = path.join(uploadDir, fileName);
                     
-                    // Process with sharp
                     await sharp(file.path)
                         .resize(440, 440, { fit: 'cover', position: 'center' })
                         .toFile(filePath);
@@ -91,6 +89,7 @@ const addProducts = async (req, res) => {
             colorVarients: colorVarients,
             productImage: images,
             status: "Available",
+            brand:products.brand
         });
 
         await newProduct.save();

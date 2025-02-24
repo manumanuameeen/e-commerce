@@ -246,6 +246,8 @@ const loadDashboard = async (req, res) => {
             }
         ]);
       
+
+
         const topCategories = await Order.aggregate([
             {
                 $match: {
@@ -255,8 +257,27 @@ const loadDashboard = async (req, res) => {
             },
             { $unwind: "$orderIteams" },
             {
+                $lookup: {
+                    from: "products", // Ensure this matches your actual collection name
+                    localField: "orderIteams.product",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } }, // Ensure products exist
+            {
+                $lookup: {
+                    from: "categories", // Ensure this matches your actual categories collection
+                    localField: "product.category",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: false } }, // Ensure categories exist
+            {
                 $group: {
-                    _id: "$orderIteams.category",
+                    _id: "$category._id",
+                    categoryName: { $first: "$category.name" },
                     sales: { $sum: { $multiply: ["$orderIteams.price", "$orderIteams.quantity"] } },
                     orders: { $sum: 1 }
                 }
@@ -265,7 +286,8 @@ const loadDashboard = async (req, res) => {
             { $limit: 10 },
             {
                 $project: {
-                    name: "$_id",
+                    categoryId: "$_id",
+                    categoryName: 1,
                     sales: { $round: ["$sales", 2] },
                     orders: 1,
                     _id: 0

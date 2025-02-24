@@ -88,8 +88,6 @@ import { applyCoupon,removeCoupon } from "../controllers/users/couponController.
 
 
 
-
-
 router.get("/pageNotFOund", loadpageNotFound);
 //home,signup,resend otp,verifyotp
 router.get("/", loadHomepage)
@@ -145,9 +143,10 @@ router.get('/shop', loadShopingPage)
 router.get("/productDetails", productDetails)
 
 
+//brand
+
+
 //profile management 
-
-
 router.get("/forgot-password", getForgotPassPage);
 router.post("/forgot-email-valid", forgotEmailValid);
 router.post("/verify-passForgot-otp", verifyForgotPassOtp)

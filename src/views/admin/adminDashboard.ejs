@@ -79,7 +79,6 @@
             </div>
         </div>
 
-        <!-- Report Filter Form -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form id="reportForm" action="/admin/" method="get" class="row g-3">
@@ -229,55 +228,79 @@
                             </tr>
                         </thead>
 
-                        <div class="row mb-4">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Sales & Orders Trend</h5>
-                <canvas id="salesTrendChart"></canvas>
+<div class="container-fluid px-4 py-3">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Sales & Orders Trend</h5>
+                    <div class="chart-container" style="position: relative; height: 400px;">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Payment Methods</h5>
+                    <div class="chart-container" style="position: relative; height: 400px;">
+                        <canvas id="paymentMethodsChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Payment Methods</h5>
-                <canvas id="paymentMethodsChart"></canvas>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Top 10 Products</h5>
+                    <div class="chart-container" style="position: relative; height: 400px;">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Top 10 Products</h5>
-                <canvas id="topProductsChart"></canvas>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Top Categories</h5>
-                <canvas id="topCategoriesChart"></canvas>
+        
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Top Categories</h5>
+                    <div class="chart-container" style="position: relative; height: 400px;">
+                        <canvas id="topCategoriesChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Top Brands Performance</h5>
-                <canvas id="topBrandsChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+// <style>
+// // .card {
+// //     border: none;
+// //     border-radius: 0.5rem;
+// // }
+
+// // .card-title {
+// //     color: #333;
+// //     font-weight: 600;
+// // }
+
+// // .shadow-sm {
+// //     box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+// // }
+
+// // .chart-container {
+// //     width: 100%;
+// //     max-height: 400px;
+// }
+// </style>
+
 
 
 
@@ -857,14 +880,13 @@ new Chart(ctx3, {
     }
 });
 
-// Top Categories Chart
 const topCategoriesData = <%- JSON.stringify(topCategories) %>;
 const ctx4 = document.getElementById('topCategoriesChart').getContext('2d');
 
 new Chart(ctx4, {
     type: 'pie',
     data: {
-        labels: topCategoriesData.map(item => item.name),
+        labels: topCategoriesData.map(item => item.categoryName), // Updated field
         datasets: [{
             data: topCategoriesData.map(item => item.sales),
             backgroundColor: [
@@ -892,14 +914,13 @@ new Chart(ctx4, {
                     label: function(context) {
                         const label = context.label || '';
                         const value = context.raw || 0;
-                        return `${label}: ₹${value.toFixed(2)}`;
+                        return `${label}: ₹${value.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
                     }
                 }
             }
         }
     }
 });
-
 
     
 });
