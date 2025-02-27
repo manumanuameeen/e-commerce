@@ -984,12 +984,12 @@
                                     <p class="order-quantity">Quantity: <%= product.quantity %>
                                     </p>
                                 </div>
-                                <div class="order-price">$<%= product.price %>
+                                <div class="order-price">₹<%= product.price %>
                                 </div>
                             </div>
                             <% }) %>
 
-                                <!-- Delivery Zone Section -->
+                                <!-- Delivery Zone Section
                                 <div class="delivery-zone-section">
                                     <label for="deliveryZone">Select Delivery Zone:</label>
                                     <select id="deliveryZone" class="delivery-zone-select"
@@ -998,24 +998,32 @@
                                         <option value="Zone2" data-charge="100">Zone2 - ₹100 (up to 100 km)</option>
                                         <option value="Zone3" data-charge="150">Zone3 - ₹150 (up to 150 km)</option>
                                     </select>
-                                </div>
+                                </div> -->
 
                                 <div class="order-summary">
                                     <div class="summary-row">
                                         <span>Subtotal</span>
-                                        <span>$<%= subTotal %></span>
+                                        <span>₹<%= subTotal %></span>
                                     </div>
                                     <div class="summary-row">
                                         <span>Shipping</span>
-                                        <span id="deliveryCharge">₹50</span>
+                                        <span id="deliveryCharge">₹0.00</span>
                                     </div>
                                     <div class="summary-row">
                                         <span>Discount</span>
-                                        <span>-$0.00</span>
+                                        <span>-₹0.00</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Tax</span>
+                                        <span>+ 18%</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span>Tax amount</span>
+                                        <span>+ ₹<%=taxAMount.toFixed(2)%></span>
                                     </div>
                                     <div class="summary-row total">
                                         <span>Total</span>
-                                        <span id="totalAmount">$<%= subTotal + 50 %></span>
+                                        <span id="totalAmount">₹<%= finalAmount.toFixed(2)  %></span>
                                     </div>
                                 </div>
                                 <% } else { %>
@@ -1900,26 +1908,7 @@ function handlePaymentFailure(response, orderId) {
             }
 
 
-            const deliveryZones = [
-                { zone: "Zone1", maxDistance: 50, charge: 50 },
-                { zone: "Zone2", maxDistance: 100, charge: 100 },
-                { zone: "Zone3", maxDistance: 150, charge: 150 },
-            ];
-
-            function updateDeliveryCharge() {
-                const select = document.getElementById("deliveryZone");
-                const selectedOption = select.options[select.selectedIndex];
-                const deliveryCharge = parseFloat(selectedOption.getAttribute("data-charge"));
-
-                // Update the delivery charge in the UI
-                document.getElementById("deliveryCharge").innerText = `₹${deliveryCharge}`;
-
-                // Update the total amount dynamically
-                const subTotal = '<%= subTotal %>'; // Dynamically fetch from the server
-                const totalAmount = subTotal + deliveryCharge;
-                document.getElementById("totalAmount").innerText = `$${totalAmount}`;
-            }
-
+         
         </script>
 
 

@@ -742,6 +742,59 @@
             height: 8px;
             border-radius: 50%;
         }
+        /* Add these styles to your existing CSS */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.pagination-container {
+    transition: opacity 0.3s ease;
+}
+
+.row:has(.single_product_item) {
+    transition: opacity 0.3s ease;
+}
+
+.fade-out {
+    opacity: 0.5;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+#pagination-loader .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Smooth transition for product items */
+.single_product_item {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Animation for newly loaded products */
+@keyframes productAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-appear {
+    animation: productAppear 0.5s ease forwards;
+}
     </style>
      <br><br><br><br>
      <section class="hero-carousel mb-8">
@@ -967,30 +1020,24 @@
                         </div>
 
                         <!-- Pagination -->
-                        <div class="pagination-container">
-                            <% if (currentPage> 1) { %>
-                                <a href="?page=<%= currentPage - 1 %><%= search ? `&search=${search}` : '' %>"
-                                    class="page-link">&laquo; Previous</a>
-                                <% } %>
+                   <!-- Pagination -->
+<div class="pagination">
+    <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="prev-page">« Previous</a>
+    <% } %>
 
-                                    <% for (let i=1; i <=totalPages; i++) { %>
-                                        <% if (i===currentPage) { %>
-                                            <span class="current-page">
-                                                <%= i %>
-                                            </span>
-                                            <% } else { %>
-                                                <a href="?page=<%= i %><%= search ? `&search=${search}` : '' %>"
-                                                    class="page-link">
-                                                    <%= i %>
-                                                </a>
-                                                <% } %>
-                                                    <% } %>
+    <% for (let i=1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+            <span class="current-page"><%= i %></span>
+        <% } else { %>
+            <a href="?page=<%= i %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="page-link"><%= i %></a>
+        <% } %>
+    <% } %>
 
-                                                        <% if (currentPage < totalPages) { %>
-                                                            <a href="?page=<%= currentPage + 1 %><%= search ? `&search=${search}` : '' %>"
-                                                                class="page-link">Next &raquo;</a>
-                                                            <% } %>
-                        </div>
+    <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="next-page">Next »</a>
+    <% } %>
+</div>
                     </div>
                 </div>
             </div>
@@ -998,14 +1045,230 @@
 
         <!-- Footer -->
         <%- include('../partials/users/footer') %>
+
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
             <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+            
             <script>
 
 
+// Add this script at the bottom of your shop.ejs file, just before the closing body tag
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get reference to pagination container
+    const paginationContainer = document.querySelector('.pagination-container');
+    const productGrid = document.querySelector('.row:has(.single_product_item)');
+    
+    // Cache for previously loaded pages to reduce server requests
+    const pageCache = new Map();
+    
+    // Add click event listener to pagination container
+    if (paginationContainer) {
+        paginationContainer.addEventListener('click', function(e) {
+            // Check if clicked element is a pagination link
+            if (e.target.classList.contains('page-link')) {
+                e.preventDefault();
+                
+                // Get the URL from the clicked link
+                const url = e.target.getAttribute('href');
+                
+                // If page is already in cache, use cached content
+                if (pageCache.has(url)) {
+                    updatePageContent(pageCache.get(url));
+                    history.pushState({}, '', url);
+                    return;
+                }
+                
+                // Add fade-out effect to product grid
+                if (productGrid) {
+                    productGrid.classList.add('fade-out');
+                }
+                
+                // Show loading indicator
+                showLoading();
+                
+                // Fetch the new page content
+                fetchPageContent(url);
+            }
+        });
+    }
+    
+    // Function to fetch page content
+    function fetchPageContent(url) {
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Cache the result
+            pageCache.set(url, html);
+            
+            // Update the page content
+            updatePageContent(html);
+            
+            // Update the URL in the browser's address bar without reloading the page
+            history.pushState({}, '', url);
+            
+            // Hide loading indicator
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Error fetching page content:', error);
+            hideLoading();
+            
+            // Remove fade-out effect if there was an error
+            if (productGrid) {
+                productGrid.classList.remove('fade-out');
+            }
+            
+            // Fallback to traditional page reload if fetch fails
+            window.location.href = url;
+        });
+    }
+    
+    // Function to update page content
+    function updatePageContent(html) {
+        // Create a temporary DOM element to parse the HTML response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Extract the product grid and pagination elements from the response
+        const newProductGrid = doc.querySelector('.row:has(.single_product_item)');
+        const newPagination = doc.querySelector('.pagination-container');
+        
+        // Update the product grid with animation
+        if (newProductGrid && productGrid) {
+            setTimeout(() => {
+                productGrid.innerHTML = newProductGrid.innerHTML;
+                productGrid.classList.remove('fade-out');
+                
+                // Add appear animation to each product
+                const productItems = productGrid.querySelectorAll('.single_product_item');
+                productItems.forEach((item, index) => {
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.classList.add('product-appear');
+                        item.style.opacity = '1';
+                    }, index * 50); // Stagger the animations
+                });
+                
+                // Scroll to the top of the product grid with smooth animation
+                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Reinitialize event listeners for the newly loaded products
+                reinitializeEventListeners();
+            }, 300); // Short delay for smoother transition
+        }
+        
+        // Update the pagination
+        if (newPagination && paginationContainer) {
+            paginationContainer.innerHTML = newPagination.innerHTML;
+        }
+    }
+    
+    // Create and show loading indicator
+    function showLoading() {
+        // Check if loading indicator already exists
+        if (!document.getElementById('pagination-loader')) {
+            const loader = document.createElement('div');
+            loader.id = 'pagination-loader';
+            loader.innerHTML = `
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="mt-2">Loading products...</div>
+            `;
+            loader.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 255, 255, 0.9);
+                padding: 25px;
+                border-radius: 10px;
+                z-index: 9999;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+                text-align: center;
+                transition: all 0.3s ease;
+            `;
+            document.body.appendChild(loader);
+            
+            // Add fade-in animation
+            setTimeout(() => {
+                loader.style.opacity = '1';
+            }, 0);
+        } else {
+            const loader = document.getElementById('pagination-loader');
+            loader.style.display = 'block';
+            loader.style.opacity = '1';
+        }
+    }
+    
+    // Hide loading indicator with animation
+    function hideLoading() {
+        const loader = document.getElementById('pagination-loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 300); // Match the transition duration
+        }
+    }
+    
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', function(event) {
+        const currentUrl = window.location.href;
+        
+        // If we have this page cached, use it
+        if (pageCache.has(currentUrl)) {
+            updatePageContent(pageCache.get(currentUrl));
+            return;
+        }
+        
+        // Otherwise fetch the new page
+        showLoading();
+        fetchPageContent(currentUrl);
+    });
+    
+    // Reinitialize event listeners for dynamically loaded content
+    function reinitializeEventListeners() {
+        // Reinitialize wishlist functionality
+        const wishlistButtons = document.querySelectorAll('.add-to-cart-btn, .wishlist-icon');
+        wishlistButtons.forEach(button => {
+            button.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                let productId;
+                if (this.hasAttribute('data-product-id')) {
+                    productId = this.getAttribute('data-product-id');
+                } else if (this.hasAttribute('onclick')) {
+                    const onclickAttr = this.getAttribute('onclick');
+                    const match = onclickAttr.match(/'([^']+)'/);
+                    if (match && match[1]) {
+                        productId = match[1];
+                    }
+                }
+                
+                if (productId) {
+                    addToWishlist(productId);
+                }
+                
+                return false;
+            };
+        });
+    }
+});
 
 
                 function addToWishlist(productId) {

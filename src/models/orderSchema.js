@@ -47,10 +47,11 @@ const orderSchema = new Schema({
         cancelReason: {
             type: String
         },
-        CategoryId:{
-            type:Schema.Types.ObjectId,
-            required:false,
-        }
+        CategoryId: {
+            type: Schema.Types.ObjectId,
+            required: false,
+        },
+      
     }],
     totalPrice: {
         type: Number,
@@ -59,6 +60,9 @@ const orderSchema = new Schema({
     discount: {
         type: Number,
         default: 0
+    },  tax: {
+        type: Number,
+        default: 18,
     },
     finalAmount: {
         type: Number,

@@ -49,6 +49,10 @@ const userSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"Orders",
     }],
+    avatar:{
+        type:String,
+        require:false
+    },
     createdOn:{
         type:Date,
         default:Date.now,

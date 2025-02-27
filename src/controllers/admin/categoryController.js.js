@@ -46,6 +46,9 @@ const addCategory = async (req, res) => {
             console.log("Category already exists");
             return res.status(400).json({ error: "Category already exists" });
         }
+//         if(name.trim().length>15){
+// return res.status(400).json({succcess:false,message:'category name should only contain 15 characters'})
+//         }
 
         const newCategory = new Category({
             name:name.toLowerCase(),

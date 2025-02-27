@@ -20,7 +20,7 @@ const loadOrder = async (req, res) => {
 
 
         const { search, page = 1 } = req.query;
-        const limit = 5;
+        const limit = 10;
 
         const query = search
             ? {

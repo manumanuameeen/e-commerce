@@ -167,10 +167,38 @@
                     <div class="profile_nav card">
                         <div class="card-body">
                             <div class="user_info text-center mb-4">
-                                <div class="user_avatar mb-3">
-                                    <img src="<%= user.avatar || '/img/default-avatar.png' %>" alt="User Avatar"
-                                        class="rounded-circle" style="width: 100px; height: 100px;">
+                                <div class="user_avatar mb-3 text-center">
+                                    <img id="selectedAvatar" 
+                                         src="<%= user.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png' %>" 
+                                         alt="User Avatar" 
+                                         class="rounded-circle" 
+                                         style="width: 100px; height: 100px; display: block; margin: auto;">
                                 </div>
+                                
+                                <!-- Avatar Selection Dropdown -->
+                                <div class="dropdown text-center">
+                                    <button class="btn btn-light dropdown-toggle" type="button" id="avatarDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Select Avatar
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="avatarDropdown">
+                                        <li><a class="dropdown-item avatar-option" data-avatar="https://cdn-icons-png.flaticon.com/512/149/149071.png">Default Grey</a></li>
+                                        <li><a class="dropdown-item avatar-option" data-avatar="https://cdn-icons-png.flaticon.com/512/4140/4140047.png">Avatar 1</a></li>
+                                        <li><a class="dropdown-item avatar-option" data-avatar="https://cdn-icons-png.flaticon.com/512/4140/4140061.png">Avatar 2</a></li>
+                                        <li><a class="dropdown-item avatar-option" data-avatar="https://cdn-icons-png.flaticon.com/512/4140/4140084.png">Avatar 3</a></li>
+                                    </ul>
+                                </div>
+                                
+                                <script>
+                                    document.querySelectorAll('.avatar-option').forEach(item => {
+                                        item.addEventListener('click', function() {
+                                            const selectedAvatarUrl = this.getAttribute('data-avatar');
+                                            document.getElementById('selectedAvatar').src = selectedAvatarUrl;
+                                        });
+                                    });
+                                </script>
+                                
+                                
+                                
                                 <h4>
                                     <%= user.name %>
                                 </h4>

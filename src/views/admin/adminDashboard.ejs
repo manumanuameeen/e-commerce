@@ -79,6 +79,7 @@
             </div>
         </div>
 
+        <!-- Report Filter Form -->
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form id="reportForm" action="/admin/" method="get" class="row g-3">
@@ -279,27 +280,7 @@
 </div>
 
 
-
-// <style>
-// // .card {
-// //     border: none;
-// //     border-radius: 0.5rem;
-// // }
-
-// // .card-title {
-// //     color: #333;
-// //     font-weight: 600;
-// // }
-
-// // .shadow-sm {
-// //     box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
-// // }
-
-// // .chart-container {
-// //     width: 100%;
-// //     max-height: 400px;
-// }
-// </style>
+le>
 
 
 
@@ -413,7 +394,7 @@
                                                                         Next
                                                                     </a>
                                                                 </li>
-                                                                <% } %>
+                                                             <% } %>
                             </ul>
                         </nav>
                     </div>
@@ -594,161 +575,308 @@
             }
         }
 
-        function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape');
+//         function exportToPDF() {
+//             const { jsPDF } = window.jspdf;
+//             const doc = new jsPDF('landscape');
 
-            doc.setFontSize(16);
-            doc.text('Sales Report', 14, 15);
-            doc.setFontSize(10);
+//             doc.setFontSize(16);
+//             doc.text('Sales Report', 14, 15);
+//             doc.setFontSize(10);
 
-            const reportType = document.getElementById('reportType').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            let periodText = `Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`;
-            if (reportType === 'custom') {
-                periodText += ` (${startDate} to ${endDate})`;
-            }
-            doc.text(periodText, 14, 25);
+//             const reportType = document.getElementById('reportType').value;
+//             const startDate = document.getElementById('startDate').value;
+//             const endDate = document.getElementById('endDate').value;
+//             let periodText = `Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`;
+//             if (reportType === 'custom') {
+//                 periodText += ` (${startDate} to ${endDate})`;
+//             }
+//             doc.text(periodText, 14, 25);
 
-            const totalSales = document.getElementById('totalSales').innerText;
-            const totalDiscounts = document.getElementById('totalDiscounts').innerText;
-            const netSales = document.getElementById('netSales').innerText;
+//             const totalSales = document.getElementById('totalSales').innerText;
+//             const totalDiscounts = document.getElementById('totalDiscounts').innerText;
+//             const netSales = document.getElementById('netSales').innerText;
 
-            doc.text(`Total Sales: ${totalSales}`, 14, 35);
-            doc.text(`Total Discounts: ${totalDiscounts}`, 14, 42);
-            doc.text(`Net Sales: ${netSales}`, 14, 49);
+//             doc.text(`Total Sales: ${totalSales}`, 14, 35);
+//             doc.text(`Total Discounts: ${totalDiscounts}`, 14, 42);
+//             doc.text(`Net Sales: ${netSales}`, 14, 49);
 
-            const table = document.getElementById('salesTable');
-            const tableData = [];
-            const headers = ['Date', 'Order ID', 'Products', 'Gross Amount', 'Discount', 'Net Amount', 'Coupon', 'Status'];
-            tableData.push(headers);
+//             const table = document.getElementById('salesTable');
+//             const tableData = [];
+//             const headers = ['Date', 'Order ID', 'Products', 'Gross Amount', 'Discount', 'Net Amount', 'Coupon', 'Status'];
+//             tableData.push(headers);
 
-            table.querySelectorAll('tbody tr').forEach(row => {
-                const rowData = [];
-                rowData.push(row.cells[0].innerText);
-                rowData.push(row.cells[1].innerText);
+//             table.querySelectorAll('tbody tr').forEach(row => {
+//                 const rowData = [];
+//                 rowData.push(row.cells[0].innerText);
+//                 rowData.push(row.cells[1].innerText);
 
-                const productList = [];
-                const products = row.cells[2].querySelectorAll('.product-item');
-                products.forEach(product => {
-                    const name = product.querySelector('.product-name').innerText;
-                    const meta = product.querySelector('.product-meta').innerText;
-                    productList.push(`${name} (${meta})`);
-                });
-                rowData.push(productList.join('\n'));
+//                 const productList = [];
+//                 const products = row.cells[2].querySelectorAll('.product-item');
+//                 products.forEach(product => {
+//                     const name = product.querySelector('.product-name').innerText;
+//                     const meta = product.querySelector('.product-meta').innerText;
+//                     productList.push(`${name} (${meta})`);
+//                 });
+//                 rowData.push(productList.join('\n'));
 
-                rowData.push(row.cells[3].innerText);
-                rowData.push(row.cells[4].innerText);
-                rowData.push(row.cells[5].innerText);
-                rowData.push(row.cells[6].innerText);
-                rowData.push(row.cells[7].innerText);
+//                 rowData.push(row.cells[3].innerText);
+//                 rowData.push(row.cells[4].innerText);
+//                 rowData.push(row.cells[5].innerText);
+//                 rowData.push(row.cells[6].innerText);
+//                 rowData.push(row.cells[7].innerText);
 
-                tableData.push(rowData);
-            });
+//                 tableData.push(rowData);
+//             });
 
-            doc.autoTable({
-                startY: 60,
-                head: [headers],
-                body: tableData.slice(1),
-                theme: 'grid',
-                styles: { fontSize: 8, cellPadding: 2 },
-                headStyles: { fillColor: [66, 139, 202] },
-                columnStyles: {
-                    2: { cellWidth: 80 }
-                }
-            });
+//             doc.autoTable({
+//                 startY: 60,
+//                 head: [headers],
+//                 body: tableData.slice(1),
+//                 theme: 'grid',
+//                 styles: { fontSize: 8, cellPadding: 2 },
+//                 headStyles: { fillColor: [66, 139, 202] },
+//                 columnStyles: {
+//                     2: { cellWidth: 80 }
+//                 }
+//             });
 
-            doc.save('sales-report.pdf');
-        }
+//             doc.save('sales-report.pdf');
+//         }
+// // 
+//         function exportToExcel() {
+//             const table = document.getElementById('salesTable');
+//             const wb = XLSX.utils.book_new();
 
-        function exportToExcel() {
-            const table = document.getElementById('salesTable');
-            const wb = XLSX.utils.book_new();
+//             const data = [];
+//             const headers = [
+//                 'Date',
+//                 'Order ID',
+//                 'Product Name',
+//                 'Quantity',
+//                 'Price',
+//                 'Gross Amount',
+//                 'Discount',
+//                 'Net Amount',
+//                 'Coupon Used',
+//                 'Status'
+//             ];
 
-            const data = [];
-            const headers = [
-                'Date',
-                'Order ID',
-                'Product Name',
-                'Quantity',
-                'Price',
-                'Gross Amount',
-                'Discount',
-                'Net Amount',
-                'Coupon Used',
-                'Status'
-            ];
+//             data.push(headers);
 
-            data.push(headers);
+//             data.push([
+//                 'SUMMARY',
+//                 '',
+//                 '',
+//                 '',
+//                 '',
+//                 document.getElementById('totalSales').innerText,
+//                 document.getElementById('totalDiscounts').innerText,
+//                 document.getElementById('netSales').innerText,
+//                 `Total Orders: ${document.getElementById('totalOrders').innerText}`,
+//                 `Discounted Orders: ${document.getElementById('discountedOrders').innerText}`
+//             ]);
 
-            data.push([
-                'SUMMARY',
-                '',
-                '',
-                '',
-                '',
-                document.getElementById('totalSales').innerText,
-                document.getElementById('totalDiscounts').innerText,
-                document.getElementById('netSales').innerText,
-                `Total Orders: ${document.getElementById('totalOrders').innerText}`,
-                `Discounted Orders: ${document.getElementById('discountedOrders').innerText}`
-            ]);
+//             data.push([]);
 
-            data.push([]);
+//             table.querySelectorAll('tbody tr').forEach(row => {
+//                 const date = row.cells[0].innerText;
+//                 const orderId = row.cells[1].innerText;
+//                 const grossAmount = row.cells[3].innerText;
+//                 const discount = row.cells[4].innerText;
+//                 const netAmount = row.cells[5].innerText;
+//                 const coupon = row.cells[6].innerText;
+//                 const status = row.cells[7].innerText;
 
-            table.querySelectorAll('tbody tr').forEach(row => {
-                const date = row.cells[0].innerText;
-                const orderId = row.cells[1].innerText;
-                const grossAmount = row.cells[3].innerText;
-                const discount = row.cells[4].innerText;
-                const netAmount = row.cells[5].innerText;
-                const coupon = row.cells[6].innerText;
-                const status = row.cells[7].innerText;
+//                 const products = row.cells[2].querySelectorAll('.product-item');
 
-                const products = row.cells[2].querySelectorAll('.product-item');
+//                 products.forEach(product => {
+//                     const productName = product.querySelector('.product-name').innerText;
+//                     const meta = product.querySelector('.product-meta').innerText;
+//                     const quantity = meta.match(/Qty: (\d+)/)?.[1] || '';
+//                     const price = meta.match(/₹(\d+(\.\d+)?)/)?.[1] || '';
 
-                products.forEach(product => {
-                    const productName = product.querySelector('.product-name').innerText;
-                    const meta = product.querySelector('.product-meta').innerText;
-                    const quantity = meta.match(/Qty: (\d+)/)?.[1] || '';
-                    const price = meta.match(/₹(\d+(\.\d+)?)/)?.[1] || '';
+//                     data.push([
+//                         date,
+//                         orderId,
+//                         productName,
+//                         quantity,
+//                         price,
+//                         grossAmount.replace('₹', ''),
+//                         discount.replace('-₹', ''),
+//                         netAmount.replace('₹', ''),
+//                         coupon,
+//                         status
+//                     ]);
+//                 });
+//             });
 
-                    data.push([
-                        date,
-                        orderId,
-                        productName,
-                        quantity,
-                        price,
-                        grossAmount.replace('₹', ''),
-                        discount.replace('-₹', ''),
-                        netAmount.replace('₹', ''),
-                        coupon,
-                        status
-                    ]);
-                });
-            });
+//             const ws = XLSX.utils.aoa_to_sheet(data);
 
-            const ws = XLSX.utils.aoa_to_sheet(data);
+//             const colWidths = [
+//                 { wch: 12 },
+//                 { wch: 25 },
+//                 { wch: 40 },
+//                 { wch: 10 },
+//                 { wch: 12 },
+//                 { wch: 15 },
+//                 { wch: 15 },
+//                 { wch: 15 },
+//                 { wch: 15 },
+//                 { wch: 12 }
+//             ];
+//             ws['!cols'] = colWidths;
 
-            const colWidths = [
-                { wch: 12 },
-                { wch: 25 },
-                { wch: 40 },
-                { wch: 10 },
-                { wch: 12 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 15 },
-                { wch: 12 }
-            ];
-            ws['!cols'] = colWidths;
-
-            XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
-            XLSX.writeFile(wb, 'sales-report.xlsx');
-        }
+//             XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+//             XLSX.writeFile(wb, 'sales-report.xlsx');
+//         }
         
+
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('landscape');
+
+    doc.setFontSize(16);
+    doc.text('Sales Report', 14, 15);
+    doc.setFontSize(10);
+
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    let periodText = `Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}`;
+    if (reportType === 'custom') {
+        periodText += ` (${startDate} to ${endDate})`;
+    }
+    doc.text(periodText, 14, 25);
+
+    const totalSales = document.getElementById('totalSales').innerText;
+    const totalDiscounts = document.getElementById('totalDiscounts').innerText;
+    const netSales = document.getElementById('netSales').innerText;
+
+    doc.text(`Total Sales: ${totalSales}`, 14, 35);
+    doc.text(`Total Discounts: ${totalDiscounts}`, 14, 42);
+    doc.text(`Net Sales: ${netSales}`, 14, 49);
+
+    const table = document.getElementById('salesTable');
+    const tableData = [];
+    const headers = ['Date', 'Order ID', 'Products', 'Gross Amount', 'Discount', 'Net Amount', 'Coupon', 'Status'];
+    tableData.push(headers);
+
+    table.querySelectorAll('tbody tr').forEach(row => {
+        const status = row.cells[7].innerText.trim().toLowerCase();
+        if (status !== 'delivered') return;
+
+        const rowData = [];
+        rowData.push(row.cells[0].innerText);
+        rowData.push(row.cells[1].innerText);
+
+        const productList = [];
+        const products = row.cells[2].querySelectorAll('.product-item');
+        products.forEach(product => {
+            const name = product.querySelector('.product-name').innerText;
+            const meta = product.querySelector('.product-meta').innerText;
+            productList.push(`${name} (${meta})`);
+        });
+        rowData.push(productList.join('\n'));
+
+        rowData.push(row.cells[3].innerText);
+        rowData.push(row.cells[4].innerText);
+        rowData.push(row.cells[5].innerText);
+        rowData.push(row.cells[6].innerText);
+        rowData.push(row.cells[7].innerText);
+
+        tableData.push(rowData);
+    });
+
+    doc.autoTable({
+        startY: 60,
+        head: [headers],
+        body: tableData.slice(1),
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [66, 139, 202] },
+        columnStyles: {
+            2: { cellWidth: 80 }
+        }
+    });
+
+    doc.save('sales-report.pdf');
+}
+
+
+function exportToExcel() {
+    const table = document.getElementById('salesTable');
+    const wb = XLSX.utils.book_new();
+
+    const data = [];
+    const headers = [
+        'Date',
+        'Order ID',
+        'Product Name',
+        'Quantity',
+        'Price',
+        'Gross Amount',
+        'Discount',
+        'Net Amount',
+        'Coupon Used',
+        'Status'
+    ];
+
+    data.push(headers);
+
+    table.querySelectorAll('tbody tr').forEach(row => {
+        const status = row.cells[7].innerText.trim();
+        if (status === 'Delivered') {
+            const date = row.cells[0].innerText;
+            const orderId = row.cells[1].innerText;
+            const grossAmount = row.cells[3].innerText;
+            const discount = row.cells[4].innerText;
+            const netAmount = row.cells[5].innerText;
+            const coupon = row.cells[6].innerText;
+
+            const products = row.cells[2].querySelectorAll('.product-item');
+
+            products.forEach(product => {
+                const productName = product.querySelector('.product-name').innerText;
+                const meta = product.querySelector('.product-meta').innerText;
+                const quantity = meta.match(/Qty: (\d+)/)?.[1] || '';
+                const price = meta.match(/₹(\d+(\.\d+)?)/)?.[1] || '';
+
+                data.push([
+                    date,
+                    orderId,
+                    productName,
+                    quantity,
+                    price,
+                    grossAmount.replace('₹', ''),
+                    discount.replace('-₹', ''),
+                    netAmount.replace('₹', ''),
+                    coupon,
+                    status
+                ]);
+            });
+        }
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    const colWidths = [
+        { wch: 12 },
+        { wch: 25 },
+        { wch: 40 },
+        { wch: 10 },
+        { wch: 12 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 12 }
+    ];
+    ws['!cols'] = colWidths;
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Delivered Sales Report');
+    XLSX.writeFile(wb, 'delivered-sales-report.xlsx');
+}
+
         
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -926,7 +1054,7 @@ new Chart(ctx4, {
 });
 
 function refreshCharts() {
-    // Submit the form to refresh data
+  
     document.getElementById('reportForm').submit();
 }
         

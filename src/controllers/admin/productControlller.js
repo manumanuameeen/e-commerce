@@ -30,12 +30,16 @@ const addProducts = async (req, res) => {
     try {
         const products = req.body;
         
-        if (!products.productName || !products.category || !products.regularPrice||!products.brand) {
+        if (!products.productName || !products.category || !products.regularPrice) {
+            console.log('here1');
+
             return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
         const productExists = await Product.findOne({ productName: products.productName });
         if (productExists) {
+            console.log('here2');
+            
             return res.status(400).json({ success: false, message: "Product already exists" });
         }
 
@@ -46,6 +50,8 @@ const addProducts = async (req, res) => {
 
             for (const file of req.files) {
                 try {
+                    console.log('here3');
+
                     const fileName = `${Date.now()}-${file.originalname}`;
                     const filePath = path.join(uploadDir, fileName);
                     
@@ -56,6 +62,8 @@ const addProducts = async (req, res) => {
                     images.push(fileName);
                     
                 } catch (error) {
+                    console.log('here4');
+
                     console.error("Error processing image:", error);
                 }
             }
@@ -77,6 +85,7 @@ const addProducts = async (req, res) => {
 
         const category = await Category.findOne({ name: products.category });
         if (!category) {
+            console.log('here5');
             return res.status(400).json({ success: false, message: "Invalid category" });
         }
 
@@ -95,6 +104,7 @@ const addProducts = async (req, res) => {
         await newProduct.save();
         return res.status(200).json({ success: true, message: "Product added successfully" });
     } catch (error) {
+        console.log('here6');
         console.error("Error saving product:", error);
         return res.status(500).json({ success: false, message: "Internal server error" });
     }

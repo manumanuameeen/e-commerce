@@ -21,27 +21,29 @@
                 color: red;
                 display: none;
             }
+
             .variant-row {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
+                background-color: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
 
-.btn-danger {
-    background-color: #ff0000;
-    border-color: #ff0000;
-}
+            .btn-danger {
+                background-color: #ff0000;
+                border-color: #ff0000;
+            }
 
-.btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-}
+            .btn-success {
+                background-color: #28a745;
+                border-color: #28a745;
+            }
 
-.form-select, .form-control {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-}
+            .form-select,
+            .form-control {
+                background-color: #fff;
+                border: 1px solid #ced4da;
+            }
         </style>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
     </head>
@@ -59,9 +61,10 @@
 
 
                     <div class="card-body">
-                        <form method="post" action="/admin/edit-Product/<%= product._id %>" enctype="multipart/form-data">
+                        <form method="post" action="/admin/edit-Product/<%= product._id %>"
+                            enctype="multipart/form-data">
 
-                        
+
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" name="productName" value="<%=product.productName%>"
@@ -92,9 +95,9 @@
                                     </div>
                                     <div id="salePrice-error" class="error-message"></div>
                                 </div>
-                                
+
                             </div>
-                           
+
                             <div class="card mb-4">
 
                                 <div class="card mb-4">
@@ -103,37 +106,32 @@
                                     </div>
                                     <div class="card-body">
                                         <div id="colorVariantsContainer">
-                                            <% if(product.colorVarients && product.colorVarients.length > 0) { %>
-                                                <% product.colorVarients.forEach((variant, index) => { %>
+                                            <% if(product.colorVarients && product.colorVarients.length> 0) { %>
+                                                <% product.colorVarients.forEach((variant, index)=> { %>
                                                     <div class="variant-row mb-3">
                                                         <div class="row align-items-center">
                                                             <div class="col-md-4">
-                                                                <input type="text" 
-                                                                       name="colors[]" 
-                                                                       class="form-control"
-                                                                       placeholder="Enter color (e.g., Navy Blue)"
-                                                                       value="<%= variant.color %>" 
-                                                                       required>
+                                                                <input type="text" name="colors[]" class="form-control"
+                                                                    placeholder="Enter color (e.g., Navy Blue)"
+                                                                    value="<%= variant.color %>" required>
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <input type="number" 
-                                                                       name="quantities[]" 
-                                                                       class="form-control" 
-                                                                       value="<%= variant.quantity %>" 
-                                                                       placeholder="Enter quantity"
-                                                                       min="0" 
-                                                                       required>
+                                                                <input type="number" name="quantities[]"
+                                                                    class="form-control" value="<%= variant.quantity %>"
+                                                                    placeholder="Enter quantity" min="0" required>
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+                                                                <button type="button" class="btn btn-danger"
+                                                                    onclick="removeVariant(this)">Remove</button>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                <% }) %>
-                                            <% } %>
+                                                    <% }) %>
+                                                        <% } %>
                                         </div>
                                         <div id="variant-error" class="error-message"></div>
-                                        <button type="button" class="btn btn-success" onclick="addVariant()">Add Color Variant</button>
+                                        <button type="button" class="btn btn-success" onclick="addVariant()">Add Color
+                                            Variant</button>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -142,8 +140,10 @@
                                             <label for="category" class="form-label">Category</label>
                                             <select name="category" class="form-control" id="category">
                                                 <% for(let i=0; i<cat.length; i++) { %>
-                                                    <option value="<%=cat[i].name%>"><%=cat[i].name%></option>
-                                                <% } %>
+                                                    <option value="<%=cat[i].name%>">
+                                                        <%=cat[i].name%>
+                                                    </option>
+                                                    <% } %>
                                             </select>
                                             <div id="category-error" class="error-message"></div>
                                         </div>
@@ -170,53 +170,53 @@
                                             </div>
                                         </div>
                                     </div>
-                                <%}%>
-                                    <div class="card-body">
-                                        <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                            <img src="" alt="" id="imgView1">
-                                            <input class="form-control" type="file" name="images" id="input1"
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                onchange="viewImage1(event), viewImage(event, 1)">
-                                            <div id="images-error" class="error-message"></div>
-                                        </div>
-                                        <div class="image-cropper d-flex align-items-center"
-                                            style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                            <img src="" id="croppedImg1" alt="">
-                                            <button type="button" id="saveButton1"
-                                                class="btn-sm btn-primary">Save</button>
-                                        </div>
-                                        <div class="row">
+                                    <%}%>
+                                        <div class="card-body">
                                             <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                                <img src="" alt="" id="imgView2">
-                                                <input class="form-control" type="file" name="images" id="input2"
+                                                <img src="" alt="" id="imgView1">
+                                                <input class="form-control" type="file" name="images" id="input1"
                                                     accept="image/png, image/jpeg, image/jpg"
-                                                    onchange="viewImage2(event),viewImage(event, 2)">
+                                                    onchange="viewImage1(event), viewImage(event, 1)">
+                                                <div id="images-error" class="error-message"></div>
                                             </div>
                                             <div class="image-cropper d-flex align-items-center"
                                                 style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                                <img src="" id="croppedImg2" alt="">
-                                                <button type="button" id="saveButton2"
+                                                <img src="" id="croppedImg1" alt="">
+                                                <button type="button" id="saveButton1"
                                                     class="btn-sm btn-primary">Save</button>
                                             </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="card-body align-items-center" style="margin-bottom: 20px;">
-                                                <img src="" alt="" id="imgView3">
-                                                <input class="form-control" type="file" name="images" id="input3"
-                                                    accept="image/png, image/jpeg, image/jpg"
-                                                    onchange="viewImage3(event),viewImage(event, 3)">
+                                            <div class="row">
+                                                <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                                    <img src="" alt="" id="imgView2">
+                                                    <input class="form-control" type="file" name="images" id="input2"
+                                                        accept="image/png, image/jpeg, image/jpg"
+                                                        onchange="viewImage2(event),viewImage(event, 2)">
+                                                </div>
+                                                <div class="image-cropper d-flex align-items-center"
+                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                                    <img src="" id="croppedImg2" alt="">
+                                                    <button type="button" id="saveButton2"
+                                                        class="btn-sm btn-primary">Save</button>
+                                                </div>
                                             </div>
-                                            <div class="image-cropper d-flex align-items-center"
-                                                style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
-                                                <img src="" id="croppedImg3" alt="">
-                                                <button type="button" id="saveButton3"
-                                                    class="btn-sm btn-primary">Save</button>
+
+                                            <div class="row">
+                                                <div class="card-body align-items-center" style="margin-bottom: 20px;">
+                                                    <img src="" alt="" id="imgView3">
+                                                    <input class="form-control" type="file" name="images" id="input3"
+                                                        accept="image/png, image/jpeg, image/jpg"
+                                                        onchange="viewImage3(event),viewImage(event, 3)">
+                                                </div>
+                                                <div class="image-cropper d-flex align-items-center"
+                                                    style="display:none; width: 300px; height: 200px; margin-bottom: 20px;">
+                                                    <img src="" id="croppedImg3" alt="">
+                                                    <button type="button" id="saveButton3"
+                                                        class="btn-sm btn-primary">Save</button>
+                                                </div>
                                             </div>
+
+
                                         </div>
-
-
-                                    </div>
                             </div>
                             <div>
 
@@ -235,12 +235,12 @@
     <%- include("../partials/admin/footer") %>
         <script>
 
-function addVariant() {
-    const container = document.getElementById('colorVariantsContainer');
-    const newVariant = document.createElement('div');
-    newVariant.classList.add('variant-row', 'mb-3');
-    
-    newVariant.innerHTML = `
+            function addVariant() {
+                const container = document.getElementById('colorVariantsContainer');
+                const newVariant = document.createElement('div');
+                newVariant.classList.add('variant-row', 'mb-3');
+
+                newVariant.innerHTML = `
         <div class="row align-items-center">
             <div class="col-md-4">
                 <input type="text" 
@@ -262,45 +262,45 @@ function addVariant() {
             </div>
         </div>
     `;
-    
-    container.appendChild(newVariant);
-}
 
-function removeVariant(button) {
-    const variantRow = button.closest('.variant-row');
-    variantRow.remove();
-}
+                container.appendChild(newVariant);
+            }
 
-function validateVariants() {
-    const colors = document.getElementsByName('colors[]');
-    const quantities = document.getElementsByName('quantities[]');
-    
-    if (colors.length === 0) {
-        displayErrorMessage('variant-error', 'At least one color variant is required.');
-        return false;
-    }
-    
-    const colorValues = Array.from(colors).map(input => input.value.trim().toLowerCase());
-    if (colorValues.some(color => color === '')) {
-        displayErrorMessage('variant-error', 'Color name cannot be empty.');
-        return false;
-    }
-    
-    if (new Set(colorValues).size !== colorValues.length) {
-        displayErrorMessage('variant-error', 'Duplicate colors are not allowed.');
-        return false;
-    }
-    
-   
-    for (let i = 0; i < quantities.length; i++) {
-        if (quantities[i].value < 0 || quantities[i].value === '') {
-            displayErrorMessage('variant-error', 'All quantities must be valid numbers greater than or equal to 0.');
-            return false;
-        }
-    }
-    
-    return true;
-}
+            function removeVariant(button) {
+                const variantRow = button.closest('.variant-row');
+                variantRow.remove();
+            }
+
+            function validateVariants() {
+                const colors = document.getElementsByName('colors[]');
+                const quantities = document.getElementsByName('quantities[]');
+
+                if (colors.length === 0) {
+                    displayErrorMessage('variant-error', 'At least one color variant is required.');
+                    return false;
+                }
+
+                const colorValues = Array.from(colors).map(input => input.value.trim().toLowerCase());
+                if (colorValues.some(color => color === '')) {
+                    displayErrorMessage('variant-error', 'Color name cannot be empty.');
+                    return false;
+                }
+
+                if (new Set(colorValues).size !== colorValues.length) {
+                    displayErrorMessage('variant-error', 'Duplicate colors are not allowed.');
+                    return false;
+                }
+
+
+                for (let i = 0; i < quantities.length; i++) {
+                    if (quantities[i].value < 0 || quantities[i].value === '') {
+                        displayErrorMessage('variant-error', 'All quantities must be valid numbers greater than or equal to 0.');
+                        return false;
+                    }
+                }
+
+                return true;
+            }
 
 
             function validateAndSubmit() {
@@ -322,7 +322,10 @@ function validateVariants() {
                 const saleprice = document.getElementsByName('salePrice')[0].value;
                 const category = document.getElementsByName('category')[0].value;
                 const images = document.getElementById('input1')
-                const quantity = document.getElementsByName('quantity')
+                // const quantity = document.getElementsByName('quantity')
+                const colorVariants = document.querySelectorAll("#colorVariantsContainer .variant-row");
+
+
                 imageDatas = document.getElementById("imageDatas")?.value;
                 let isValid = true;
                 if (name.trim() === "") {
@@ -336,10 +339,10 @@ function validateVariants() {
                 }
 
 
-                if (parseInt(quantity) < 0) {
-                    displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
-                    isValid = false;
-                }
+                // if (parseInt(quantity) < 0) {
+                //     displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
+                //     isValid = false;
+                // }
 
 
 
@@ -353,10 +356,29 @@ function validateVariants() {
                     isValid = false;
                 }
 
-               
+
                 if (!imageDatas && images.files.length === 0) {
                     displayErrorMessage("images-error", 'Please select an image.');
                     isValid = false;
+                }
+                if (colorVariants.length === 0) {
+                    displayErrorMessage("variant-error", "Please add at least one color variant.");
+                    isValid = false;
+                } else {
+                    colorVariants.forEach((variant, index) => {
+                        const colorInput = variant.querySelector("input[name='colors[]']");
+                        const quantityInput = variant.querySelector("input[name='quantities[]']");
+
+                        if (!colorInput.value.trim()) {
+                            displayErrorMessage("variant-error", "Color name cannot be empty.");
+                            isValid = false;
+                        }
+
+                        if (quantityInput.value === "" || parseInt(quantityInput.value) < 0) {
+                            displayErrorMessage("variant-error", "Please enter a valid non-negative quantity.");
+                            isValid = false;
+                        }
+                    });
                 }
                 return isValid;
             }
@@ -476,27 +498,27 @@ function validateVariants() {
             };
 
 
-function deleteSingleImage(imageId,productId){
-    fetch('/admin/deleteImage', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        imageNameToServer: imageId,
-        productIdToServer: productId,
-    }),
-})
-    .then((response) => response.json())
-    .then((data) => {
-        if (data.status === true) {
-            window.location.reload();
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+            function deleteSingleImage(imageId, productId) {
+                fetch('/admin/deleteImage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        imageNameToServer: imageId,
+                        productIdToServer: productId,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.status === true) {
+                            window.location.reload();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
 
-}
+            }
 
         </script>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -123,7 +124,8 @@
             border-collapse: collapse;
         }
 
-        th, td {
+        th,
+        td {
             padding: 16px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
@@ -195,18 +197,35 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         @media (max-width: 768px) {
@@ -219,12 +238,14 @@
             .details-grid {
                 grid-template-columns: 1fr;
             }
+
             .button-container {
                 flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="card" id="invoice-content">
@@ -243,27 +264,35 @@
                 <div class="details-grid">
                     <div class="detail-item">
                         <div class="detail-label">Order ID</div>
-                        <div class="detail-value">#<%= order.orderId %></div>
+                        <div class="detail-value">#<%= order.orderId %>
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Order Date</div>
-                        <div class="detail-value"><%= new Date(order.createdAt).toLocaleDateString() %></div>
+                        <div class="detail-value">
+                            <%= new Date(order.createdAt).toLocaleDateString() %>
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Payment Method</div>
-                        <div class="detail-value"><%= order.paymentMethod %></div>
+                        <div class="detail-value">
+                            <%= order.paymentMethod %>
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Total Amount</div>
-                        <div class="detail-value">₹<%= order.totalPrice.toFixed(2) %></div>
+                        <div class="detail-value">₹<%= order.totalPrice.toFixed(2) %>
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Discount</div>
-                        <div class="detail-value">₹<%= order.discount.toFixed(2) %></div>
+                        <div class="detail-value">₹<%= order.discount.toFixed(2) %>
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Final Amount</div>
-                        <div class="detail-value">₹<%= order.finalAmount.toFixed(2) %></div>
+                        <div class="detail-value">₹<%= order.finalAmount.toFixed(2) %>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,19 +313,26 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% order.orderIteams.forEach(item => { %>
+                            <% order.orderIteams.forEach(item=> { %>
                                 <tr>
-                                    <td><%= item.productName %></td>
-                                    <td><%= item.quantity %></td>
-                                    <td>₹<%= item.price.toFixed(2) %></td>
-                                    <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
                                     <td>
-                                        <span class="status-badge <%= item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' : 'status-delivered' %>">
+                                        <%= item.productName %>
+                                    </td>
+                                    <td>
+                                        <%= item.quantity %>
+                                    </td>
+                                    <td>₹<%= item.price.toFixed(2) %>
+                                    </td>
+                                    <td>₹<%= (item.price * item.quantity).toFixed(2) %>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="status-badge <%= item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' : 'status-delivered' %>">
                                             <%= item.status %>
                                         </span>
                                     </td>
                                 </tr>
-                            <% }); %>
+                                <% }); %>
                         </tbody>
                     </table>
                 </div>
@@ -310,7 +346,7 @@
                     </svg>
                     Back to Home
                 </a>
-                <button id="downloadInvoice" class="button button-primary">
+                <button id="downloadInvoice" class="button button-primary " onclick="generateInvoice('<%=order._id%>')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -328,195 +364,218 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-    // Initialize jsPDF
-  // Initialize jsPDF
-// Initialize jsPDF
-// Initialize jsPDF
-window.jsPDF = window.jspdf.jsPDF;
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-function exportToPDF() {
-    const doc = new jsPDF();
-    
-    try {
-        // Define colors
-        const greyColor = [128, 128, 128];
-        const lightGreyBg = [245, 245, 245];
-        
-        doc.setFillColor(...lightGreyBg);
-        doc.rect(0, 0, 210, 15, 'F');
-        
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('Aranoz', 15, 35);
-        
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Perinthalmanna', 15, 45);
-        doc.text('Kerala, 679322', 15, 50);
-        doc.text('Contact: +91 8075973591', 15, 55);
-        doc.text('Email: aranoz@gmail.com', 15, 60);
-        
-        // Invoice Details - Left side
-        doc.setFont('helvetica', 'bold');
-        const currentDate = new Date().toLocaleDateString();
-        doc.text(`Date: ${currentDate}`, 15, 75);
-        const orderId = document.querySelector('.detail-value').textContent;
-        doc.text(`Invoice No: ${orderId}`, 15, 80);
-        
-        // Add "INVOICE" text centered at top
-        doc.setFontSize(24);
-        doc.setTextColor(...greyColor);
-        doc.text('INVOICE', doc.internal.pageSize.width/2, 30, { align: 'center' });
-        
-        // Billing and Shipping Sections with columns
-        doc.setFillColor(...lightGreyBg);
-        doc.rect(15, 95, 180, 7, 'F');
-        
-        doc.setFontSize(11);
-        doc.setTextColor(...greyColor);
-        doc.text('BILLING & SHIPPING DETAILS', 17, 100);
-        
-        // Details content in columns
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        
-       
-        const billingDetails = {
-            name: document.querySelector('[data-customer-name]')?.dataset.customerName || '<%=user.name%>',
-            houseName: document.querySelector('[data-house-name]')?.dataset.houseName || 'House/Building',
-            street: document.querySelector('[data-street]')?.dataset.street || '',
-            
-          
-        };
-        
-        // Column 1 - From
-        doc.setFont('helvetica', 'bold');
-        doc.text('From:', 15, 115);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Aranoz Company', 15, 125);
-        doc.text('123 Business District', 15, 130);
-        doc.text('Perinthalmanna, Kerala', 15, 135);
-        doc.text('Phone: +91 8075973591', 15, 140);
-        
-        // Column 2 - Bill To
-        doc.setFont('helvetica', 'bold');
-        doc.text('Bill To:', 105, 115);
-        doc.setFont('helvetica', 'normal');
-        
-        // doc.text(billingDetails.name, 105, 125);
-        // doc.text(billingDetails.houseName, 105, 130);
-        // doc.text(billingDetails.street, 105, 135);
-        // doc.text(`${billingDetails.city}, ${billingDetails.state}`, 105, 140);
-        // doc.text(`PIN: ${billingDetails.pincode}`, 105, 145);
-        // doc.text(`Phone: ${billingDetails.phone}`, 105, 150);
-       
-        // doc.setFillColor(...lightGreyBg);
-        // doc.rect(15, 165, 180, 10, 'F');
-        
-        // Table Headers
-        doc.setTextColor(...greyColor);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Product Description', 17, 172);
-        doc.text('Qty', 95, 172);
-        doc.text('Price', 130, 172);
-        doc.text('Total', 170, 172);
-        
-        // Get order items from the table
-        const table = document.querySelector('table');
-        const rows = table.querySelectorAll('tbody tr');
-        
-        // Table Contents with alternating backgrounds
-        let yPos = 185;
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        
-        rows.forEach((row, index) => {
-            // Add alternating row backgrounds
-            if (index % 2 === 0) {
-                doc.setFillColor(250, 250, 250);
-                doc.rect(15, yPos - 5, 180, 10, 'F');
-            }
-            
-            const cells = row.querySelectorAll('td');
-            const productName = cells[0].textContent;
-            const quantity = cells[1].textContent;
-            const price = cells[2].textContent.replace('₹', '').trim();
-            const total = cells[3].textContent.replace('₹', '').trim();
-            
-            doc.text(productName, 17, yPos);
-            doc.text(quantity, 95, yPos);
-            doc.text(`₹ ${price}`, 130, yPos);
-            doc.text(`₹ ${total}`, 170, yPos);
-            
-            yPos += 10;
-        });
-        
-        // Summary Section
-        yPos += 10;
-        doc.setFillColor(...lightGreyBg);
-        doc.rect(110, yPos - 5, 85, 50, 'F');
-        
-        // Get pricing details from the page
-        const detailValues = document.querySelectorAll('.detail-value');
-        const totalPrice = detailValues[3].textContent.replace('₹', '').trim();
-        const discount = detailValues[4].textContent.replace('₹', '').trim();
-        const finalAmount = detailValues[5].textContent.replace('₹', '').trim();
-        
-        doc.setFont('helvetica', 'normal');
-        doc.text('Subtotal:', 115, yPos + 5);
-        doc.text(`₹ ${totalPrice}`, 170, yPos + 5);
-        
-        doc.text('Discount:', 115, yPos + 15);
-        doc.text(`₹ ${discount}`, 170, yPos + 15);
-        
-        doc.text('Shipping:', 115, yPos + 25);
-        doc.text('₹ 0.00', 170, yPos + 25);
-        
-        doc.setFont('helvetica', 'bold');
-        doc.text('Total Amount:', 115, yPos + 40);
-        doc.text(`₹ ${finalAmount}`, 170, yPos + 40);
-        
-        // Footer
-        doc.setFillColor(...lightGreyBg);
-        doc.rect(0, 277, 210, 20, 'F');
-        
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Thank you for shopping with Aranoz!', 15, 285);
-        doc.text('For support, contact: +91 8075973591 | aranoz@gmail.com', 15, 290);
-        
-        // Save the PDF
-        doc.save(`aranoz-invoice-${orderId.replace('#', '')}.pdf`);
-        
-        return true;
-    } catch (error) {
-        console.error('PDF generation error:', error);
-        return false;
-    }
-}
+    <script>
 
-// Event listener
-document.getElementById('downloadInvoice').addEventListener('click', function() {
-    const toast = document.getElementById('toast');
-    toast.style.display = 'block';
-    toast.textContent = 'Preparing your invoice...';
-    
-    setTimeout(() => {
-        try {
-            const success = exportToPDF();
-            toast.textContent = success ? 'Invoice downloaded successfully!' : 'Error generating invoice. Please try again.';
-        } catch (error) {
-            toast.textContent = 'Error generating invoice. Please try again.';
-            console.error('Error:', error);
+        window.jsPDF = window.jspdf.jsPDF;
+
+
+
+
+        function generateInvoice(orderId) {
+            Swal.fire({
+                title: 'Generating Invoice',
+                text: 'Please wait...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/getOrderDetails/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to fetch order details');
+                    }
+
+                    createInvoicePDF(data.order, data.userData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Failed to generate invoice'
+                    });
+                });
         }
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }, 100);
-});
-</script>
+
+        function createInvoicePDF(order, userData) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            doc.setProperties({
+                title: `Invoice-${order.orderId}`,
+                subject: 'Order Invoice',
+                author: 'Aranoz',
+                creator: 'Aranoz E-commerce'
+            });
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            const usableWidth = pageWidth - (margin * 2);
+
+            // Colors
+            doc.setDrawColor(241, 90, 36);
+            doc.setFillColor(241, 90, 36);
+
+            doc.rect(0, 0, pageWidth, 15, 'F');
+
+            doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+
+
+
+            doc.setFontSize(11);
+            doc.text('Aranoz', margin + 0, 30);
+            doc.setFontSize(9);
+            doc.text('Perinthalmanna Street', margin + 0, 35);
+            doc.text('Phone: +91 12345 67890', margin + 0, 40);
+
+
+            doc.setFontSize(20);
+            doc.setTextColor(100, 100, 100);
+            doc.text('INVOICE', pageWidth - margin - 30, 35);
+
+
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text('DATE', pageWidth - margin - 30, 45);
+            doc.line(pageWidth - margin - 30, 46, pageWidth - margin, 46);
+            doc.text(new Date(order.createdAt).toLocaleDateString(), pageWidth - margin - 30, 50);
+
+
+            doc.setFontSize(8);
+
+            if (order.status === 'Payment Pending') {
+                doc.setTextColor(255, 0, 0);
+            } else {
+                doc.setTextColor(0, 128, 0);
+            }
+
+            doc.text(`Payment terms: ${order.status === 'Payment Pending' ? 'Due immediately' : 'Paid'}`, margin, 70);
+
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text('BILL TO', margin, 80);
+            doc.setFontSize(9);
+            doc.text(order.address?.name || 'Customer Name', margin, 85);
+            doc.text(order.address?.street || 'Customer Address', margin, 90);
+            doc.text(`${order.address?.city || 'City'}, ${order.address?.state || 'State'} ${order.address?.pincode || 'Pincode'}`, margin, 95);
+            doc.text(order.address?.phone || 'Phone', margin, 100);
+            doc.text(userData?.email || 'Email', margin, 105);
+
+            doc.setFontSize(10);
+            doc.text('SHIP TO', pageWidth / 2, 80);
+            doc.setFontSize(9);
+            doc.text(order.address?.name || 'Customer Name', pageWidth / 2, 85);
+            doc.text(order.address?.street || 'Customer Address', pageWidth / 2, 90);
+            doc.text(`${order.address?.city || 'City'}, ${order.address?.state || 'State'} ${order.address?.pincode || 'Pincode'}`, pageWidth / 2, 95);
+            doc.text(order.address?.phone || 'Phone', pageWidth / 2, 100);
+
+            const tableTop = 115;
+            const tableWidth = usableWidth;
+            const colWidth = [tableWidth * 0.45, tableWidth * 0.15, tableWidth * 0.2, tableWidth * 0.2];
+
+            doc.setFillColor(241, 90, 36);
+            doc.rect(margin, tableTop, tableWidth, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.text('NAME', margin + 5, tableTop + 5);
+            doc.text('QTY', margin + colWidth[0] + 5, tableTop + 5);
+            doc.text('UNIT PRICE', margin + colWidth[0] + colWidth[1] + 5, tableTop + 5);
+            doc.text('TOTAL', margin + colWidth[0] + colWidth[1] + colWidth[2] + 5, tableTop + 5);
+
+            let yPos = tableTop + 8;
+            doc.setTextColor(50, 50, 50);
+
+            order.orderIteams.forEach((item, index) => {
+                if (yPos > pageHeight - 60) {
+                    doc.addPage();
+                    yPos = margin + 10;
+
+                    doc.setDrawColor(241, 90, 36);
+                    doc.setFillColor(241, 90, 36);
+                    doc.rect(0, 0, pageWidth, 15, 'F');
+                    doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+                }
+
+                doc.setDrawColor(220, 220, 220);
+                doc.line(margin, yPos, margin + tableWidth, yPos);
+                doc.line(margin, yPos + 10, margin + tableWidth, yPos + 10);
+                doc.line(margin, yPos, margin, yPos + 10);
+                doc.line(margin + colWidth[0], yPos, margin + colWidth[0], yPos + 10);
+                doc.line(margin + colWidth[0] + colWidth[1], yPos, margin + colWidth[0] + colWidth[1], yPos + 10);
+                doc.line(margin + colWidth[0] + colWidth[1] + colWidth[2], yPos, margin + colWidth[0] + colWidth[1] + colWidth[2], yPos + 10);
+                doc.line(margin + tableWidth, yPos, margin + tableWidth, yPos + 10);
+
+                doc.setFontSize(8);
+                doc.text(item.productName + (item.color ? ` (${item.color})` : ''), margin + 2, yPos + 5);
+                doc.text(item.quantity.toString(), margin + colWidth[0] + 5, yPos + 5);
+                doc.text(`${item.price.toFixed(2)}`, margin + colWidth[0] + colWidth[1] + 5, yPos + 5);
+                doc.text(`${(item.price * item.quantity).toFixed(2)}`, margin + colWidth[0] + colWidth[1] + colWidth[2] + 5, yPos + 5);
+
+                yPos += 10;
+            });
+
+            yPos += 5;
+            doc.setFontSize(8);
+            doc.text('Remarks / Payment Instructions:', margin, yPos);
+            doc.text(order.status === 'Payment Pending' ? 'Payment pending. Please complete payment to process order.' : 'Thank you for your business.', margin, yPos + 5);
+
+
+            const GST_RATE = 18;
+
+            const taxAmount = (order.totalPrice * GST_RATE) / 100;
+
+            const summaryX = pageWidth - margin - 50;
+            doc.setDrawColor(220, 220, 220);
+
+            doc.text('SUBTOTAL', summaryX, yPos);
+            doc.text(`${order.totalPrice.toFixed(2)}`, pageWidth - margin - 5, yPos, { align: 'right' });
+
+            yPos += 5;
+            doc.text('DISCOUNT', summaryX, yPos);
+            doc.text(`${order.discount.toFixed(2)}`, pageWidth - margin - 5, yPos, { align: 'right' });
+
+            yPos += 5;
+            doc.text('GST RATE', summaryX, yPos);
+            doc.text(`${GST_RATE}%`, pageWidth - margin - 5, yPos, { align: 'right' });
+
+            yPos += 5;
+            doc.text('TOTAL TAX', summaryX, yPos);
+            doc.text(`${taxAmount.toFixed(2)}`, pageWidth - margin - 5, yPos, { align: 'right' });
+
+            yPos += 5;
+            doc.text('SHIPPING/HANDLING', summaryX, yPos);
+            doc.text('0.00', pageWidth - margin - 5, yPos, { align: 'right' });
+
+            yPos += 8;
+            const finalAmount = order.totalPrice - order.discount + taxAmount;
+            doc.setFillColor(253, 233, 233);
+            doc.rect(summaryX - 10, yPos - 5, 70, 10, 'F');
+            doc.setFontSize(9);
+            doc.setTextColor(50, 50, 50);
+            doc.text('Balance Due', summaryX, yPos);
+            doc.text(`${finalAmount.toFixed(2)}`, pageWidth - margin - 5, yPos, { align: 'right' });
+            doc.save(`Invoice-${order.orderId}.pdf`);
+
+            Swal.close();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Invoice Generated',
+                text: 'Your invoice has been downloaded successfully.'
+            });
+        }
+
+    </script>
 </body>
+
 </html>

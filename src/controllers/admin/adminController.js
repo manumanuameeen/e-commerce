@@ -67,7 +67,7 @@ const loadDashboard = async (req, res) => {
 
         const { startDate, endDate, reportType, page } = req.query;
         const currentPage = parseInt(page) || 1;
-        const ordersPerPage = 5;
+        const ordersPerPage = 15;
 
         const now = new Date();
         let startOfPeriod = new Date(now.setHours(0, 0, 0, 0));
@@ -257,28 +257,28 @@ const loadDashboard = async (req, res) => {
             },
             { $unwind: "$orderIteams" },
             {
-                $lookup: {
-                    from: "products", // Ensure this matches your actual collection name
-                    localField: "orderIteams.product",
+                $lookup:{
+                    from: "products", 
+                    localField: "orderIteams.product", 
                     foreignField: "_id",
-                    as: "product"
+                    as: 'product'
                 }
             },
-            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } }, // Ensure products exist
+            { $unwind: '$product' },
             {
-                $lookup: {
-                    from: "categories", // Ensure this matches your actual categories collection
+                $lookup:{
+                    from: "categories", 
                     localField: "product.category",
                     foreignField: "_id",
                     as: "category"
                 }
             },
-            { $unwind: { path: "$category", preserveNullAndEmptyArrays: false } }, // Ensure categories exist
+            { $unwind: "$category" },
             {
-                $group: {
-                    _id: "$category._id",
+                $group:{
+                    _id: "$category._id", 
                     categoryName: { $first: "$category.name" },
-                    sales: { $sum: { $multiply: ["$orderIteams.price", "$orderIteams.quantity"] } },
+                    sales: { $sum: { $multiply: ["$orderIteams.price", "$orderIteams.quantity"] } }, 
                     orders: { $sum: 1 }
                 }
             },
@@ -294,7 +294,6 @@ const loadDashboard = async (req, res) => {
                 }
             }
         ]);
-        
       console.log(topCategories);
       
         
@@ -367,7 +366,7 @@ const logout = async (req, res) => {
         req.session.destroy((err) => {
             if (err) {
                 console.log("Error destroying session", err);
-                return res.redirect("/pageerror");  // Ensure only one redirect happens
+                return res.redirect("/pageerror");  
             }
             return res.redirect("/admin/login");
         });

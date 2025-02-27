@@ -77,7 +77,8 @@ import{
         requestReturn
         ,cancelOrderItem,
         handlePaymentDismissal,
-
+        fetchOrderData,
+        
 
 } from '../controllers/users/checkoutController.js'
 
@@ -143,9 +144,6 @@ router.get('/shop', loadShopingPage)
 router.get("/productDetails", productDetails)
 
 
-//brand
-
-
 //profile management 
 router.get("/forgot-password", getForgotPassPage);
 router.post("/forgot-email-valid", forgotEmailValid);
@@ -158,13 +156,13 @@ router.get("/Profile", userAuth, userProfile);
 router.get("/change-email", userAuth, changeEmail)
 router.post("/change-email", userAuth, changeEmailValid);
 
-router.post("/verify-email-otp", userAuth, verifyEmailOtp);
+router.post("/verify-email-otp", verifyEmailOtp);
 router.get("/update-email", userAuth, getUpdateEmailPage);
 router.post("/update-email", userAuth, updateEmail)
-router.get("/change-password", userAuth, changePassword);
+router.get("/change-password", changePassword);
 
-router.post("/change-password", userAuth, changePasswordValid)
-router.post("/verify-changePassword-otp", userAuth, verifyChangePassOtp);
+router.post("/change-password", changePasswordValid)
+router.post("/verify-changePassword-otp", verifyChangePassOtp);
 
 router.get("/update-name", userAuth, updateName)
 router.post("/update-name", userAuth, changeName)
@@ -198,7 +196,7 @@ router.get('/order-details/:orderId', userAuth, orderDetails);
 router.patch("/orderCancel/:orderId", userAuth, orderCancel);
 router.patch('/requestReturn/:orderId', userAuth, requestReturn);
 router.patch('/cancelOrderItem/:orderId/:itemId', userAuth, cancelOrderItem);
-
+router.get('/getOrderDetails/:orderId',userAuth,fetchOrderData)
 
 //wishlist
 router.get('/wishlist',userAuth,getWishlist)

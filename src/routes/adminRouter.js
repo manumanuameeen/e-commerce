@@ -143,3 +143,4 @@ router.get("/offer-list",adminAuth,offerList)
 router.delete("/remove-offer/:Id",adminAuth,removeOffer)
 router.put('/update-offer/:id',editOffer);
 export default router;  
+

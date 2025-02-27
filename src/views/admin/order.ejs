@@ -245,7 +245,7 @@
                     <tr>
                         <th>Order ID</th>
                         <th>Date</th>
-                        <th>Customer</th>
+                        <!-- <th>Customer</th> -->
                         <!-- <th>Total</th> -->
                         <th>Status</th>
                         <th>Return Request</th>
@@ -260,9 +260,7 @@
                     <tr>
                         <td><%= order.orderId %></td>
                         <td><%= formatDate(order.createdAt) %></td>
-                        <td>
-                         <%=user.name%>
-                        </td>
+                      
                         <td>
                          <%=order.status%>
                         </td>

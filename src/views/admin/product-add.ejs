@@ -231,10 +231,8 @@ function viewImage(event, index) {
         const cropperContainer = document.querySelector(`#imageView${index}`).parentNode.querySelector('.image-cropper');
         cropperContainer.style.display = 'block';
 
-        // Setup save button with proper event handling
         const saveButton = document.getElementById(`saveButton${index}`);
         if (saveButton) {
-            // Remove old event listeners by cloning and replacing the button
             const newSaveButton = saveButton.cloneNode(true);
             saveButton.parentNode.replaceChild(newSaveButton, saveButton);
 
@@ -250,24 +248,20 @@ function viewImage(event, index) {
                     
                     croppedImages[index] = croppedCanvas.toDataURL('image/jpeg', 0.9);
                     
-                    // Update thumbnail
                     const thumbnailContainer = document.getElementById(`addedImagesContainer${index}`);
                     thumbnailContainer.innerHTML = `
                         <div class="thumbnail">
                             <img src="${croppedImages[index]}" alt="Thumbnail ${index}" style="width: 50px; height: 50px; object-fit: cover;">
                         </div>`;
                     
-                    // Update cropped preview
                     const croppedImg = document.getElementById(`croppedImg${index}`);
                     if (croppedImg) {
                         croppedImg.src = croppedImages[index];
                     }
                     
-                    // Hide cropper elements
                     cropperContainer.style.display = 'none';
                     image.style.display = 'none';
                     
-                    // Cleanup cropper
                     cropper.destroy();
                     delete cropperInstances[index];
                 }
@@ -277,7 +271,6 @@ function viewImage(event, index) {
     reader.readAsDataURL(file);
 }
 
-// Add color variants functionality
 document.addEventListener('DOMContentLoaded', function() {
     const addMoreColorsBtn = document.getElementById('addMoreColors');
     const colorsContainer = document.getElementById('colorsContainer');
@@ -302,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
             colorsContainer.appendChild(newEntry);
         });
 
-        // Event delegation for remove buttons
         colorsContainer.addEventListener('click', function(event) {
             if (event.target.classList.contains('remove-color')) {
                 event.target.closest('.color-entry').remove();
@@ -311,7 +303,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Form submission handler
 async function handleSubmit(event) {
     event.preventDefault();
     
@@ -423,7 +414,6 @@ function validateForm() {
         }
     };
 
-    // Validate each field
     for (const [fieldName, validation] of Object.entries(validations)) {
         if (validation.element) {
             const value = validation.element.value;
@@ -470,7 +460,6 @@ function clearErrorMessages() {
     }
 }
 
-// Initialize form submit handler
 document.getElementById('productSubmitForm').addEventListener('submit', handleSubmit);
 </script>
 

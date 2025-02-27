@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5.0.26/bootstrap-4.min.css">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: #333333;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #666666;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #007bff;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .timer {
+      font-size: 1rem;
+      color: #333333;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .links {
+      margin-top: 20px;
+    }
+
+    .links a {
+      display: inline-block;
+      margin: 10px 0;
+      text-decoration: none;
+      color: #007bff;
+      font-size: 1rem;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Email Verification</h2>
+    <p>Enter the OTP sent to your registered email address.</p>
+    <form id="otpForm" onsubmit="return validateOTPForm()" action="/reset-password" method="post">
+      <div class="form-group">
+        <input type="text" id="otp" name="otp" placeholder="Enter OTP" maxlength="6" required />
+      </div>
+      <button type="submit" id="submitButton">Verify Email</button>
+      <div class="timer" id="timer"></div>
+    </form>
+
+    <div><button type="button" class="btn btn-secondary" onclick="resendOTP()" id="resendOtp" disabled>
+        Resend otp</button></div>
+    <div class="links">
+      <div></div>
+      <a href="/login" id="alreadyVerified">Already verified? Login</a>
+    </div>
+  </div>
+
+  <script>
+    const timerDuration = 120;  
+    let remainingTime = timerDuration;
+    let interval;
+
+    function startTimer() {
+      const timerElement = document.getElementById("timer");
+      const submitButton = document.getElementById("submitButton");
+      const resendButton = document.getElementById("resendOtp");
+
+      resendButton.disabled = true;
+
+      interval = setInterval(() => {
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+        timerElement.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+        if (remainingTime <= 0) {
+          clearInterval(interval);
+          timerElement.textContent = "OTP expired. Please request a new OTP.";
+
+          resendButton.disabled = false;
+        }
+
+        remainingTime--;
+      }, 1000);
+    }
+
+    startTimer();
+
+    function validateOTPForm() {
+      const otpInput = document.getElementById("otp").value;
+
+      if (remainingTime <= 0) {
+        Swal.fire({
+          icon: "error",
+          title: "OTP Expired",
+          text: "Your OTP has expired. Please request a new one.",
+        });
+        return false;
+      }
+
+      fetch('/verify-passForgot-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ otp: otpInput }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "OTP Verified Successfully",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              window.location.href = data.redirectUrl;
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid OTP",
+              text: data.message,
+            });
+          }
+        })
+        .catch(() => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Something went wrong, please try again.",
+          });
+        });
+
+      return false;
+    }
+
+    function resendOTP() {
+      clearInterval(interval);
+
+      remainingTime = timerDuration;
+
+      document.getElementById("otp").disabled = false;
+      document.getElementById("timer").classList.remove("expired");
+
+      startTimer();  // Restart the timer
+
+      fetch("/resend-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "OTP Resent Successfully",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: data.message,
+            });
+          }
+        })
+        .catch(() => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred. Please try again.",
+          });
+        });
+    }
+
+  </script>
+</body>
+
+</html>
