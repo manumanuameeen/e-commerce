@@ -514,7 +514,7 @@ const offerList = async (req, res) => {
             productName= product.productName
 
         }
-      return   res.render("home", { offers,productName:productName||null });
+      return   res.render("offerLoad", { offers,productName:productName||null });
     } catch (error) {
         console.error('Error in offerList:', error);
         res.status(500).json({ 
