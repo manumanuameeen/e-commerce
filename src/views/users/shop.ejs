@@ -1,6 +1,6 @@
 <%- include('../partials/users/header') %>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
         .pagination-container {
             display: flex;
@@ -695,109 +695,132 @@
 
         .moving-line span:nth-child(4) {
             font-weight: bold;
-            
+
         }
+
         .store_header_bg {
             background: #f8f9fa;
             padding: 50px 0;
         }
+
         .store_header_content {
             text-align: center;
         }
+
         .store_header_content h2 {
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
+
         .store_header_content p {
             margin: 0;
             color: #666;
         }
+
         .store_header_content p span {
             margin: 0 10px;
             color: #999;
         }
+
         .store_carousel_wrapper {
             display: flex;
             justify-content: flex-end;
             margin-top: 2rem;
         }
+
         .store_carousel {
-         
+
             width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .carousel-item {
             height: 200px;
         }
+
         .carousel-item img {
             object-fit: cover;
             height: 100%;
             width: 100%;
         }
+
         .carousel-indicators {
             margin-bottom: 0.5rem;
         }
+
         .carousel-indicators button {
             width: 8px;
             height: 8px;
             border-radius: 50%;
         }
+
         /* Add these styles to your existing CSS */
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
 
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
+            to {
+                opacity: 1;
+            }
+        }
 
-.pagination-container {
-    transition: opacity 0.3s ease;
-}
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
 
-.row:has(.single_product_item) {
-    transition: opacity 0.3s ease;
-}
+            to {
+                opacity: 0;
+            }
+        }
 
-.fade-out {
-    opacity: 0.5;
-}
+        .pagination-container {
+            transition: opacity 0.3s ease;
+        }
 
-.fade-in {
-    animation: fadeIn 0.5s ease forwards;
-}
+        .row:has(.single_product_item) {
+            transition: opacity 0.3s ease;
+        }
 
-#pagination-loader .spinner-border {
-    width: 3rem;
-    height: 3rem;
-}
+        .fade-out {
+            opacity: 0.5;
+        }
 
-/* Smooth transition for product items */
-.single_product_item {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
 
-/* Animation for newly loaded products */
-@keyframes productAppear {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        #pagination-loader .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
 
-.product-appear {
-    animation: productAppear 0.5s ease forwards;
-}
+        /* Smooth transition for product items */
+        .single_product_item {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* Animation for newly loaded products */
+        @keyframes productAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-appear {
+            animation: productAppear 0.5s ease forwards;
+        }
     </style>
-     <br><br><br><br>
-     <section class="hero-carousel mb-8">
+    <br><br><br><br>
+    <section class="hero-carousel mb-8">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
@@ -805,31 +828,41 @@
                     <p class="text-muted mb-4">Home <span class="mx-2">-</span> shop</p>
                 </div>
             </div>
-            
+
             <!-- Main Featured Carousel -->
             <div id="mainCarousel" class="carousel slide mb-8" data-bs-ride="carousel" data-bs-interval="3000">
                 <div class="carousel-indicators">
-                    <% for(let i = 0; i < Math.min(products.length, 3); i++) { %>
-                        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="<%=i%>" 
+                    <% for(let i=0; i < Math.min(products.length, 3); i++) { %>
+                        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="<%=i%>"
                             class="<%= i === 0 ? 'active' : '' %>"></button>
-                    <% } %>
+                        <% } %>
                 </div>
                 <div class="carousel-inner rounded-lg overflow-hidden">
-                    <% for(let i = 0; i < Math.min(products.length, 3); i++) { %>
+                    <% for(let i=0; i < Math.min(products.length, 3); i++) { %>
                         <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
-                            <div class="featured-slide" style="height: 500px; background: linear-gradient(45deg, #f3f4f6, #e5e7eb); position: relative;">
-                                <div class="slide-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; padding: 2rem;">
-                                    <h2 class="display-5 mb-4" style="color: #1f2937;"><%= products[i].productName %></h2>
-                                    <p class="lead mb-4" style="color: #4b5563;">Experience premium quality and style</p>
-                                    <h3 class="mb-4" style="color: #2563eb;">₹<%= products[i].salePrice %></h3>
+                            <div class="featured-slide"
+                                style="height: 500px; background: linear-gradient(45deg, #f3f4f6, #e5e7eb); position: relative;">
+                                <div class="slide-content"
+                                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; padding: 2rem;">
+                                    <h2 class="display-5 mb-4" style="color: #1f2937;">
+                                        <%= products[i].productName %>
+                                    </h2>
+                                    <p class="lead mb-4" style="color: #4b5563;">Experience premium quality and style
+                                    </p>
+                                    <h3 class="mb-4" style="color: #2563eb;">₹<%= products[i].salePrice %>
+                                    </h3>
                                     <button class="btn btn-primary px-4 py-2">Shop Now</button>
                                 </div>
                                 <!-- Decorative Elements -->
-                                <div class="decorative-circle" style="position: absolute; width: 150px; height: 150px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); top: 20%; left: 20%;"></div>
-                                <div class="decorative-circle" style="position: absolute; width: 100px; height: 100px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); bottom: 15%; right: 25%;"></div>
+                                <div class="decorative-circle"
+                                    style="position: absolute; width: 150px; height: 150px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); top: 20%; left: 20%;">
+                                </div>
+                                <div class="decorative-circle"
+                                    style="position: absolute; width: 100px; height: 100px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); bottom: 15%; right: 25%;">
+                                </div>
                             </div>
                         </div>
-                    <% } %>
+                        <% } %>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -840,355 +873,359 @@
             </div>
         </div>
     </section>
-        <!-- breadcrumb end-->
+    <!-- breadcrumb end-->
 
-        <!--================Category Product Area =================-->
-        <section class="cat_product_area section_padding">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="left_sidebar_area">
-                            <!-- Categories Filter -->
-                            <aside class="left_widgets p_filter_widgets">
-                                <div class="l_w_title">
-                                    <h3>Browse Categories</h3>
-                                </div>
-                                <div class="widgets_inner">
-                                    <ul class="list">
-                                        <li><a href="/shop">All Categories</a></li>
-                                        <% for (let category of categories) { %>
-                                            <li>
-                                                <a href="/shop?category=<%= category._id %><%= sort ? `&sort=${sort}` : '' %>"
-                                                    class="<%= query?.category === category._id.toString() ? 'active' : '' %>">
-                                                    <%= category.name %>
-                                                </a>
-                                            </li>
-                                            <% } %>
-                                    </ul>
-                                </div>
-                            </aside>
+    <!--================Category Product Area =================-->
+    <section class="cat_product_area section_padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="left_sidebar_area">
+                        <!-- Categories Filter -->
+                        <aside class="left_widgets p_filter_widgets">
+                            <div class="l_w_title">
+                                <h3>Browse Categories</h3>
+                            </div>
+                            <div class="widgets_inner">
+                                <ul class="list">
+                                    <li><a href="/shop">All Categories</a></li>
+                                    <% for (let category of categories) { %>
+                                        <li>
+                                            <a href="/shop?category=<%= category._id %><%= sort ? `&sort=${sort}` : '' %>"
+                                                class="<%= query?.category === category._id.toString() ? 'active' : '' %>">
+                                                <%= category.name %>
+                                            </a>
+                                        </li>
+                                        <% } %>
+                                </ul>
+                            </div>
+                        </aside>
 
-                            <!-- Sort Options -->
-                            <aside class="left_widgets p_filter_widgets sorting_aside">
-                                <div class="filter-title">Sort by</div>
-                                <div class="sorting-options">
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'newest'}).toString() %>">
-                                        <button type="button" class="<%= currentSort === 'newest' ? 'active' : '' %>">
-                                            <i class="ti-star"></i> New Arrivals
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-asc'}).toString() %>">
-                                        <button type="button"
-                                            class="<%= currentSort === 'price-asc' ? 'active' : '' %>">
-                                            <i class="ti-arrow-up"></i> Price: Low to High
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-desc'}).toString() %>">
-                                        <button type="button"
-                                            class="<%= currentSort === 'price-desc' ? 'active' : '' %>">
-                                            <i class="ti-arrow-down"></i> Price: High to Low
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-asc'}).toString() %>">
-                                        <button type="button" class="<%= currentSort === 'name-asc' ? 'active' : '' %>">
-                                            <i class="ti-sort-alpha-asc"></i> Name: A to Z
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-desc'}).toString() %>">
-                                        <button type="button"
-                                            class="<%= currentSort === 'name-desc' ? 'active' : '' %>">
-                                            <i class="ti-sort-alpha-desc"></i> Name: Z to A
-                                        </button>
-                                    </a>
-                                </div>
-                            </aside>
+                        <!-- Sort Options -->
+                        <aside class="left_widgets p_filter_widgets sorting_aside">
+                            <div class="filter-title">Sort by</div>
+                            <div class="sorting-options">
+                                <a href="/shop?<%= new URLSearchParams({...queryParams, sort: 'newest'}).toString() %>">
+                                    <button type="button" class="<%= currentSort === 'newest' ? 'active' : '' %>">
+                                        <i class="ti-star"></i> New Arrivals
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-asc'}).toString() %>">
+                                    <button type="button" class="<%= currentSort === 'price-asc' ? 'active' : '' %>">
+                                        <i class="ti-arrow-up"></i> Price: Low to High
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, sort: 'price-desc'}).toString() %>">
+                                    <button type="button" class="<%= currentSort === 'price-desc' ? 'active' : '' %>">
+                                        <i class="ti-arrow-down"></i> Price: High to Low
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-asc'}).toString() %>">
+                                    <button type="button" class="<%= currentSort === 'name-asc' ? 'active' : '' %>">
+                                        <i class="ti-sort-alpha-asc"></i> Name: A to Z
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, sort: 'name-desc'}).toString() %>">
+                                    <button type="button" class="<%= currentSort === 'name-desc' ? 'active' : '' %>">
+                                        <i class="ti-sort-alpha-desc"></i> Name: Z to A
+                                    </button>
+                                </a>
+                            </div>
+                        </aside>
 
-                            <!-- Price Filter -->
-                            <aside class="left_widgets p_filter_widgets sorting_aside">
-                                <div class="filter-title">Price Range</div>
-                                <div class="sorting-options price-filter">
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: 'below-1500'}).toString() %>">
-                                        <button type="button" class="<%= price === 'below-1500' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> Below ₹30,000
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '1500-2000'}).toString() %>">
-                                        <button type="button" class="<%= price === '1500-2000' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> ₹30,000 - ₹50,000
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '2000-2500'}).toString() %>">
-                                        <button type="button" class="<%= price === '2000-2500' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> ₹50,000 - ₹70,000
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '2500-3000'}).toString() %>">
-                                        <button type="button" class="<%= price === '2500-3000' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> ₹70,000 - ₹90,000
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: '3000-4000'}).toString() %>">
-                                        <button type="button" class="<%= price === '3000-4000' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> ₹90,000 - ₹110,000
-                                        </button>
-                                    </a>
-                                    <a
-                                        href="/shop?<%= new URLSearchParams({...queryParams, price: 'Above4000'}).toString() %>">
-                                        <button type="button" class="<%= price === 'Above4000' ? 'active' : '' %>">
-                                            <i class="ti-money"></i> Above ₹110,000
-                                        </button>
-                                    </a>
-                                </div>
-                            </aside>
-                        </div>
+                        <!-- Price Filter -->
+                        <aside class="left_widgets p_filter_widgets sorting_aside">
+                            <div class="filter-title">Price Range</div>
+                            <div class="sorting-options price-filter">
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: 'below-1500'}).toString() %>">
+                                    <button type="button" class="<%= price === 'below-1500' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> Below ₹30,000
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: '1500-2000'}).toString() %>">
+                                    <button type="button" class="<%= price === '1500-2000' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> ₹30,000 - ₹50,000
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: '2000-2500'}).toString() %>">
+                                    <button type="button" class="<%= price === '2000-2500' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> ₹50,000 - ₹70,000
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: '2500-3000'}).toString() %>">
+                                    <button type="button" class="<%= price === '2500-3000' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> ₹70,000 - ₹90,000
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: '3000-4000'}).toString() %>">
+                                    <button type="button" class="<%= price === '3000-4000' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> ₹90,000 - ₹110,000
+                                    </button>
+                                </a>
+                                <a
+                                    href="/shop?<%= new URLSearchParams({...queryParams, price: 'Above4000'}).toString() %>">
+                                    <button type="button" class="<%= price === 'Above4000' ? 'active' : '' %>">
+                                        <i class="ti-money"></i> Above ₹110,000
+                                    </button>
+                                </a>
+                            </div>
+                        </aside>
                     </div>
+                </div>
 
-                    <!-- Product Display Area -->
-                    <div class="col-lg-9">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="product_top_bar d-flex justify-content-between align-items-center">
-                                    <!-- Search Form -->
-                                    <div class="single_product_menu d-flex">
-                                        <form action="/shop" method="GET" class="d-flex">
-                                            <input type="text" name="search" class="form-control"
-                                                placeholder="Search products..." value="<%= searchQuery || '' %>">
-                                            <button type="submit" class="btn btn-primary ml-2">Search</button>
-                                        </form>
-                                    </div>
+                <!-- Product Display Area -->
+                <div class="col-lg-9">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="product_top_bar d-flex justify-content-between align-items-center">
+                                <!-- Search Form -->
+                                <div class="single_product_menu d-flex">
+                                    <form action="/shop" method="GET" class="d-flex">
+                                        <input type="text" name="search" class="form-control"
+                                            placeholder="Search products..." value="<%= searchQuery || '' %>">
+                                        <button type="submit" class="btn btn-primary ml-2">Search</button>
+                                    </form>
+                                </div>
 
-                                    <!-- Product Count -->
-                                    <div class="single_product_menu">
-                                        <p><span>
-                                                <%= products.length %>
-                                            </span> Products Found</p>
-                                    </div>
+                                <!-- Product Count -->
+                                <div class="single_product_menu">
+                                    <p><span>
+                                            <%= products.length %>
+                                        </span> Products Found</p>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Product Grid -->
-                        <div class="row">
-                            <% if (products.length===0) { %>
-                                <div class="col-12 text-center py-5">
-                                    <h3>No products found</h3>
-                                </div>
-                                <% } else { %>
-                                    <% products.forEach(product=> { %>
-                                        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                                            <div class="single_product_item">
-                                                <a href="/productDetails?id=<%= product._id %>">
-                                                    <img src="/uploads/re-image/<%= product.productImage[0] %>"
-                                                        alt="<%= product.productName %>" class="img-fluid">
-                                                    <div class="single_product_text">
-                                                        <h4>
-                                                            <%= product.productName %>
-                                                        </h4>
-                                                        <div class="product-price">
-                                                            <span class="current-price">₹<%=
-                                                                    product.salePrice.toLocaleString('en-IN') %></span>
-                                                            <% if (product.regularPrice> product.salePrice) { %>
-                                                                <span class="original-price">₹<%=
-                                                                        product.regularPrice.toLocaleString('en-IN') %>
-                                                                </span>
-                                                                <% } %>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <button class="add-to-cart-btn"
-                                                    onclick="addToWishlist('<%= product._id %>')"
-                                                    data-product-id="<%= product._id %>">
-                                                    Add to Wishlist
-                                                </button>
-
-                                                <i class="ti-heart wishlist-icon"
-                                                    onclick="addToWishlist('<%= product._id %>')"></i>
-                                            </div>
-                                        </div>
-                                        <% }) %>
-                                            <% } %>
-                        </div>
-
-                        <!-- Pagination -->
-                   <!-- Pagination -->
-<div class="pagination">
-    <% if (currentPage > 1) { %>
-        <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="prev-page">« Previous</a>
-    <% } %>
-
-    <% for (let i=1; i <= totalPages; i++) { %>
-        <% if (i === currentPage) { %>
-            <span class="current-page"><%= i %></span>
-        <% } else { %>
-            <a href="?page=<%= i %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="page-link"><%= i %></a>
-        <% } %>
-    <% } %>
-
-    <% if (currentPage < totalPages) { %>
-        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>" class="next-page">Next »</a>
-    <% } %>
-</div>
                     </div>
+
+                    <!-- Product Grid -->
+                    <div class="row">
+                        <% if (products.length===0) { %>
+                            <div class="col-12 text-center py-5">
+                                <h3>No products found</h3>
+                            </div>
+                            <% } else { %>
+                                <% products.forEach(product=> { %>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                        <div class="single_product_item">
+                                            <a href="/productDetails?id=<%= product._id %>">
+                                                <img src="/uploads/re-image/<%= product.productImage[0] %>"
+                                                    alt="<%= product.productName %>" class="img-fluid">
+                                                <div class="single_product_text">
+                                                    <h4>
+                                                        <%= product.productName %>
+                                                    </h4>
+                                                    <div class="product-price">
+                                                        <span class="current-price">₹<%=
+                                                                product.salePrice.toLocaleString('en-IN') %></span>
+                                                        <% if (product.regularPrice> product.salePrice) { %>
+                                                            <span class="original-price">₹<%=
+                                                                    product.regularPrice.toLocaleString('en-IN') %>
+                                                            </span>
+                                                            <% } %>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            <button class="add-to-cart-btn"
+                                                onclick="addToWishlist('<%= product._id %>')"
+                                                data-product-id="<%= product._id %>">
+                                                Add to Wishlist
+                                            </button>
+
+                                            <i class="ti-heart wishlist-icon"
+                                                onclick="addToWishlist('<%= product._id %>')"></i>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                                        <% } %>
+                    </div>
+
+                    <!-- Pagination -->
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <!-- <% if (currentPage> 1) { %>
+                            <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>"
+                                class="prev-page">« Previous</a>
+                            <% } %> -->
+
+                                <% for (let i=1; i <=totalPages; i++) { %>
+                                    <% if (i===currentPage) { %>
+                                        <span class="current-page">
+                                            <%= i %>
+                                        </span>
+                                        <% } else { %>
+                                            <a href="?page=<%= i %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>"
+                                                class="page-link">
+                                                <%= i %>
+                                            </a>
+                                            <% } %>
+                                                <% } %>
+
+                                                    <!-- <% if (currentPage < totalPages) { %>
+                                                        <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + searchQuery : '' %><%= sort ? '&sort=' + sort : '' %><%= price ? '&price=' + price : '' %><%= availability ? '&availability=' + availability : '' %><%= query.category ? '&category=' + query.category : '' %>"
+                                                            class="next-page">Next »</a>
+                                                        <% } %> -->
+                    </div>
+
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Footer -->
-        <%- include('../partials/users/footer') %>
+    <!-- Footer -->
+    <%- include('../partials/users/footer') %>
 
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
-            
-            <script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+
+        <script>
 
 
-// Add this script at the bottom of your shop.ejs file, just before the closing body tag
+            // Add this script at the bottom of your shop.ejs file, just before the closing body tag
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Get reference to pagination container
-    const paginationContainer = document.querySelector('.pagination-container');
-    const productGrid = document.querySelector('.row:has(.single_product_item)');
-    
-    // Cache for previously loaded pages to reduce server requests
-    const pageCache = new Map();
-    
-    // Add click event listener to pagination container
-    if (paginationContainer) {
-        paginationContainer.addEventListener('click', function(e) {
-            // Check if clicked element is a pagination link
-            if (e.target.classList.contains('page-link')) {
-                e.preventDefault();
-                
-                // Get the URL from the clicked link
-                const url = e.target.getAttribute('href');
-                
-                // If page is already in cache, use cached content
-                if (pageCache.has(url)) {
-                    updatePageContent(pageCache.get(url));
-                    history.pushState({}, '', url);
-                    return;
+            document.addEventListener('DOMContentLoaded', function () {
+                // Get reference to pagination container
+                const paginationContainer = document.querySelector('.pagination-container');
+                const productGrid = document.querySelector('.row:has(.single_product_item)');
+
+                // Cache for previously loaded pages to reduce server requests
+                const pageCache = new Map();
+
+                // Add click event listener to pagination container
+                if (paginationContainer) {
+                    paginationContainer.addEventListener('click', function (e) {
+                        // Check if clicked element is a pagination link
+                        if (e.target.classList.contains('page-link')) {
+                            e.preventDefault();
+
+                            // Get the URL from the clicked link
+                            const url = e.target.getAttribute('href');
+
+                            // If page is already in cache, use cached content
+                            if (pageCache.has(url)) {
+                                updatePageContent(pageCache.get(url));
+                                history.pushState({}, '', url);
+                                return;
+                            }
+
+                            // Add fade-out effect to product grid
+                            if (productGrid) {
+                                productGrid.classList.add('fade-out');
+                            }
+
+                            // Show loading indicator
+                            showLoading();
+
+                            // Fetch the new page content
+                            fetchPageContent(url);
+                        }
+                    });
                 }
-                
-                // Add fade-out effect to product grid
-                if (productGrid) {
-                    productGrid.classList.add('fade-out');
+
+                // Function to fetch page content
+                function fetchPageContent(url) {
+                    fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            // Cache the result
+                            pageCache.set(url, html);
+
+                            // Update the page content
+                            updatePageContent(html);
+
+                            // Update the URL in the browser's address bar without reloading the page
+                            history.pushState({}, '', url);
+
+                            // Hide loading indicator
+                            hideLoading();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching page content:', error);
+                            hideLoading();
+
+                            // Remove fade-out effect if there was an error
+                            if (productGrid) {
+                                productGrid.classList.remove('fade-out');
+                            }
+
+                            // Fallback to traditional page reload if fetch fails
+                            window.location.href = url;
+                        });
                 }
-                
-                // Show loading indicator
-                showLoading();
-                
-                // Fetch the new page content
-                fetchPageContent(url);
-            }
-        });
-    }
-    
-    // Function to fetch page content
-    function fetchPageContent(url) {
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(html => {
-            // Cache the result
-            pageCache.set(url, html);
-            
-            // Update the page content
-            updatePageContent(html);
-            
-            // Update the URL in the browser's address bar without reloading the page
-            history.pushState({}, '', url);
-            
-            // Hide loading indicator
-            hideLoading();
-        })
-        .catch(error => {
-            console.error('Error fetching page content:', error);
-            hideLoading();
-            
-            // Remove fade-out effect if there was an error
-            if (productGrid) {
-                productGrid.classList.remove('fade-out');
-            }
-            
-            // Fallback to traditional page reload if fetch fails
-            window.location.href = url;
-        });
-    }
-    
-    // Function to update page content
-    function updatePageContent(html) {
-        // Create a temporary DOM element to parse the HTML response
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // Extract the product grid and pagination elements from the response
-        const newProductGrid = doc.querySelector('.row:has(.single_product_item)');
-        const newPagination = doc.querySelector('.pagination-container');
-        
-        // Update the product grid with animation
-        if (newProductGrid && productGrid) {
-            setTimeout(() => {
-                productGrid.innerHTML = newProductGrid.innerHTML;
-                productGrid.classList.remove('fade-out');
-                
-                // Add appear animation to each product
-                const productItems = productGrid.querySelectorAll('.single_product_item');
-                productItems.forEach((item, index) => {
-                    item.style.opacity = '0';
-                    setTimeout(() => {
-                        item.classList.add('product-appear');
-                        item.style.opacity = '1';
-                    }, index * 50); // Stagger the animations
-                });
-                
-                // Scroll to the top of the product grid with smooth animation
-                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Reinitialize event listeners for the newly loaded products
-                reinitializeEventListeners();
-            }, 300); // Short delay for smoother transition
-        }
-        
-        // Update the pagination
-        if (newPagination && paginationContainer) {
-            paginationContainer.innerHTML = newPagination.innerHTML;
-        }
-    }
-    
-    // Create and show loading indicator
-    function showLoading() {
-        // Check if loading indicator already exists
-        if (!document.getElementById('pagination-loader')) {
-            const loader = document.createElement('div');
-            loader.id = 'pagination-loader';
-            loader.innerHTML = `
+
+                // Function to update page content
+                function updatePageContent(html) {
+                    // Create a temporary DOM element to parse the HTML response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Extract the product grid and pagination elements from the response
+                    const newProductGrid = doc.querySelector('.row:has(.single_product_item)');
+                    const newPagination = doc.querySelector('.pagination-container');
+
+                    // Update the product grid with animation
+                    if (newProductGrid && productGrid) {
+                        setTimeout(() => {
+                            productGrid.innerHTML = newProductGrid.innerHTML;
+                            productGrid.classList.remove('fade-out');
+
+                            // Add appear animation to each product
+                            const productItems = productGrid.querySelectorAll('.single_product_item');
+                            productItems.forEach((item, index) => {
+                                item.style.opacity = '0';
+                                setTimeout(() => {
+                                    item.classList.add('product-appear');
+                                    item.style.opacity = '1';
+                                }, index * 50); // Stagger the animations
+                            });
+
+                            // Scroll to the top of the product grid with smooth animation
+                            productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                            // Reinitialize event listeners for the newly loaded products
+                            reinitializeEventListeners();
+                        }, 300); // Short delay for smoother transition
+                    }
+
+                    // Update the pagination
+                    if (newPagination && paginationContainer) {
+                        paginationContainer.innerHTML = newPagination.innerHTML;
+                    }
+                }
+
+                // Create and show loading indicator
+                function showLoading() {
+                    // Check if loading indicator already exists
+                    if (!document.getElementById('pagination-loader')) {
+                        const loader = document.createElement('div');
+                        loader.id = 'pagination-loader';
+                        loader.innerHTML = `
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <div class="mt-2">Loading products...</div>
             `;
-            loader.style.cssText = `
+                        loader.style.cssText = `
                 position: fixed;
                 top: 50%;
                 left: 50%;
@@ -1201,119 +1238,119 @@ document.addEventListener('DOMContentLoaded', function() {
                 text-align: center;
                 transition: all 0.3s ease;
             `;
-            document.body.appendChild(loader);
-            
-            // Add fade-in animation
-            setTimeout(() => {
-                loader.style.opacity = '1';
-            }, 0);
-        } else {
-            const loader = document.getElementById('pagination-loader');
-            loader.style.display = 'block';
-            loader.style.opacity = '1';
-        }
-    }
-    
-    // Hide loading indicator with animation
-    function hideLoading() {
-        const loader = document.getElementById('pagination-loader');
-        if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 300); // Match the transition duration
-        }
-    }
-    
-    // Handle browser back/forward navigation
-    window.addEventListener('popstate', function(event) {
-        const currentUrl = window.location.href;
-        
-        // If we have this page cached, use it
-        if (pageCache.has(currentUrl)) {
-            updatePageContent(pageCache.get(currentUrl));
-            return;
-        }
-        
-        // Otherwise fetch the new page
-        showLoading();
-        fetchPageContent(currentUrl);
-    });
-    
-    // Reinitialize event listeners for dynamically loaded content
-    function reinitializeEventListeners() {
-        // Reinitialize wishlist functionality
-        const wishlistButtons = document.querySelectorAll('.add-to-cart-btn, .wishlist-icon');
-        wishlistButtons.forEach(button => {
-            button.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                let productId;
-                if (this.hasAttribute('data-product-id')) {
-                    productId = this.getAttribute('data-product-id');
-                } else if (this.hasAttribute('onclick')) {
-                    const onclickAttr = this.getAttribute('onclick');
-                    const match = onclickAttr.match(/'([^']+)'/);
-                    if (match && match[1]) {
-                        productId = match[1];
+                        document.body.appendChild(loader);
+
+                        // Add fade-in animation
+                        setTimeout(() => {
+                            loader.style.opacity = '1';
+                        }, 0);
+                    } else {
+                        const loader = document.getElementById('pagination-loader');
+                        loader.style.display = 'block';
+                        loader.style.opacity = '1';
                     }
                 }
-                
-                if (productId) {
-                    addToWishlist(productId);
+
+                // Hide loading indicator with animation
+                function hideLoading() {
+                    const loader = document.getElementById('pagination-loader');
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                        }, 300); // Match the transition duration
+                    }
                 }
-                
-                return false;
-            };
-        });
-    }
-});
 
+                // Handle browser back/forward navigation
+                window.addEventListener('popstate', function (event) {
+                    const currentUrl = window.location.href;
 
-                function addToWishlist(productId) {
-                    fetch("/addWishlist", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            productId: productId
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: data.message,
-                                    showConfirmButton: true,
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: data.message,
-                                    showConfirmButton: true,
-                                });
+                    // If we have this page cached, use it
+                    if (pageCache.has(currentUrl)) {
+                        updatePageContent(pageCache.get(currentUrl));
+                        return;
+                    }
+
+                    // Otherwise fetch the new page
+                    showLoading();
+                    fetchPageContent(currentUrl);
+                });
+
+                // Reinitialize event listeners for dynamically loaded content
+                function reinitializeEventListeners() {
+                    // Reinitialize wishlist functionality
+                    const wishlistButtons = document.querySelectorAll('.add-to-cart-btn, .wishlist-icon');
+                    wishlistButtons.forEach(button => {
+                        button.onclick = function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            let productId;
+                            if (this.hasAttribute('data-product-id')) {
+                                productId = this.getAttribute('data-product-id');
+                            } else if (this.hasAttribute('onclick')) {
+                                const onclickAttr = this.getAttribute('onclick');
+                                const match = onclickAttr.match(/'([^']+)'/);
+                                if (match && match[1]) {
+                                    productId = match[1];
+                                }
                             }
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
+
+                            if (productId) {
+                                addToWishlist(productId);
+                            }
+
+                            return false;
+                        };
+                    });
+                }
+            });
+
+
+            function addToWishlist(productId) {
+                fetch("/addWishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        productId: productId
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status) {
                             Swal.fire({
-                                icon: 'error',
-                                title: 'Error adding to wishlist',
-                                text: 'Something went wrong. Please try again.',
+                                icon: "success",
+                                title: data.message,
                                 showConfirmButton: true,
                             });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: data.message,
+                                showConfirmButton: true,
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error adding to wishlist',
+                            text: 'Something went wrong. Please try again.',
+                            showConfirmButton: true,
                         });
-                } </script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-            <script>
-                // Register Cube component
-                Vue.component('cube', {
-                    template: `
+                    });
+            } </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Register Cube component
+            Vue.component('cube', {
+                template: `
                     <div class="cube">
                         <div class="cube__side cube__side--front"></div>
                         <div class="cube__side cube__side--back"></div>
@@ -1323,92 +1360,92 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="cube__side cube__side--right"></div>
                     </div>
                 `,
-                    props: {
-                        x: { default: 0 }, y: { default: 0 }, z: { default: 0 },
-                        w: { default: 100 }, h: { default: 100 }, d: { default: 100 },
-                        rx: { default: 0 }, ry: { default: 0 }, rz: { default: 0 },
-                        color: { default: '#717C89' }
-                    },
-                    mounted() {
-                        const el = this.$el;
-                        gsap.set(el.querySelectorAll('.cube__side'), {
-                            background: this.color,
-                            transformStyle: 'preserve-3d'
-                        });
+                props: {
+                    x: { default: 0 }, y: { default: 0 }, z: { default: 0 },
+                    w: { default: 100 }, h: { default: 100 }, d: { default: 100 },
+                    rx: { default: 0 }, ry: { default: 0 }, rz: { default: 0 },
+                    color: { default: '#717C89' }
+                },
+                mounted() {
+                    const el = this.$el;
+                    gsap.set(el.querySelectorAll('.cube__side'), {
+                        background: this.color,
+                        transformStyle: 'preserve-3d'
+                    });
 
-                        gsap.set(el, {
-                            width: this.w,
-                            height: this.h,
-                            transformStyle: 'preserve-3d',
-                            x: this.x,
-                            y: this.y,
-                            z: this.z,
-                            rotationX: this.rx,
-                            rotationY: this.ry,
-                            rotationZ: this.rz
-                        });
-                    }
-                });
+                    gsap.set(el, {
+                        width: this.w,
+                        height: this.h,
+                        transformStyle: 'preserve-3d',
+                        x: this.x,
+                        y: this.y,
+                        z: this.z,
+                        rotationX: this.rx,
+                        rotationY: this.ry,
+                        rotationZ: this.rz
+                    });
+                }
+            });
 
-                // Initialize Vue app
-                new Vue({
-                    el: '#animation-app',
-                    mounted() {
-                        // Animate title
-                        const letters = document.querySelectorAll('.shop-title span');
-                        gsap.to(letters, {
-                            y: 0,
-                            opacity: 1,
+            // Initialize Vue app
+            new Vue({
+                el: '#animation-app',
+                mounted() {
+                    // Animate title
+                    const letters = document.querySelectorAll('.shop-title span');
+                    gsap.to(letters, {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        stagger: 0.1,
+                        ease: 'back.out(1.7)',
+                        delay: 0.5
+                    });
+
+                    // Initialize 3D animation
+                    const wrapper = document.querySelector('.codepen-logo__wrapper');
+                    gsap.set(wrapper, { transformStyle: 'preserve-3d' });
+
+                    gsap.fromTo(wrapper,
+                        {
+                            scale: 0,
+                            rotationX: -90
+                        },
+                        {
+                            scale: 1,
+                            rotationX: -45,
+                            rotationY: 37,
+                            rotationZ: -32,
+                            duration: 2,
+                            ease: 'power4.out',
+                            delay: 0.2
+                        }
+                    );
+
+                    // Add mouse movement effect
+                    document.addEventListener('mousemove', (e) => {
+                        const { clientX, clientY } = e;
+                        const x = (clientX - window.innerWidth / 2) * 0.05;
+                        const y = (clientY - window.innerHeight / 2) * 0.05;
+
+                        gsap.to(wrapper, {
+                            rotationY: 37 + x,
+                            rotationX: -45 + y,
                             duration: 1,
-                            stagger: 0.1,
-                            ease: 'back.out(1.7)',
-                            delay: 0.5
+                            ease: 'power2.out'
                         });
+                    });
+                }
+            });
 
-                        // Initialize 3D animation
-                        const wrapper = document.querySelector('.codepen-logo__wrapper');
-                        gsap.set(wrapper, { transformStyle: 'preserve-3d' });
 
-                        gsap.fromTo(wrapper,
-                            {
-                                scale: 0,
-                                rotationX: -90
-                            },
-                            {
-                                scale: 1,
-                                rotationX: -45,
-                                rotationY: 37,
-                                rotationZ: -32,
-                                duration: 2,
-                                ease: 'power4.out',
-                                delay: 0.2
-                            }
-                        );
 
-                        // Add mouse movement effect
-                        document.addEventListener('mousemove', (e) => {
-                            const { clientX, clientY } = e;
-                            const x = (clientX - window.innerWidth / 2) * 0.05;
-                            const y = (clientY - window.innerHeight / 2) * 0.05;
+            document.addEventListener('DOMContentLoaded', function () {
 
-                            gsap.to(wrapper, {
-                                rotationY: 37 + x,
-                                rotationX: -45 + y,
-                                duration: 1,
-                                ease: 'power2.out'
-                            });
-                        });
-                    }
+                var carousel = new bootstrap.Carousel(document.getElementById('storeCarousel'), {
+                    interval: 3000,
+                    wrap: true,
+                    pause: false
                 });
-
-
-
-                document.addEventListener('DOMContentLoaded', function() {
-   
-    var carousel = new bootstrap.Carousel(document.getElementById('storeCarousel'), {
-        interval: 3000,
-        wrap: true,      
-        pause: false    
-    });
-});
-            </script>
+            });
+        </script>

@@ -1085,7 +1085,7 @@
         doc.text('0.00', pageWidth - margin - 5, yPos, { align: 'right' });
 
         yPos += 8;
-        const finalAmount = order.totalPrice - order.discount + taxAmount;
+        const finalAmount = order.finalAmount - order.discount + taxAmount;
         doc.setFillColor(253, 233, 233);
         doc.rect(summaryX - 10, yPos - 5, 70, 10, 'F');
         doc.setFontSize(9);

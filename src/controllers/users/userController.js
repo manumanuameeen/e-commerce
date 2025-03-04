@@ -314,7 +314,7 @@ const loadHomepage = async (req, res) => {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map(category => category._id);
-        const fProducts = await Product.find().sort({createdAt:-1}).limit(4)
+        const fProducts = await Product.find({isBlocked:false}).sort({createdAt:-1}).limit(4)
         const productsB = await Product.find({
             isBlocked: false,
             productImage: { $exists: true, $ne: [] }

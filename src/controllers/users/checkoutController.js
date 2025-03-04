@@ -388,12 +388,12 @@ const orderCancel = async (req, res) => {
                 wallet.balance += order.totalPrice;
                 wallet.transactions.push({
                     type: "credit",
-                    amount: order.totalPrice,
+                    amount: order.finalAmount,
                     description: "Refund from cancelled product",
                     date: new Date(),
                 });
                 wallet.creditHistory.push({
-                    amount: order.totalPrice,
+                    amount: order.finalAmount,
                     date: new Date(),
                     description: `Refund from cancelled order: ${order._id}`
                 });
