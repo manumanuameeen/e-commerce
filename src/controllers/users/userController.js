@@ -40,11 +40,13 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+
 function generateReferralCode(name) {
     const prefix = name.substring(0, 3).toUpperCase();
     const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     return `${prefix}${randomNum}`;
 }
+
 
 async function sendVerificationEmail(email, otp) {
     console.log("the otp verification goining on");
@@ -74,6 +76,7 @@ async function sendVerificationEmail(email, otp) {
         return false;
     }
 }
+
 
 const signup = async (req, res) => {
     console.log("working on the sign up page");
