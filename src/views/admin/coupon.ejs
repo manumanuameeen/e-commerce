@@ -175,6 +175,125 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
         <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.querySelector('input[name="name"]');
+    const offerPriceInput = document.querySelector('input[name="offerPrice"]');
+    const minimumPriceInput = document.querySelector('input[name="minimumPrice"]');
+    const expiryDateInput = document.querySelector('input[name="expireOn"]');
+
+    nameInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '');
+        if (this.value.length > 50) {
+            this.value = this.value.slice(0, 50);
+        }
+    });
+
+    document.getElementById('addCouponForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = nameInput.value.trim();
+        if (!name || name.length < 3 || name.length > 50) {
+            Swal.fire({ title: 'Error!', text: 'Coupon name must be between 3 and 50 characters', icon: 'error' });
+            return;
+        }
+
+        const offerPrice = parseFloat(offerPriceInput.value);
+        if (isNaN(offerPrice) || offerPrice <= 0 || offerPrice > 10000) {
+            Swal.fire({ title: 'Error!', text: 'Discount amount must be a positive number and less than ₹10,000', icon: 'error' });
+            return;
+        }
+
+        const minimumPrice = parseFloat(minimumPriceInput.value);
+        if (isNaN(minimumPrice) || minimumPrice <= 0 || minimumPrice > 100000) {
+            Swal.fire({ title: 'Error!', text: 'Minimum purchase amount must be a positive number and less than ₹100,000', icon: 'error' });
+            return;
+        }
+
+        if (offerPrice >= minimumPrice) {
+            Swal.fire({ title: 'Error!', text: 'Discount amount must be less than minimum purchase amount', icon: 'error' });
+            return;
+        }
+
+        const expiryDate = new Date(expiryDateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (!expiryDate || expiryDate <= today) {
+            Swal.fire({ title: 'Error!', text: 'Expiry date must be a future date', icon: 'error' });
+            return;
+        }
+
+        const formData = new FormData(this);
+        const couponData = Object.fromEntries(formData.entries());
+
+        couponData.offerPrice = parseFloat(couponData.offerPrice);
+        couponData.minimumPrice = parseFloat(couponData.minimumPrice);
+        couponData.expireOn = new Date(couponData.expireOn).toISOString();
+
+        fetch('/admin/coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(couponData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({ title: 'Success', text: 'Coupon created successfully', icon: 'success' }).then(() => window.location.reload());
+            } else {
+                Swal.fire({ title: 'Error!', text: data.message || 'Failed to create coupon', icon: 'error' });
+            }
+        })
+        .catch(error => {
+            Swal.fire({ title: 'Error', text: 'Something went wrong', icon: 'error' });
+        });
+    });
+
+    function validateEditCoupon() {
+        const editOfferPrice = parseFloat(document.getElementById('editOfferPrice').value);
+        const editMinimumPrice = parseFloat(document.getElementById('editMinimumPrice').value);
+        const editExpiryDate = new Date(document.getElementById('editExpiryDate').value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (isNaN(editOfferPrice) || editOfferPrice <= 0 || editOfferPrice > 10000) {
+            Swal.fire({ title: 'Error!', text: 'Discount amount must be a positive number and less than ₹10,000', icon: 'error' });
+            return false;
+        }
+
+        if (isNaN(editMinimumPrice) || editMinimumPrice <= 0 || editMinimumPrice > 100000) {
+            Swal.fire({ title: 'Error!', text: 'Minimum purchase amount must be a positive number and less than ₹100,000', icon: 'error' });
+            return false;
+        }
+
+        if (editOfferPrice >= editMinimumPrice) {
+            Swal.fire({ title: 'Error!', text: 'Discount amount must be less than minimum purchase amount', icon: 'error' });
+            return false;
+        }
+
+        if (!editExpiryDate || editExpiryDate <= today) {
+            Swal.fire({ title: 'Error!', text: 'Expiry date must be a future date', icon: 'error' });
+            return false;
+        }
+
+        return true;
+    }
+
+    window.updateCoupon = async function() {
+        if (!validateEditCoupon()) {
+            return;
+        }
+
+        const couponId = document.getElementById('editCouponId').value;
+        const formData = {
+            offerPrice: parseFloat(document.getElementById('editOfferPrice').value),
+            minimumPrice: parseFloat(document.getElementById('editMinimumPrice').value),
+            expireOn: new Date(document.getElementById('editExpiryDate').value).toISOString()
+        };
+    }
+});
+
             // Delete Coupon Function
             async function deleteCoupon(couponId) {
                 console.log("coupon id", couponId);

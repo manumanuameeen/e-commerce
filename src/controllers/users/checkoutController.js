@@ -23,8 +23,9 @@ const razorpayInstance = new Razorpay({
 
 const getChekout = async (req, res) => {
     try {
-        const successMessage = req.flash('success');
-        const errorMessage = req.flash('error');
+        // const successMessage = req.flash('success');
+        // const errorMessage = req.flash('error');
+        
         const user = req.session.user;
         //(user);
 
@@ -537,7 +538,7 @@ const orderDetails = async (req, res) => {
 
         if (!order) {
             //("No order found with ID:", systemOrderId);
-            req.flash('error', 'Order not found');
+            // req.flash('error', 'Order not found');
             return res.redirect('/profile');
         } else
 
@@ -549,7 +550,7 @@ const orderDetails = async (req, res) => {
 
     } catch (error) {
         console.error('Error in order view:', error);
-        req.flash('error', 'Error retrieving order details');
+        // req.flash('error', 'Error retrieving order details');
         res.redirect('/profile');
     }
 };
@@ -568,8 +569,9 @@ const createRazorpayOrder = async (req, res) => {
         if (orderId) {
             const existingOrder = await Order.findById(orderId);
             if (!existingOrder) {
-                return res.status(400).json({ success: false, message: "Order not found" });
+                return res.status(400).json({ success: false, message: "Order not found c" });
             }
+
 
             const order = await razorpayInstance.orders.create({
                 amount: Math.round(existingOrder.finalAmount * 100),
@@ -732,7 +734,7 @@ const verifyRazorpayPayment = async (req, res) => {
         if (orderId) {
             const order = await Order.findById(orderId).populate("orderIteams.product");
             if (!order) {
-                return res.status(400).json({ success: false, message: "Order not found" });
+                return res.status(400).json({ success: false, message: "Order not found in razorpay" });
             }
 
             for (const item of order.orderIteams) {

@@ -78,7 +78,99 @@
     <!-- Bootstrap and other scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nameInput = document.querySelector('input[name="categoryName"]');
+            const descInput = document.querySelector('textarea[name="description"]');
+            
+            const name = nameInput.value.trim();
+            const description = descInput.value.trim();
+            
+            if (!name) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Category name is required',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            if (name.length < 2 || name.length > 50) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Category name must be between 2 and 50 characters',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            const nameRegex = /^[a-zA-Z0-9 ]+$/;
+            if (!nameRegex.test(name)) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Category name can only contain letters, numbers, and spaces',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            if (!description) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Description is required',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            if (description.length < 10 || description.length > 500) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Description must be between 10 and 500 characters',
+                    icon: 'error'
+                });
+                return;
+            }
+            
+            nameInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z0-9 ]/g, '');
+            });
+            
+            descInput.addEventListener('input', function() {
+                if (this.value.length > 500) {
+                    this.value = this.value.slice(0, 500);
+                }
+            });
+        });
+    
+        const nameInput = document.querySelector('input[name="categoryName"]');
+        const descInput = document.querySelector('textarea[name="description"]');
+        
+        const createCharCountDisplay = (input, maxLength) => {
+            const countSpan = document.createElement('small');
+            countSpan.className = 'form-text text-muted';
+            input.parentNode.appendChild(countSpan);
+            
+            input.addEventListener('input', () => {
+                const remaining = maxLength - input.value.length;
+                countSpan.textContent = `${input.value.length}/${maxLength} characters`;
+                
+                if (remaining < 0) {
+                    countSpan.style.color = 'red';
+                } else {
+                    countSpan.style.color = 'inherit';
+                }
+            });
+        };
+        
+        createCharCountDisplay(nameInput, 50);
+        createCharCountDisplay(descInput, 500);
+    </script>
     <script>
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
