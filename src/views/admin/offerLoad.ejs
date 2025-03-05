@@ -20,7 +20,7 @@
                         <tr>
                             <th>Offer Name</th>
                             <th>Type</th>
-                            <th>name</th>
+                            <!-- <th>name</th> -->
                             <th>Discount (%)</th>
                             <th>Applied To</th>
                             <th>Start Date</th>
@@ -33,7 +33,7 @@
                             <tr>
                                 <td><%= offer.name %></td>
                                 <td><%= offer.type.charAt(0).toUpperCase() + offer.type.slice(1) %></td>
-                                <td><%= productName %></td>
+                               
                                 <td><%= offer.discount %>%</td>
                                 <td>
                                     <% if (offer.type === 'product') { %>

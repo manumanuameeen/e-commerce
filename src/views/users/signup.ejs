@@ -244,7 +244,7 @@ const error5 = document.getElementById('error5');
 function nameValidateChecking() {
     const nameVal = nameid.value;
     const namepattern = /^[A-Za-z\s]+$/;
-    if (nameVal.trim() === "") {
+    if (nameVal.trim() === ""||nameVal.trim().length>10) {
         error1.style.display = 'block';
         error1.innerHTML = "Please enter a valid name";
     } else if (!namepattern.test(nameVal)) {
