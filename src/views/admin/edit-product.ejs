@@ -426,44 +426,105 @@
 
 
 
-
             function viewImage(event, index) {
-                let input = event.target;
+    let input = event.target;
     let reader = new FileReader();
+    
     reader.onload = function () {
         let dataURL = reader.result;
         let image = document.getElementById('imgView' + index);
+        let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
+        let croppedImage = document.getElementById("croppedImg" + index);
+        let saveButton = document.querySelector('#saveButton' + index);
+        let cropper;
+
+        // Clear previous image and reset display
+        image.src = '';
+        croppedImage.src = '';
+        cropperContainer.style.display = 'none';
+
+        // Set new image source
         image.src = dataURL;
-        let cropper = new Cropper(image, {
-            aspectRatio: 1,
-            viewMode: 1,
-            guides: true,
-            background: false,
-            autoCropArea: 1,
-            zoomable: true
-        });
-                    let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
-                    cropperContainer.style.display = 'block';
-                    let saveButton = document.querySelector('#saveButton' + index);
-                    saveButton.addEventListener('click', async function () {
-                        let croppedCanvas = cropper.getCroppedCanvas();
-                        let croppedImage = document.getElementById("croppedImg" + index);
-                        croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
-                        let timestamp = new Date().getTime();
-                        let fileName = `cropped-img-${timestamp}-${index}.png`;
-                        await croppedCanvas.toBlob(blob => {
-                            let input = document.getElementById('input' + index);
-                            let imgFile = new File([blob], fileName, blob)
-                            const fileList = new DataTransfer();
-                            fileList.items.add(imgFile);
-                            input.files = fileList.files
-                        });
-                        cropperContainer.style.display = 'none';
-                    });
-                };
-                reader.readAsDataURL(input.files[0]);
+
+        // Wait for image to load before initializing cropper
+        image.onload = function() {
+            // Destroy any existing cropper
+            if (cropper) {
+                cropper.destroy();
             }
 
+            // Initialize new cropper
+            cropper = new Cropper(image, {
+                aspectRatio: 1, // 1:1 aspect ratio
+                viewMode: 1,
+                guides: true,
+                background: false,
+                autoCropArea: 1,
+                zoomable: true,
+                dragMode: 'move'
+            });
+
+            // Show cropper container
+            cropperContainer.style.display = 'flex';
+
+            // Remove any existing event listeners to prevent multiple attachments
+            saveButton.removeEventListener('click', saveCroppedImage);
+
+            // Add save button event listener
+            saveButton.addEventListener('click', saveCroppedImage);
+
+            // Save cropped image function
+            function saveCroppedImage() {
+                let croppedCanvas = cropper.getCroppedCanvas({
+                    // You can adjust these settings as needed
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
+                });
+
+                // Update cropped image preview
+                croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+
+                // Convert to file and update input
+                croppedCanvas.toBlob(blob => {
+                    let timestamp = new Date().getTime();
+                    let fileName = `cropped-img-${timestamp}-${index}.png`;
+                    let imgFile = new File([blob], fileName, { type: 'image/png' });
+                    
+                    // Create a new FileList
+                    const fileList = new DataTransfer();
+                    fileList.items.add(imgFile);
+                    
+                    // Update the file input
+                    let fileInput = document.getElementById('input' + index);
+                    fileInput.files = fileList.files;
+
+                    // Hide cropper container
+                    cropperContainer.style.display = 'none';
+
+                    // Destroy cropper
+                    cropper.destroy();
+                });
+            }
+        };
+    };
+
+    // Read the selected file
+    reader.readAsDataURL(input.files[0]);
+}
+
+// Attach event listeners when the document is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach event listeners to file inputs
+    ['input1', 'input2', 'input3'].forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', function(event) {
+                const index = inputId.replace('input', '');
+                viewImage(event, index);
+            });
+        }
+    });
+});
 
             const selectedImages = [];
             document.getElementById("imageInput").addEventListener("change", handleFileSelect);
