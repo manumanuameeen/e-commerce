@@ -2,6 +2,7 @@
 import User from "../../models/userSchema.js";
 import Product from "../../models/productSchema.js";
 import Cart from "../../models/cartSchema.js";
+import Category from "../../models/categorySchema.js";
 
 
 const loadCart = async (req, res) => {
@@ -49,14 +50,18 @@ const addToCart = async (req, res) => {
             });
         }
 
-        const product = await Product.findById(productId);
+        const product = await Product.finDOne({_id:productId,isBlocked:false});
         if (!product) {
             return res.status(404).json({
                 status: false,
                 message: "Product not found"
             });
         }
+const category = await Category.findById(product.category)
 
+if(category.isListed === false){
+    return res.status(400).json({success:false,message:"admin unlisted the category for some issues thank you "})
+}
         if (!colorVariant) {
             return res.status(400).json({
                 status: false,
