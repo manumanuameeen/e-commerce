@@ -94,14 +94,9 @@ const createCoupon = async (req, res) => {
                 message: "Discount amount must be less than minimum purchase amount",
             });
         }
- 
 
-        if (isNaN(expirationDate) || expirationDate <= today) {
-            return res.status(400).json({
-                status: false,
-                message: "Expiration date must be a future date!",
-            });
-        }
+
+      
 
         const newCoupon = new Coupon({
             name,
