@@ -232,6 +232,8 @@
         </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
     <%- include("../partials/admin/footer") %>
         <script>
 
@@ -427,19 +429,19 @@
 
             function viewImage(event, index) {
                 let input = event.target;
-                let reader = new FileReader();
-                reader.onload = function () {
-                    let dataURL = reader.result;
-                    let image = document.getElementById('imgView' + index);
-                    image.src = dataURL;
-                    let cropper = new Cropper(image, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        guides: true,
-                        background: false,
-                        autoCropArea: 1,
-                        zoomable: true
-                    });
+    let reader = new FileReader();
+    reader.onload = function () {
+        let dataURL = reader.result;
+        let image = document.getElementById('imgView' + index);
+        image.src = dataURL;
+        let cropper = new Cropper(image, {
+            aspectRatio: 1,
+            viewMode: 1,
+            guides: true,
+            background: false,
+            autoCropArea: 1,
+            zoomable: true
+        });
                     let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
                     cropperContainer.style.display = 'block';
                     let saveButton = document.querySelector('#saveButton' + index);
