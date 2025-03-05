@@ -50,13 +50,14 @@ const addToCart = async (req, res) => {
             });
         }
 
-        const product = await Product.finDOne({_id:productId,isBlocked:false});
+        const product = await Product.findOne({_id:productId,isBlocked:false});
         if (!product) {
             return res.status(404).json({
                 status: false,
                 message: "Product not found"
             });
         }
+        
 const category = await Category.findById(product.category)
 
 if(category.isListed === false){

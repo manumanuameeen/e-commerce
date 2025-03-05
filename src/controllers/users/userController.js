@@ -421,12 +421,124 @@ const loadlogout = async (req, res) => {
 }
 
 
+// const loadShopingPage = async (req, res) => {
+//     try {
+//         const user = req.session.user;
+//         const userData = await User.findOne({ _id: user });
+//         const categories = await Category.find({ isListed: true });
+        
+//         const categoryId = req.query.category;
+//         const searchQuery = req.query.search;
+//         const priceRange = req.query.price;
+//         const availability = req.query.availability;
+//         const sort = req.query.sort || 'newest';
+//         const page = parseInt(req.query.page) || 1;
+//         const limit = 9;
+        
+//         let query = {
+//             isBlocked: false,
+//             'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
+//         };
+        
+//         if (categoryId) {
+//             query.category = categoryId;
+//         }
+        
+//         if (searchQuery) {
+//             query.$or = [
+//                 { productName: { $regex: searchQuery, $options: 'i' } }
+//             ];
+//         }
+        
+//         if (priceRange) {
+//             const priceRanges = {
+//                 'below-1500': { $lt: 30000 },
+//                 '1500-2000': { $gte: 30000, $lte: 50000 },
+//                 '2000-2500': { $gte: 50000, $lte: 70000 },
+//                 '2500-3000': { $gte: 70000, $lte: 90000 },
+//                 '3000-4000': { $gte: 90000, $lte: 110000 },
+//                 'Above4000': { $gt: 110000 }
+//             };
+//             if (priceRanges[priceRange]) {
+//                 query.salePrice = priceRanges[priceRange];
+//             }
+//         }
+        
+//         if (availability === 'Available') {
+//             query['colorVarients.quantity'] = { $gt: 0 };
+//         } else if (availability === 'Unavailable') {
+//             query['colorVarients.quantity'] = { $lte: 0 };
+//         }
+        
+//         const sortOptions = {
+//             'newest': { createdAt: -1 },
+//             'price-asc': { salePrice: 1 },
+//             'price-desc': { salePrice: -1 },
+//             'name-asc': { productName: 1 },
+//             'name-desc': { productName: -1 }
+//         };
+        
+//         const skip = (page - 1) * limit;
+        
+//         const totalProducts = await Product.countDocuments(query);
+//         const products = await Product.find(query)
+//             .sort(sortOptions[sort] || sortOptions.newest)
+//             .skip(skip)
+//             .limit(limit)
+//             .populate('category')
+//             .lean();
+        
+
+            
+//         const totalPages = Math.ceil(totalProducts / limit);
+        
+//         const isAjaxRequest = req.xhr || (req.headers['x-requested-with'] === 'XMLHttpRequest');
+        
+//         if (isAjaxRequest) {
+//             return res.render('shop', {
+//                 user: userData,
+//                 products: products,
+//                 categories: categories,
+//                 currentPage: page,
+//                 totalPages: totalPages,
+//                 totalProducts: totalProducts,
+//                 currentSort: sort,
+//                 price: priceRange,
+//                 searchQuery: searchQuery,
+//                 availability: availability,
+//                 sort: req.query.sort || null,
+//                 query: req.query,
+//                 queryParams: req.query,
+//                 layout: false   });
+//         }
+        
+//         res.render('shop', {
+//             user: userData,
+//             products: products,
+//             categories: categories,
+//             currentPage: page,
+//             totalPages: totalPages,
+//             totalProducts: totalProducts,
+//             currentSort: sort,
+//             price: priceRange,
+//             searchQuery: searchQuery,
+//             availability: availability,
+//             sort: req.query.sort || null,
+//             query: req.query,
+//             queryParams: req.query,
+//         });
+//     } catch (error) {
+//         console.error('Error in shop page:', error);
+//         res.redirect('/pageNotFound');
+//     }
+// };
+
 const loadShopingPage = async (req, res) => {
     try {
         const user = req.session.user;
         const userData = await User.findOne({ _id: user });
         const categories = await Category.find({ isListed: true });
-        
+
         const categoryId = req.query.category;
         const searchQuery = req.query.search;
         const priceRange = req.query.price;
@@ -434,22 +546,20 @@ const loadShopingPage = async (req, res) => {
         const sort = req.query.sort || 'newest';
         const page = parseInt(req.query.page) || 1;
         const limit = 9;
-        
+
         let query = {
             isBlocked: false,
-            'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
+            'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } },
         };
-        
+
         if (categoryId) {
             query.category = categoryId;
         }
-        
+
         if (searchQuery) {
-            query.$or = [
-                { productName: { $regex: searchQuery, $options: 'i' } }
-            ];
+            query.$or = [{ productName: { $regex: searchQuery, $options: 'i' } }];
         }
-        
+
         if (priceRange) {
             const priceRanges = {
                 'below-1500': { $lt: 30000 },
@@ -457,29 +567,35 @@ const loadShopingPage = async (req, res) => {
                 '2000-2500': { $gte: 50000, $lte: 70000 },
                 '2500-3000': { $gte: 70000, $lte: 90000 },
                 '3000-4000': { $gte: 90000, $lte: 110000 },
-                'Above4000': { $gt: 110000 }
+                'Above4000': { $gt: 110000 },
             };
             if (priceRanges[priceRange]) {
                 query.salePrice = priceRanges[priceRange];
             }
         }
-        
+
         if (availability === 'Available') {
             query['colorVarients.quantity'] = { $gt: 0 };
         } else if (availability === 'Unavailable') {
             query['colorVarients.quantity'] = { $lte: 0 };
         }
-        
+
         const sortOptions = {
             'newest': { createdAt: -1 },
             'price-asc': { salePrice: 1 },
             'price-desc': { salePrice: -1 },
             'name-asc': { productName: 1 },
-            'name-desc': { productName: -1 }
+            'name-desc': { productName: -1 },
         };
-        
+
         const skip = (page - 1) * limit;
-        
+
+        // Get only categories that are listed
+        const listedCategories = await Category.find({ isListed: true }).select('_id');
+        const listedCategoryIds = listedCategories.map(category => category._id);
+
+        query.category = { $in: listedCategoryIds }; // Ensure only products in listed categories are shown
+
         const totalProducts = await Product.countDocuments(query);
         const products = await Product.find(query)
             .sort(sortOptions[sort] || sortOptions.newest)
@@ -487,11 +603,10 @@ const loadShopingPage = async (req, res) => {
             .limit(limit)
             .populate('category')
             .lean();
-        
+
         const totalPages = Math.ceil(totalProducts / limit);
-        
         const isAjaxRequest = req.xhr || (req.headers['x-requested-with'] === 'XMLHttpRequest');
-        
+
         if (isAjaxRequest) {
             return res.render('shop', {
                 user: userData,
@@ -507,9 +622,10 @@ const loadShopingPage = async (req, res) => {
                 sort: req.query.sort || null,
                 query: req.query,
                 queryParams: req.query,
-                layout: false   });
+                layout: false,
+            });
         }
-        
+
         res.render('shop', {
             user: userData,
             products: products,
@@ -530,7 +646,6 @@ const loadShopingPage = async (req, res) => {
         res.redirect('/pageNotFound');
     }
 };
-
 
 
 
