@@ -57,7 +57,12 @@ const createCoupon = async (req, res) => {
                 message: "Coupon with this name already exists!",
             });
         }
-
+        if (name.length < 3 || name.length > 50 || !/^[a-zA-Z0-9 ]+$/.test(name)) {
+            return res.status(400).json({
+                status: false,
+                message: "Coupon name must be between 3 and 50 characters and contain only alphanumeric characters",
+            });
+        }
 
         const expirationDate = new Date(expireOn);
         if (isNaN(expirationDate) || expirationDate <= new Date()) {
@@ -67,6 +72,36 @@ const createCoupon = async (req, res) => {
             });
         }
 
+        const parsedOfferPrice = parseFloat(offerPrice);
+        if (isNaN(parsedOfferPrice) || parsedOfferPrice <= 0 || parsedOfferPrice > 10000) {
+            return res.status(400).json({
+                status: false,
+                message: "Discount amount must be a positive number and less than ₹10,000",
+            });
+        }
+
+
+        const parsedMinimumPrice = parseFloat(minimumPrice);
+        if (isNaN(parsedMinimumPrice) || parsedMinimumPrice <= 0 || parsedMinimumPrice > 100000) {
+            return res.status(400).json({
+                status: false,
+                message: "Minimum purchase amount must be a positive number and less than ₹100,000",
+            });
+        }
+        if (parsedOfferPrice >= parsedMinimumPrice) {
+            return res.status(400).json({
+                status: false,
+                message: "Discount amount must be less than minimum purchase amount",
+            });
+        }
+ 
+
+        if (isNaN(expirationDate) || expirationDate <= today) {
+            return res.status(400).json({
+                status: false,
+                message: "Expiration date must be a future date!",
+            });
+        }
 
         const newCoupon = new Coupon({
             name,
@@ -130,7 +165,6 @@ const editCoupon = async (req, res) => {
         const { couponId } = req.params;
         const { offerPrice, minimumPrice, expireOn } = req.body;
 
-        // Validate inputs
         if (!offerPrice || !minimumPrice || !expireOn) {
             return res.status(400).json({
                 success: false,
@@ -138,7 +172,6 @@ const editCoupon = async (req, res) => {
             });
         }
 
-        // Validate expiry date
         const expirationDate = new Date(expireOn);
         if (isNaN(expirationDate)) {
             return res.status(400).json({
@@ -147,7 +180,7 @@ const editCoupon = async (req, res) => {
             });
         }
 
-        // Update the coupon
+      
         const updatedCoupon = await Coupon.findByIdAndUpdate(
             couponId,
             {
