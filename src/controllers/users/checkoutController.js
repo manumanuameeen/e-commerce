@@ -23,9 +23,8 @@ const razorpayInstance = new Razorpay({
 
 const getChekout = async (req, res) => {
     try {
-        // const successMessage = req.flash('success');
-        // const errorMessage = req.flash('error');
-        
+        const successMessage = req.flash('success');
+        const errorMessage = req.flash('error');
         const user = req.session.user;
         //(user);
 
@@ -550,7 +549,7 @@ const orderDetails = async (req, res) => {
 
     } catch (error) {
         console.error('Error in order view:', error);
-        // req.flash('error', 'Error retrieving order details');
+        req.flash('error', 'Error retrieving order details');
         res.redirect('/profile');
     }
 };
