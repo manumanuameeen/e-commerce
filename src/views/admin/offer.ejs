@@ -160,95 +160,203 @@
 });
 
 
-function validateForm() {
+function validateOfferForm() {
+    const name = document.getElementById('name').value.trim();
     const type = document.getElementById('type').value;
     const discount = parseFloat(document.getElementById('discount').value);
-    const name = document.getElementById('name').value.trim();
     const startDate = new Date(document.getElementById('startDate').value);
     const endDate = new Date(document.getElementById('endDate').value);
+    const currentDate = new Date();
 
-    if (!name) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Please enter an offer name'
-        });
-        return false;
-    }
+    const validations = [
+        {
+            condition: !name,
+            message: 'Please enter an offer name',
+            focus: 'name'
+        },
+        {
+            condition: !type,
+            message: 'Please select an offer type',
+            focus: 'type'
+        },
+        {
+            condition: isNaN(discount) || discount < 1 || discount > 100,
+            message: 'Discount must be between 1 and 100',
+            focus: 'discount'
+        },
+        {
+            condition: !startDate || isNaN(startDate.getTime()),
+            message: 'Please select a valid start date',
+            focus: 'startDate'
+        },
+        {
+            condition: !endDate || isNaN(endDate.getTime()),
+            message: 'Please select a valid end date',
+            focus: 'endDate'
+        },
+        {
+            condition: endDate < startDate,
+            message: 'End date cannot be before start date',
+            focus: 'endDate'
+        },
+        {
+            condition: startDate < currentDate,
+            message: 'Start date cannot be in the past',
+            focus: 'startDate'
+        }
+    ];
 
-    if (!type) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Please select an offer type'
-        });
-        return false;
-    }
-
-    if (isNaN(discount) || discount <= 0 || discount > 100) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Discount must be between 1 and 100'
-        });
-        return false;
-    }
-
-    if (!startDate || !endDate) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'Please select both start and end dates'
-        });
-        return false;
-    }
-
-    if (endDate < startDate) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Validation Error',
-            text: 'End date cannot be before start date'
-        });
-        return false;
-    }
-
-    // Type-specific validation
     switch (type) {
         case 'product':
-            if (!document.getElementById('productId').value) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please select a product'
-                });
-                return false;
-            }
+            validations.push({
+                condition: !document.getElementById('productId').value,
+                message: 'Please select a product',
+                focus: 'productId'
+            });
             break;
         case 'category':
-            if (!document.getElementById('categoryId').value) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please select a category'
-                });
-                return false;
-            }
+            validations.push({
+                condition: !document.getElementById('categoryId').value,
+                message: 'Please select a category',
+                focus: 'categoryId'
+            });
             break;
         case 'referral':
-            if (!document.getElementById('referralCode').value.trim()) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please enter a referral code'
-                });
-                return false;
-            }
+            // Commented out as referral div is commented in HTML
+            // validations.push({
+            //     condition: !document.getElementById('referralCode').value.trim(),
+            //     message: 'Please enter a referral code',
+            //     focus: 'referralCode'
+            // });
             break;
+    }
+
+    // Check validations
+    for (const validation of validations) {
+        if (validation.condition) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: validation.message
+            });
+            
+            // Focus on the element with error
+            const errorElement = document.getElementById(validation.focus);
+            if (errorElement) {
+                errorElement.focus();
+                errorElement.classList.add('is-invalid');
+                
+                // Remove invalid class on input
+                errorElement.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                }, { once: true });
+            }
+            
+            return false;
+        }
     }
 
     return true;
 }
-        function validateDates() {
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('offerForm');
+    const typeSelect = document.getElementById('type');
+    const productSelect = document.getElementById('productId');
+    const categorySelect = document.getElementById('categoryId');
+    const discountInput = document.getElementById('discount');
+
+    function handleTypeChange() {
+        const type = typeSelect.value;
+        
+        productSelect.value = '';
+        categorySelect.value = '';
+        document.getElementById('discountedPrice').textContent = '0.00';
+
+        document.getElementById('productSelectDiv').style.display = 
+            type === 'product' ? 'block' : 'none';
+        document.getElementById('categorySelectDiv').style.display = 
+            type === 'category' ? 'block' : 'none';
+        document.getElementById('discountedPriceDiv').style.display = 
+            type === 'product' ? 'block' : 'none';
+    }
+
+    discountInput.addEventListener('input', function() {
+        let value = parseFloat(this.value);
+        if (value > 100) this.value = 100;
+        if (value < 0) this.value = 0;
+    });
+
+    function calculateDiscountedPrice() {
+        if (typeSelect.value === 'product' && productSelect.selectedIndex > 0) {
+            const originalPrice = parseFloat(
+                productSelect.options[productSelect.selectedIndex].dataset.price
+            );
+            const discount = parseFloat(discountInput.value) || 0;
+            const discountAmount = (originalPrice * discount) / 100;
+            const discountedPrice = originalPrice - discountAmount;
+            
+            document.getElementById('discountedPrice').textContent = 
+                discountedPrice.toFixed(2);
+        }
+    }
+
+    typeSelect.addEventListener('change', handleTypeChange);
+    productSelect?.addEventListener('change', calculateDiscountedPrice);
+    discountInput?.addEventListener('input', calculateDiscountedPrice);
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (!validateOfferForm()) {
+            return;
+        }
+
+        const formData = {
+            name: document.getElementById('name').value,
+            type: typeSelect.value,
+            discount: discountInput.value,
+            productId: productSelect?.value || null,
+            categoryId: categorySelect?.value || null,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value
+        };
+
+        try {
+            const response = await fetch("/admin/offer", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"  
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Offer Added',
+                    text: data.message || 'The new offer has been added successfully.',
+                    showConfirmButton: true
+                });
+                window.location.href = "/admin/offers"; 
+            } else {
+                throw new Error(data.message || 'Failed to add offer');
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to add offer. Please try again.',
+                showConfirmButton: true
+            });
+        }
+    });
+});
+
+function validateDates() {
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
 
