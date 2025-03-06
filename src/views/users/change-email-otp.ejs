@@ -295,7 +295,7 @@
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'An error occurred during verification. Please try again.'
+            text: error.message||'An error occurred during verification. Please try again.'
         });
     });
 
