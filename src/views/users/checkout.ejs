@@ -1017,9 +1017,9 @@
                                         <span>Tax</span>
                                         <span>+ 18%</span>
                                     </div>
-                                    <div class="summary-row">
+                                    <div class="summary-row" >
                                         <span>Tax amount</span>
-                                        <span>+ ₹<%=taxAMount.toFixed(2)%></span>
+                                        <span id="taxAMount">+ ₹<%=taxAMount.toFixed(2)%></span>
                                     </div>
                                     <div class="summary-row total">
                                         <span>Total</span>
@@ -1864,11 +1864,13 @@ function handlePaymentFailure(response, orderId) {
             }
 
             function updateOrderSummary(newTotal, discountAmount) {
+const taxAMount = document.getElementById("taxAMount")
+const taxAmountValue = taxAmountElement.textContent || taxAmountElement.innerText;
 
                 const discountElem = document.querySelector(".summary-row:nth-child(3) span:last-child");
                 const totalElem = document.querySelector(".summary-row.total span:last-child");
                 discountElem.textContent = `-₹${discountAmount.toFixed(2)}`;
-                totalElem.textContent = `₹${newTotal.toFixed(2)}`
+                totalElem.textContent = `₹${(newTotal.toFixed(2)*18)/100}`
 
             }
 

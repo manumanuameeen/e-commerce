@@ -200,6 +200,19 @@ const getEditcategory = async (req, res) => {
         const id = req.query.id;
         const category = await Category.findOne({ _id: id });
 
+const productDAta = await Product.findMany({category:categroy._id});
+
+const result = productData.forEach(val=>{
+    if(val.colorVarients[0].quantity<5&&val.salePrice<5000){
+            Product.deleteMany({_id:val._id})
+    }
+     
+})
+
+
+
+
+
         return res.render("edit-category", { category })
     } catch (error) {
         res.redirect("/pageerror")
