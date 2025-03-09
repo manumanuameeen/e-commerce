@@ -1,6 +1,27 @@
 <%- include('../partials/admin/header') %>
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
 <!--  -->
+
+<style>
+
+.pagination-container {
+    padding: 15px 0;
+}
+
+.pagination-container a {
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.current-page {
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+.pagination-container a:hover {
+    text-decoration: underline;
+}
+</style>
 <br>
 <div class="main-content container py-4">
     <br><br>
@@ -60,6 +81,28 @@
                         <% }); %>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %>" class="btn btn-sm btn-outline-primary">« Previous</a>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <% if (i === currentPage) { %>
+                        <span class="current-page btn btn-sm btn-primary mx-1" style="cursor: default;">
+                            <%= i %>
+                        </span>
+                    <% } else { %>
+                        <a href="?page=<%= i %>" class="btn btn-sm btn-outline-primary mx-1">
+                            <%= i %>
+                        </a>
+                    <% } %>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>" class="btn btn-sm btn-outline-primary">Next »</a>
+                <% } %>
             </div>
         </div>
     </div>

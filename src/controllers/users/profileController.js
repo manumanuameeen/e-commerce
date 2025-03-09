@@ -174,19 +174,31 @@ const postNewPassword = async (req, res) => {
 const userProfile = async (req, res) => {
     try {
         const userId = req.session.user;
+        
+   
+        const page = parseInt(req.query.page) || 1;
+        const limit = 1; 
+        const skip = (page - 1) * limit;
+
         const userData = await User.findById(userId);
         const addressData = await Address.findOne({ userId: userId });
 
+      
+        const totalOrders = await Order.countDocuments({ userId: userId });
+        const totalPages = Math.ceil(totalOrders / limit);
 
+      
         const orders = await Order.find({ userId: userId })
             .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
             .populate('orderIteams.product');
+
+        const wallet = await Wallet.find({ userId: userId })
+            .sort({ createdAt: -1 });
 
         console.log("orders ", orders);
         console.log("user address", addressData);
-
-        const wallet = await Wallet.find({ userId: userId }).sort({ createdAt: -1 })
-        
         console.log("the wallet is getting", wallet);
 
         res.render('userProfile', {
@@ -194,14 +206,17 @@ const userProfile = async (req, res) => {
             userAddress: addressData,
             orders,
             wallet,
-
+            currentPage: page,
+            totalPages: totalPages,
+            totalOrders: totalOrders
         });
 
     } catch (error) {
         console.error("Error retrieving profile data", error);
         return res.redirect("/pageNotFound");
     }
-}
+};
+
 const changeEmail = async (req, res) => {
     try {
 

@@ -114,16 +114,18 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="mb-4">
                             <label for="category" class="form-label">Category</label>
                             <select name="category" class="form-control" id="category">
+                                <option value="" >Select Category</option>
                                 <% for(let i=0; i<cat.length; i++) { %>
-                                    <option value="<%=cat[i].name%>"><%=cat[i].name%></option>
+                                    <option value="<%= cat[i]._id %>"><%= cat[i].name %></option>
                                 <% } %>
                             </select>
                             <div id="category-error" class="error-message"></div>
                         </div>
+                        
+                        
                         
                         <div class="col-lg-8">
                             <div class="mb-4">
@@ -305,54 +307,79 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function handleSubmit(event) {
     event.preventDefault();
-    
+    console.log('Form submission started...');
+
     if (!validateForm()) {
+        console.log('Form validation failed.');
         return false;
     }
 
     try {
         const form = document.getElementById('productSubmitForm');
         const formData = new FormData(form);
+        console.log('Form data initialized.');
 
-        // Handle color variants
+   
         formData.delete('colors[]');
         formData.delete('quantities[]');
-        
+
         const colorEntries = document.querySelectorAll('.color-entry');
-        colorEntries.forEach((entry) => {
+        console.log(`Found ${colorEntries.length} color entries.`);
+
+        if (colorEntries.length === 0) {
+            alert('Please add at least one color and quantity.');
+            return;
+        }
+
+        colorEntries.forEach((entry, index) => {
             const colorInput = entry.querySelector('input[name="colors[]"]');
             const quantityInput = entry.querySelector('input[name="quantities[]"]');
-            
+
             if (colorInput && colorInput.value && quantityInput && quantityInput.value) {
                 formData.append('colors', colorInput.value);
                 formData.append('quantities', quantityInput.value);
+                console.log(`Color ${index + 1}: ${colorInput.value}, Quantity: ${quantityInput.value}`);
             }
         });
 
-        // Handle images
-        const hasImages = Object.keys(croppedImages).length > 0;
-        if (!hasImages) {
-            throw new Error('Please select and crop at least one image.');
+    
+        console.log('Checking cropped images...');
+        if (!croppedImages || Object.keys(croppedImages).length === 0) {
+            alert('Please select and crop at least one image.');
+            return;
         }
 
+        console.log(`Processing ${Object.keys(croppedImages).length} images.`);
         for (const [index, dataUrl] of Object.entries(croppedImages)) {
+            if (!dataUrl.startsWith('data:image/')) {
+                console.error('Invalid image URL:', dataUrl);
+                return;
+            }
+
+            console.log(`Fetching image ${index}...`);
             const response = await fetch(dataUrl);
             const blob = await response.blob();
             formData.append('images', blob, `image-${Date.now()}-${index}.jpg`);
         }
 
+        console.log('Sending form data to:', form.action);
         const response = await fetch(form.action, {
             method: 'POST',
             body: formData
         });
 
+        const responseText = await response.text();
+        console.log('Server Response:', responseText);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}, Response: ${responseText}`);
         }
 
-        const result = await response.json();
-        
+        const result = JSON.parse(responseText);
+        console.log('Parsed response:', result);
+
         if (result.success) {
+            console.log('Product saved successfully. Redirecting...');
             window.location.href = '/admin/addProducts';
         } else {
             throw new Error(result.message || 'Error saving product');
@@ -366,7 +393,7 @@ async function handleSubmit(event) {
     }
 }
 
-// Form validation helper functions
+
 function validateForm() {
     clearErrorMessages();
     let isValid = true;
@@ -411,6 +438,15 @@ function validateForm() {
                     message: 'Please enter a valid non-negative price.'
                 }
             ]
+        },
+        category: {
+            element: document.getElementById('category'),
+            rules: [
+                {
+                    test: value => value !== '',
+                    message: 'Please select a category.'
+                }
+            ]
         }
     };
 
@@ -427,7 +463,6 @@ function validateForm() {
         }
     }
 
-  
     const regularPrice = parseFloat(document.getElementById('regularPrice').value);
     const salePrice = parseFloat(document.getElementById('salePrice').value);
     if (!isNaN(regularPrice) && !isNaN(salePrice) && regularPrice <= salePrice) {

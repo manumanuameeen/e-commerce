@@ -29,7 +29,7 @@ const getProductAddPage = async (req, res) => {
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
-        
+console.log(req.body)
         if (!products.productName || !products.category || !products.regularPrice) {
             console.log('here1');
 
@@ -83,7 +83,7 @@ const addProducts = async (req, res) => {
             }
         }
 
-        const category = await Category.findOne({ name: products.category });
+        const category = await Category.findOne({ _id: products.category });
         if (!category) {
             console.log('here5');
             return res.status(400).json({ success: false, message: "Invalid category" });
@@ -179,8 +179,8 @@ const getEditProduct = async (req, res) => {
         const id = req.query.id;
         const product = await Product.findById(id).lean();
         const categories = await Category.find({ isListed: true }).lean();
-
-        res.render("edit-product", { product, cat: categories });
+const productCat = await Category.find({_id:product.category})
+        res.render("edit-product", { product, cat: categories,productCat  });
     } catch (error) {
         console.error("Error in getEditProduct:", error);
         res.redirect("/pageerror");

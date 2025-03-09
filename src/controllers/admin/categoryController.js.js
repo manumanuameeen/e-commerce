@@ -17,8 +17,8 @@ const categoryInfo = async (req, res) => {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit).populate({
-                path:'offers',
-                select:"name,discount"
+                path: 'offers',
+                select: "name,discount"
             })
 
         const totalCategories = await Category.countDocuments();
@@ -46,26 +46,26 @@ const addCategory = async (req, res) => {
             console.log("Category already exists");
             return res.status(400).json({ error: "Category already exists" });
         }
-//         if(name.trim().length>15){
-// return res.status(400).json({succcess:false,message:'category name should only contain 15 characters'})
-//         }
+        //         if(name.trim().length>15){
+        // return res.status(400).json({succcess:false,message:'category name should only contain 15 characters'})
+        //         }
 
         const newCategory = new Category({
-            name:name.toLowerCase(),
+            name: name.toLowerCase(),
             description,
         });
         await newCategory.save();
 
-        return res.json({ 
-            success: true, 
-            message: "Category added successfully", 
-            category: newCategory 
+        return res.json({
+            success: true,
+            message: "Category added successfully",
+            category: newCategory
         });
     } catch (error) {
         console.error("Error adding category:", error);
-        return res.status(500).json({ 
-            success: false, 
-            error: "Internal server error" 
+        return res.status(500).json({
+            success: false,
+            error: "Internal server error"
         });
     }
 }
@@ -198,20 +198,8 @@ const getunListCategory = async (req, res) => {
 const getEditcategory = async (req, res) => {
     try {
         const id = req.query.id;
+
         const category = await Category.findOne({ _id: id });
-
-const productDAta = await Product.findMany({category:categroy._id});
-
-const result = productData.forEach(val=>{
-    if(val.colorVarients[0].quantity<5&&val.salePrice<5000){
-            Product.deleteMany({_id:val._id})
-    }
-     
-})
-
-
-
-
 
         return res.render("edit-category", { category })
     } catch (error) {

@@ -157,6 +157,23 @@
         .nav-link:hover {
             background-color: #f8f9fc;
         }
+
+        .pagination-container .btn_2 {
+    padding: 5px 10px;
+    margin: 0 5px;
+}
+
+.pagination-container .btn-dark {
+    background: #000;
+    color: white;
+    padding: 5px 10px;
+    margin: 0 5px;
+}
+
+.pagination-container .btn_2:hover,
+.pagination-container .btn-dark:hover {
+    opacity: 0.9;
+}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <section class="profile_section padding_top">
@@ -284,33 +301,65 @@
                                 <div class="card-body">
                                     <!-- Orders container with scroll -->
                                     <div class="orders-container">
-                                        <% orders.forEach(item=> { %>
-                                            <div class="order-item">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5>Order <%=item.orderId%></h5>
-                                                        <p class="mb-1">Date: <%=item.createdAt%></p>
-                                                        <p class="mb-1">Status:
-                                                            <span class="status-badge <%= 
-                                                                item.status.toLowerCase() === 'delivered' ? 'status-delivered' :
-                                                                item.status.toLowerCase() === 'pending' ? 'status-pending' :
-                                                                item.status.toLowerCase() === 'processing' ? 'status-processing' :
-                                                                item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' :
-                                                                item.status.toLowerCase() === 'returned' ? 'status-returned' :
-                                                                item.status.toLowerCase() === 'payment pending' ? 'status-payment-pending' : ''
-                                                            %>">
-                                                                <%=item.status%>
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <h5>₹<%=item.finalAmount.toFixed(2)%></h5>
-                                                        <button class="btn_2" onclick="viewOrderDetails('<%=item.orderId%>')">View Details</button>
+                                        <% if (orders && orders.length > 0) { %>
+                                            <% orders.forEach(item => { %>
+                                                <div class="order-item">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h5>Order <%=item.orderId%></h5>
+                                                            <p class="mb-1">Date: <%=item.createdAt%></p>
+                                                            <p class="mb-1">Status:
+                                                                <span class="status-badge <%= 
+                                                                    item.status.toLowerCase() === 'delivered' ? 'status-delivered' :
+                                                                    item.status.toLowerCase() === 'pending' ? 'status-pending' :
+                                                                    item.status.toLowerCase() === 'processing' ? 'status-processing' :
+                                                                    item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' :
+                                                                    item.status.toLowerCase() === 'returned' ? 'status-returned' :
+                                                                    item.status.toLowerCase() === 'payment pending' ? 'status-payment-pending' : ''
+                                                                %>">
+                                                                    <%=item.status%>
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <h5>₹<%=item.finalAmount.toFixed(2)%></h5>
+                                                            <button class="btn_2" onclick="viewOrderDetails('<%=item.orderId%>')">View Details</button>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                                                <p class="mb-0">No orders found</p>
                                             </div>
-                                        <% }) %>
+                                        <% } %>
                                     </div>
+                        
+                                    <!-- Pagination -->
+                                    <% if (totalPages > 1) { %>
+                                        <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+                                            <% if (currentPage > 1) { %>
+                                                <a href="?page=<%= currentPage - 1 %>#orders" class="btn btn-sm btn_2 mr-2">« Previous</a>
+                                            <% } %>
+                        
+                                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                                <% if (i === currentPage) { %>
+                                                    <span class="btn btn-sm btn-dark mx-1" style="cursor: default;">
+                                                        <%= i %>
+                                                    </span>
+                                                <% } else { %>
+                                                    <a href="?page=<%= i %>#orders" class="btn btn-sm btn_2 mx-1">
+                                                        <%= i %>
+                                                    </a>
+                                                <% } %>
+                                            <% } %>
+                        
+                                            <% if (currentPage < totalPages) { %>
+                                                <a href="?page=<%= currentPage + 1 %>#orders" class="btn btn-sm btn_2 ml-2">Next »</a>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
