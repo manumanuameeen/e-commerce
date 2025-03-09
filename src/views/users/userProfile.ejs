@@ -158,38 +158,31 @@
             background-color: #f8f9fc;
         }
 
-        .pagination-container .btn_2 {
-    padding: 5px 10px;
-    margin: 0 5px;
-}
-
-.pagination-container .btn-dark {
-    background: #000;
-    color: white;
-    padding: 5px 10px;
-    margin: 0 5px;
-}
-
-.pagination-container .btn_2:hover,
-.pagination-container .btn-dark:hover {
-    opacity: 0.9;
-}
-
+    /* Ensure uniform button sizing */
 .pagination-container .btn_2 {
-    padding: 5px 10px;
+    padding: 5px 10px; /* Consistent padding */
     margin: 0 5px;
+    min-width: 30px; /* Ensure buttons don’t shrink too much */
+    text-align: center;
 }
 
-.pagination-container .btn-dark {
-    background: #000;
+/* Active button styling */
+.pagination-container .btn_2.active {
+    background: #000; /* Solid black for active state */
     color: white;
-    padding: 5px 10px;
-    margin: 0 5px;
+    cursor: default; /* No pointer for active button */
+    box-shadow: none; /* Remove hover shadow for active state */
 }
 
-.pagination-container .btn_2:hover,
-.pagination-container .btn-dark:hover {
-    opacity: 0.9;
+/* Hover effect only for non-active buttons */
+.pagination-container .btn_2:not(.active):hover {
+    background: linear-gradient(45deg, #333333, #000000);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove default btn-dark override if not needed */
+.pagination-container .btn-dark {
+    display: none; /* We won’t use btn-dark anymore */
 }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
