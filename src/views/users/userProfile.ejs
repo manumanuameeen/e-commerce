@@ -317,7 +317,7 @@
                                 </div>
                                 <div class="card-body">
                                     <!-- Orders container with scroll -->
-                                    <div class="orders-container">
+                                    <div class="orders-container" id="ordersContainer">
                                         <% if (orders && orders.length > 0) { %>
                                             <% orders.forEach(item => { %>
                                                 <div class="order-item">
@@ -352,28 +352,28 @@
                                             </div>
                                         <% } %>
                                     </div>
-                        
+    
                                     <!-- Pagination -->
                                     <% if (totalPages > 1) { %>
-                                        <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+                                        <div class="pagination-container" style="margin-top: 20px; text-align: center;" id="paginationContainer">
                                             <% if (currentPage > 1) { %>
-                                                <a href="?page=<%= currentPage - 1 %>#orders" class="btn btn-sm btn_2 mr-2">« Previous</a>
+                                                <button class="btn btn-sm btn_2 mr-2" onclick="loadOrders(<%= currentPage - 1 %>)">« Previous</button>
                                             <% } %>
-                        
+    
                                             <% for (let i = 1; i <= totalPages; i++) { %>
                                                 <% if (i === currentPage) { %>
                                                     <span class="btn btn-sm btn-dark mx-1" style="cursor: default;">
                                                         <%= i %>
                                                     </span>
                                                 <% } else { %>
-                                                    <a href="?page=<%= i %>#orders" class="btn btn-sm btn_2 mx-1">
+                                                    <button class="btn btn-sm btn_2 mx-1" onclick="loadOrders(<%= i %>)">
                                                         <%= i %>
-                                                    </a>
+                                                    </button>
                                                 <% } %>
                                             <% } %>
-                        
+    
                                             <% if (currentPage < totalPages) { %>
-                                                <a href="?page=<%= currentPage + 1 %>#orders" class="btn btn-sm btn_2 ml-2">Next »</a>
+                                                <button class="btn btn-sm btn_2 ml-2" onclick="loadOrders(<%= currentPage + 1 %>)">Next »</button>
                                             <% } %>
                                         </div>
                                     <% } %>
@@ -557,80 +557,231 @@
         </div>
     </section>
 
-    <script>
-        function copyReferralCode() {
-            let referralInput = document.getElementById("referralCode");
+    // <script>
+    //     function copyReferralCode() {
+    //         let referralInput = document.getElementById("referralCode");
 
-            if (!referralInput.value) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "No Referral Code",
-                    text: "There is no referral code available to copy.",
+    //         if (!referralInput.value) {
+    //             Swal.fire({
+    //                 icon: "warning",
+    //                 title: "No Referral Code",
+    //                 text: "There is no referral code available to copy.",
+    //             });
+    //             return;
+    //         }
+
+    //         referralInput.select();
+    //         document.execCommand("copy");
+
+    //         Swal.fire({
+    //             icon: "success",
+    //             title: "Copied!",
+    //             text: "Referral Code has been copied to clipboard.",
+    //             showConfirmButton: false,
+    //             timer: 1500
+    //         });
+    //     }
+
+    //     function confirmDelete(addressId) {
+    //         Swal.fire({
+    //             title: 'Are you sure?',
+    //             text: 'This action cannot be undone.',
+    //             icon: 'warning',
+    //             showCancelButton: true,
+    //             confirmButtonColor: '#000',
+    //             cancelButtonColor: '#6c757d',
+    //             confirmButtonText: 'Yes, delete it!'
+    //         }).then((result) => {
+    //             if (result.isConfirmed) {
+    //                 fetch(`/deleteAddress/${addressId}`, {
+    //                     method: 'DELETE',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                     }
+    //                 })
+    //                 .then(response => {
+    //                     if (response.ok) {
+    //                         Swal.fire(
+    //                             'Deleted!',
+    //                             'The address has been deleted.',
+    //                             'success'
+    //                         ).then(() => {
+    //                             window.location.href = '/Profile';
+    //                         });
+    //                     } else {
+    //                         Swal.fire(
+    //                             'Error!',
+    //                             'Failed to delete the address.',
+    //                             'error'
+    //                         );
+    //                     }
+    //                 })
+    //                 .catch(error => {
+    //                     console.error('Error:', error);
+    //                     Swal.fire(
+    //                         'Error!',
+    //                         error.message||'An error occurred.',
+    //                         'error'
+    //                     );
+    //                 });
+    //             }
+    //         });
+    //     }
+
+    //     function viewOrderDetails(orderId) {
+    //         window.location.href = `/order-details/${orderId}`;
+    //     }
+    // </script>
+
+
+
+    <script>
+    // Function to load orders dynamically via AJAX
+    function loadOrders(page) {
+        fetch(`/Profile?page=${page}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Indicate this is an AJAX request
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update the orders container
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = ''; // Clear existing content
+
+            if (data.orders && data.orders.length > 0) {
+                data.orders.forEach(item => {
+                    const statusClass = item.status.toLowerCase() === 'delivered' ? 'status-delivered' :
+                        item.status.toLowerCase() === 'pending' ? 'status-pending' :
+                        item.status.toLowerCase() === 'processing' ? 'status-processing' :
+                        item.status.toLowerCase() === 'cancelled' ? 'status-cancelled' :
+                        item.status.toLowerCase() === 'returned' ? 'status-returned' :
+                        item.status.toLowerCase() === 'payment pending' ? 'status-payment-pending' : '';
+
+                    const orderHtml = `
+                        <div class="order-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5>Order ${item.orderId}</h5>
+                                    <p class="mb-1">Date: ${new Date(item.createdAt).toLocaleString()}</p>
+                                    <p class="mb-1">Status:
+                                        <span class="status-badge ${statusClass}">${item.status}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h5>₹${item.finalAmount.toFixed(2)}</h5>
+                                    <button class="btn_2" onclick="viewOrderDetails('${item.orderId}')">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    ordersContainer.innerHTML += orderHtml;
                 });
-                return;
+            } else {
+                ordersContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No orders found</p>
+                    </div>
+                `;
             }
 
-            referralInput.select();
-            document.execCommand("copy");
+            // Update the pagination container
+            const paginationContainer = document.getElementById('paginationContainer');
+            paginationContainer.innerHTML = ''; // Clear existing pagination
 
-            Swal.fire({
-                icon: "success",
-                title: "Copied!",
-                text: "Referral Code has been copied to clipboard.",
-                showConfirmButton: false,
-                timer: 1500
-            });
-        }
+            if (data.totalPages > 1) {
+                let paginationHtml = '';
 
-        function confirmDelete(addressId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This action cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#000',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/deleteAddress/${addressId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            Swal.fire(
-                                'Deleted!',
-                                'The address has been deleted.',
-                                'success'
-                            ).then(() => {
-                                window.location.href = '/Profile';
-                            });
-                        } else {
-                            Swal.fire(
-                                'Error!',
-                                'Failed to delete the address.',
-                                'error'
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire(
-                            'Error!',
-                            error.message||'An error occurred.',
-                            'error'
-                        );
-                    });
+                if (data.currentPage > 1) {
+                    paginationHtml += `<button class="btn btn-sm btn_2 mr-2" onclick="loadOrders(${data.currentPage - 1})">« Previous</button>`;
                 }
-            });
-        }
 
-        function viewOrderDetails(orderId) {
-            window.location.href = `/order-details/${orderId}`;
+                for (let i = 1; i <= data.totalPages; i++) {
+                    if (i === data.currentPage) {
+                        paginationHtml += `<span class="btn btn-sm btn-dark mx-1" style="cursor: default;">${i}</span>`;
+                    } else {
+                        paginationHtml += `<button class="btn btn-sm btn_2 mx-1" onclick="loadOrders(${i})">${i}</button>`;
+                    }
+                }
+
+                if (data.currentPage < data.totalPages) {
+                    paginationHtml += `<button class="btn btn-sm btn_2 ml-2" onclick="loadOrders(${data.currentPage + 1})">Next »</button>`;
+                }
+
+                paginationContainer.innerHTML = paginationHtml;
+            }
+
+            // Ensure the orders tab remains active
+            document.querySelector('.nav-link[href="#orders"]').classList.add('active');
+            document.getElementById('orders').classList.add('show', 'active');
+        })
+        .catch(error => {
+            console.error('Error loading orders:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to load orders. Please try again.'
+            });
+        });
+    }
+
+    // Existing functions (unchanged)
+    function copyReferralCode() {
+        let referralInput = document.getElementById("referralCode");
+        if (!referralInput.value) {
+            Swal.fire({
+                icon: "warning",
+                title: "No Referral Code",
+                text: "There is no referral code available to copy.",
+            });
+            return;
         }
-    </script>
+        referralInput.select();
+        document.execCommand("copy");
+        Swal.fire({
+            icon: "success",
+            title: "Copied!",
+            text: "Referral Code has been copied to clipboard.",
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+
+    function confirmDelete(addressId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#000',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/deleteAddress/${addressId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('Deleted!', 'The address has been deleted.', 'success')
+                            .then(() => { window.location.href = '/Profile'; });
+                    } else {
+                        Swal.fire('Error!', 'Failed to delete the address.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', error.message || 'An error occurred.', 'error');
+                });
+            }
+        });
+    }
+
+    function viewOrderDetails(orderId) {
+        window.location.href = `/order-details/${orderId}`;
+    }
+</script>
 
     <%- include('../partials/users/footer') %>

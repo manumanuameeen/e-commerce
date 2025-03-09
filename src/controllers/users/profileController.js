@@ -174,20 +174,15 @@ const postNewPassword = async (req, res) => {
 const userProfile = async (req, res) => {
     try {
         const userId = req.session.user;
-        
-   
         const page = parseInt(req.query.page) || 1;
         const limit = 1; 
         const skip = (page - 1) * limit;
 
         const userData = await User.findById(userId);
         const addressData = await Address.findOne({ userId: userId });
-
-      
         const totalOrders = await Order.countDocuments({ userId: userId });
         const totalPages = Math.ceil(totalOrders / limit);
 
-      
         const orders = await Order.find({ userId: userId })
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -197,9 +192,14 @@ const userProfile = async (req, res) => {
         const wallet = await Wallet.find({ userId: userId })
             .sort({ createdAt: -1 });
 
-        console.log("orders ", orders);
-        console.log("user address", addressData);
-        console.log("the wallet is getting", wallet);
+        if (req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+            return res.json({
+                orders,
+                currentPage: page,
+                totalPages,
+                totalOrders
+            });
+        }
 
         res.render('userProfile', {
             user: userData,
@@ -207,8 +207,8 @@ const userProfile = async (req, res) => {
             orders,
             wallet,
             currentPage: page,
-            totalPages: totalPages,
-            totalOrders: totalOrders
+            totalPages,
+            totalOrders
         });
 
     } catch (error) {
@@ -216,6 +216,8 @@ const userProfile = async (req, res) => {
         return res.redirect("/pageNotFound");
     }
 };
+
+// router.get("/Profile", userAuth, userProfile);
 
 const changeEmail = async (req, res) => {
     try {
