@@ -202,7 +202,7 @@ const getEditProduct = async (req, res) => {
         const categories = await Category.find();
         const currentCategory = await Category.findById(product.category);
         
-        res.render('editProduct', { 
+        res.render('edit-Product', { 
             product: product,
             cat: categories,
             currentCategoryName: currentCategory ? currentCategory.name : ''
