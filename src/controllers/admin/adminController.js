@@ -2,67 +2,52 @@ import User from "../../models/userSchema.js";
 import Coupon from "../../models/couponSchema.js";
 import mongoose from "mongoose";
 import Product from "../../models/productSchema.js";
-import bcrypt from "bcrypt"
-import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
-
-
-
-
+import bcrypt from "bcrypt";
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js";
 import Order from "../../models/orderSchema.js";
-
-
+import MESSAGES from "../../utils/adminConstants.js";
 
 const loadPageerror = async (req, res) => {
     try {
-        return res.render("pageerror")
+        return res.render("pageerror");
     } catch (error) {
         console.log("Error in pageerror ", error);
-
-
     }
-}
-
+};
 
 const loadlogin = async (req, res) => {
-
     try {
         if (req.session.admin) {
-            return res.redirect("/admin")
+            return res.redirect("/admin");
         }
-        return res.render("admin-login", { message: null })
+        return res.render("admin-login", { message: null });
     } catch (error) {
         console.log('Error loading admin login:', error);
-        res.status(500
-).send('Internal Server Error');
+        res.status(500).send(MESSAGES.SERVER_ERROR);
     }
-}
+};
 
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const admin = await User.findOne({ email, isAdmin: true })
+        const admin = await User.findOne({ email, isAdmin: true });
 
         if (admin) {
-            const passwordMatch = await bcrypt.compare(password, admin.password)
+            const passwordMatch = await bcrypt.compare(password, admin.password);
             if (passwordMatch) {
-                req.session.admin = admin._id
-                return res.redirect('/admin')
+                req.session.admin = admin._id;
+                return res.redirect('/admin');
             } else {
-                return res.redirect("/admin//login")
+                return res.redirect("/admin//login");
             }
-
         } else {
-            return res.redirect('/admin/login')
+            return res.redirect('/admin/login');
         }
     } catch (error) {
-        console.log("Login error", error)
-        return res.redirect("/pageerror")
+        console.log("Login error", error);
+        return res.redirect("/pageerror");
     }
-
-}
-
-
+};
 
 const loadDashboard = async (req, res) => {
     try {
@@ -78,7 +63,6 @@ const loadDashboard = async (req, res) => {
         let startOfPeriod = new Date(now.setHours(0, 0, 0, 0));
         let endOfPeriod = new Date(now.setHours(23, 59, 59, 999));
 
-       
         switch (reportType) {
             case 'weekly':
                 startOfPeriod = new Date(now);
@@ -129,7 +113,6 @@ const loadDashboard = async (req, res) => {
             acc.totalOrders += 1;
             acc.statusCounts[order.status] = (acc.statusCounts[order.status] || 0) + 1;
 
-
             if (order.status === 'Delivered') {
                 acc.totalSales += order.totalPrice || 0;
                 if (order.discount > 0 || order.couponApplied) {
@@ -162,13 +145,10 @@ const loadDashboard = async (req, res) => {
                 productName: item.productName,
                 productImage: item.productImage || [],
                 productStatus: item.status,
-                price: item.price,
-                quantity: item.quantity,
-                color: item.color
+                price: item.price || item.quantity * item.product.price,
             }))
         }));
 
-        
         const salesTrend = await Order.aggregate([
             {
                 $match: {
@@ -198,7 +178,7 @@ const loadDashboard = async (req, res) => {
                 }
             }
         ]);
-        
+
         const paymentMethods = await Order.aggregate([
             {
                 $match: {
@@ -222,7 +202,6 @@ const loadDashboard = async (req, res) => {
                 }
             }
         ]);
-       
 
         const topProducts = await Order.aggregate([
             {
@@ -250,8 +229,6 @@ const loadDashboard = async (req, res) => {
                 }
             }
         ]);
-      
-
 
         const topCategories = await Order.aggregate([
             {
@@ -262,7 +239,7 @@ const loadDashboard = async (req, res) => {
             },
             { $unwind: "$orderIteams" },
             {
-                $lookup:{
+                $lookup: {
                     from: "products", 
                     localField: "orderIteams.product", 
                     foreignField: "_id",
@@ -271,7 +248,7 @@ const loadDashboard = async (req, res) => {
             },
             { $unwind: '$product' },
             {
-                $lookup:{
+                $lookup: {
                     from: "categories", 
                     localField: "product.category",
                     foreignField: "_id",
@@ -280,7 +257,7 @@ const loadDashboard = async (req, res) => {
             },
             { $unwind: "$category" },
             {
-                $group:{
+                $group: {
                     _id: "$category._id", 
                     categoryName: { $first: "$category.name" },
                     sales: { $sum: { $multiply: ["$orderIteams.price", "$orderIteams.quantity"] } }, 
@@ -299,9 +276,8 @@ const loadDashboard = async (req, res) => {
                 }
             }
         ]);
-      console.log(topCategories);
-      
-        
+        console.log(topCategories);
+
         const report = {
             ...salesReport,
             orders: processedOrders,
@@ -322,10 +298,9 @@ const loadDashboard = async (req, res) => {
             lastPage: totalPages,
             pages: generatePageArray(currentPage, totalPages),
             salesTrend,
-            paymentMethods ,
+            paymentMethods,
             topProducts,
             topCategories,
-        
         });
 
     } catch (error) {
@@ -361,11 +336,8 @@ function generatePageArray(currentPage, totalPages) {
     return rangeWithDots;
 }
 
-
-
 const logout = async (req, res) => {
     try {
-        
         console.log("before", req.session?.admin);
         
         req.session.destroy((err) => {
@@ -382,14 +354,10 @@ const logout = async (req, res) => {
     }
 };
 
-
-
-
 export {
     loadlogin,
     login,
     loadDashboard,
     loadPageerror,
     logout,
-
-}
+};

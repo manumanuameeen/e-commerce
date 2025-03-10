@@ -3,10 +3,9 @@ import User from "../../models/userSchema.js";
 import Category from "../../models/categorySchema.js";
 import Wishlist from "../../models/wishlistSchema.js";
 import mongoose from 'mongoose';
+import MESSAGES from "../../utils/userConstant.js";
 
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
-
 
 const productDetails = async (req, res) => {
     try {
@@ -17,11 +16,9 @@ const productDetails = async (req, res) => {
         if (!productId) {
             return res.redirect("/pageNotFound")
             console.log("the product id is not getting check that once again");
-
         }
 
         const product = await Product.findById(productId).populate("category");
-
 
         if (!product) {
             return res.status(statusCode.OK).json({
@@ -36,7 +33,6 @@ const productDetails = async (req, res) => {
         const findRelatedProduct = await Product.find({ category: findCategory._id }).limit(5);
         console.log("Related products found:", findRelatedProduct.length);
 
-
         const categoryOffer = findCategory ? findCategory.offer || 0 : 0;
         const productOffer = product.productOffer || 0;
         const totalOffer = categoryOffer + productOffer;
@@ -48,6 +44,7 @@ const productDetails = async (req, res) => {
             totalOffer: totalOffer,
             categories: findCategory,
             findRelatedProduct,
+            messages: MESSAGES
         });
 
     } catch (error) {
@@ -60,7 +57,6 @@ const getWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
 
-
         const user = await User.findById(userId);
         if (!user) {
             return res.redirect("/login");
@@ -68,19 +64,20 @@ const getWishlist = async (req, res) => {
 
         const wishlist = await Wishlist.findOne({ userId: userId }).populate("products.productId");
 
-
         const products = wishlist ? wishlist.products : [];
 
         res.render('wishlist', {
             user,
-            wishlist: products
+            wishlist: products,
+            messages: MESSAGES
         });
 
     } catch (error) {
         console.error("Error in getWishlist:", error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(MESSAGES.SERVER_ERROR);
     }
 }
+
 const addWishlist = async (req, res) => {
     try {
         console.log("Product added to the cart");
@@ -92,13 +89,11 @@ const addWishlist = async (req, res) => {
             console.log("User not found");
             return res.json({
                 status: false,
-                message: "User not found",
+                message: MESSAGES.USER_NOT_FOUND,
             });
         }
 
         const productId = req.body.productId;
-
-
 
         console.log("The product ID:", productId);
 
@@ -145,18 +140,15 @@ const addWishlist = async (req, res) => {
 
         res.json({
             status: false,
-            message: "Error adding to wishlist",
+            message: MESSAGES.GENERIC_ERROR,
         });
     }
 };
-
 
 const removeFromWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
         const { productId } = req.body;
-
-
 
         const wishlist = await Wishlist.findOne({ userId });
 
@@ -182,7 +174,7 @@ const removeFromWishlist = async (req, res) => {
         console.error("Error removing from wishlist:", error);
         return res.json({
             status: false,
-            message: "Error removing product from wishlist"
+            message: MESSAGES.SOMETHING_WENT_WRONG
         });
     }
 };
@@ -192,5 +184,4 @@ export {
     getWishlist,
     addWishlist,
     removeFromWishlist,
-
 };

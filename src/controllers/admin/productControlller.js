@@ -1,3 +1,4 @@
+import MESSAGES from "../../utils/adminConstants.js"
 import Product from "../../models/productSchema.js";
 import Category from "../../models/categorySchema.js";
 import fs from "fs";
@@ -6,20 +7,11 @@ import sharp from "sharp";
 import { fileURLToPath } from "url";
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
-
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const getProductAddPage = async (req, res) => {
-
     try {
-
-        // if (!req.session.admin) {
-        //     return res.redirect("/admin/login");
-        // }
-
         const category = await Category.find({ isListed: true }).lean();
         res.render("product-add", { cat: category });
     } catch (error) {
@@ -28,25 +20,23 @@ const getProductAddPage = async (req, res) => {
     }
 };
 
-
-
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
         console.log(req.body)
         if (!products.productName || !products.category || !products.regularPrice) {
-            console.log('here1');
-
-            return res.status(statusCode.OK
-            ).json({ success: false, message: "Missing required fields" });
+            return res.status(statusCode.OK).json({ 
+                success: false, 
+                message: MESSAGES.REQUIRED_FIELD 
+            });
         }
 
         const productExists = await Product.findOne({ productName: products.productName });
         if (productExists) {
-            console.log('here2');
-
-            return res.status(statusCode.OK
-            ).json({ success: false, message: "Product already exists" });
+            return res.status(statusCode.OK).json({ 
+                success: false, 
+                message: MESSAGES.PRODUCT_EXISTS 
+            });
         }
 
         const images = [];
@@ -56,8 +46,6 @@ const addProducts = async (req, res) => {
 
             for (const file of req.files) {
                 try {
-                    console.log('here3');
-
                     const fileName = `${Date.now()}-${file.originalname}`;
                     const filePath = path.join(uploadDir, fileName);
 
@@ -68,13 +56,14 @@ const addProducts = async (req, res) => {
                     images.push(fileName);
 
                 } catch (error) {
-                    console.log('here4');
-
                     console.error("Error processing image:", error);
+                    return res.status(statusCode.OK).json({
+                        success: false,
+                        message: MESSAGES.IMAGE_PROCESSING_ERROR
+                    });
                 }
             }
         }
-
 
         let colorVarients = [];
         const colors = Array.isArray(products.colors) ? products.colors : [products.colors];
@@ -91,9 +80,10 @@ const addProducts = async (req, res) => {
 
         const category = await Category.findOne({ _id: products.category });
         if (!category) {
-            console.log('here5');
-            return res.status(statusCode.OK
-            ).json({ success: false, message: "Invalid category" });
+            return res.status(statusCode.OK).json({ 
+                success: false, 
+                message: MESSAGES.INVALID_CATEGORY 
+            });
         }
 
         const newProduct = new Product({
@@ -109,14 +99,19 @@ const addProducts = async (req, res) => {
         });
 
         await newProduct.save();
-        return res.status(statusCode.OK).json({ success: true, message: "Product added successfully" });
+        return res.status(statusCode.OK).json({ 
+            success: true, 
+            message: MESSAGES.PRODUCT_ADDED 
+        });
     } catch (error) {
-        console.log('here6');
         console.error("Error saving product:", error);
-        return res.status(statusCode.INTERNAL_SERVER_ERROR
-        ).json({ success: false, message: "Internal server error" });
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: MESSAGES.SERVER_ERROR 
+        });
     }
 };
+
 const getAllProduct = async (req, res) => {
     try {
         const search = req.query.search || "";
@@ -136,7 +131,6 @@ const getAllProduct = async (req, res) => {
         });
 
         const category = await Category.find({ isListed: true }).lean();
-        console.log("product data from product page", productData);
 
         res.render('adminProduct', {
             data: productData,
@@ -155,14 +149,24 @@ const blockProduct = async (req, res) => {
         const id = req.query.id;
         const blockProduct = await Product.updateOne({ _id: id }, { isBlocked: true });
 
-        if (!blockProduct) {
-            return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
+        if (!blockProduct.matchedCount) {
+            return res.status(statusCode.NOT_FOUND).json({ 
+                success: false, 
+                message: MESSAGES.PRODUCT_NOT_FOUND 
+            });
         }
 
+        // return res.status(statusCode.OK).json({
+        //     success: true,
+        //     message: MESSAGES.PRODUCT_BLOCKED
+        // });
         res.redirect("/admin/products");
     } catch (error) {
         console.error("Error blocking product:", error);
-        res.redirect("/pageerror");
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.SERVER_ERROR
+        });
     }
 };
 
@@ -171,34 +175,37 @@ const unBlockProduct = async (req, res) => {
         const id = req.query.id;
         const unBlockProduct = await Product.updateOne({ _id: id }, { isBlocked: false });
 
-        if (!unBlockProduct) {
-            return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
+        if (!unBlockProduct.matchedCount) {
+            return res.status(statusCode.NOT_FOUND).json({ 
+                success: false, 
+                message: MESSAGES.PRODUCT_NOT_FOUND 
+            });
         }
 
+        // return res.status(statusCode.OK).json({
+        //     success: true,
+        //     message: MESSAGES.PRODUCT_UNBLOCKED
+        // });
         res.redirect("/admin/products");
     } catch (error) {
         console.error("Error unblocking product:", error);
-        res.redirect("/pageerror");
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.SERVER_ERROR
+        });
     }
 };
-
-// const getEditProduct = async (req, res) => {
-//     try {
-//         const id = req.query.id;
-//         const product = await Product.findById(id).lean();
-//         const categories = await Category.find({ isListed: true }).lean();
-//         const productCat = await Category.find({ _id: product.category })
-//         res.render("edit-product", { product, cat: categories, productCat });
-//     } catch (error) {
-//         console.error("Error in getEditProduct:", error);
-//         res.redirect("/pageerror");
-//     }
-// };
 
 const getEditProduct = async (req, res) => {
     try {
         const productId = req.query.id;
         const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(statusCode.NOT_FOUND).json({
+                success: false,
+                message: MESSAGES.PRODUCT_NOT_FOUND
+            });
+        }
         const categories = await Category.find();
         const currentCategory = await Category.findById(product.category);
         
@@ -224,18 +231,30 @@ const editProduct = async (req, res) => {
         });
 
         if (existingProduct) {
-            return res.status(statusCode.OK
-            ).json({ error: "Product with this name already exists" });
+            return res.status(statusCode.OK).json({ 
+                success: false,
+                message: MESSAGES.PRODUCT_EXISTS 
+            });
         }
 
         const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(statusCode.NOT_FOUND).json({
+                success: false,
+                message: MESSAGES.PRODUCT_NOT_FOUND
+            });
+        }
+
         const images = req.files?.map(file => file.filename) || [];
 
         const category = await Category.findOne({ name: data.category });
         if (!category) {
-            return res.status(statusCode.OK
-            ).json({ error: "Category not found" });
+            return res.status(statusCode.OK).json({ 
+                success: false,
+                message: MESSAGES.INVALID_CATEGORY 
+            });
         }
+
         const colorVarients = [];
         const colors = Array.isArray(data.colors) ? data.colors : [data.colors];
         const quantities = Array.isArray(data.quantities) ? data.quantities : [data.quantities];
@@ -263,19 +282,35 @@ const editProduct = async (req, res) => {
         }
 
         await Product.findByIdAndUpdate(productId, updateFields, { new: true });
-        res.redirect(`/admin/edit-Product?id=${productId}`);
+        return res.status(statusCode.OK).json({
+            success: true,
+            message: MESSAGES.PRODUCT_UPDATED
+        });
     } catch (error) {
         console.error("Error in editProduct:", error);
-        res.redirect("/pageerror");
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.SERVER_ERROR
+        });
     }
 };
-
 
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;
 
-        await Product.findByIdAndUpdate(productIdToServer, { $pull: { productImage: imageNameToServer } });
+        const product = await Product.findByIdAndUpdate(
+            productIdToServer, 
+            { $pull: { productImage: imageNameToServer } },
+            { new: true }
+        );
+
+        if (!product) {
+            return res.status(statusCode.NOT_FOUND).json({
+                success: false,
+                message: MESSAGES.PRODUCT_NOT_FOUND
+            });
+        }
 
         const imagePath = path.join(__dirname, "../../public/uploads/re-image", imageNameToServer);
         if (fs.existsSync(imagePath)) {
@@ -283,10 +318,16 @@ const deleteSingleImage = async (req, res) => {
             console.log(`Image ${imageNameToServer} deleted successfully`);
         }
 
-        res.send({ status: true });
+        res.send({ 
+            status: true,
+            message: "Image deleted successfully"
+        });
     } catch (error) {
         console.error("Error in deleteSingleImage:", error);
-        res.redirect('/pageerror');
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.SERVER_ERROR
+        });
     }
 };
 

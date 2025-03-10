@@ -1,10 +1,6 @@
 import User from "../../models/userSchema.js";
 
 import Product from "../../models/productSchema.js";
-
-
-
-
 import Address from "../../models/addressSchema.js";
 import Wallet from "../../models/wallet.js";
 import Order from "../../models/orderSchema.js";
@@ -16,8 +12,8 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { console } from "inspector";
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
-// import { updateOrderStatus } from "../admin/orderManagement.js";
+import MESSAGES from "../../utils/userConstant.js";
+// import { updateOrderStatus} from "../admin/orderManagement.js";
 dotenv.config();
 
 const razorpayInstance = new Razorpay({
@@ -110,20 +106,17 @@ const placeOrder = async (req, res) => {
         if (!userId) {
             return res.status(statusCode.UNAUTHORIZED).json({
                 success: false,
-                message: "Please login to place an order"
+                message: MESSAGES.LOGIN_FAILED 
             });
         }
 
         const { selectedAddress, paymentMethod, selectedCoupon } = req.body;
-        //("addres is ge", selectedAddress);
-
-        //(`User selected the: ${paymentMethod} method`);
 
         const cart = await Cart.findOne({ userId }).populate("items.ProductId");
         if (!cart || !cart.items.length) {
             return res.status(statusCode.OK).json({
                 success: false,
-                message: "Cart is empty"
+                message: MESSAGES.SOMETHING_WENT_WRONG
             });
         }
 
@@ -155,26 +148,23 @@ const placeOrder = async (req, res) => {
         if (selectedCoupon) {
             appliedCoupon = await Coupon.findOne({
                 name: selectedCoupon,
-
                 expireOn: { $gt: new Date() },
                 minimumPrice: { $lte: totalPrice }
             });
-            //("the seected coupon", appliedCoupon);
 
             if (!appliedCoupon) {
                 return res.status(statusCode.OK).json({
                     success: false,
-                    message: "Invalid or expired coupon"
+                    message: MESSAGES.INVALID_REFERRAL 
                 });
             }
-
 
             discountAmount = appliedCoupon.offerPrice;
         }
 
         const TAX_RATE = 18;
-        const taxAmount = (totalPrice * TAX_RATE) / 100
-        const finalAmount = totalPrice - discountAmount + taxAmount;;
+        const taxAmount = (totalPrice * TAX_RATE) / 100;
+        const finalAmount = totalPrice - discountAmount + taxAmount;
 
         if (paymentMethod === "wallet") {
             const wallet = await Wallet.findOne({ userId });
@@ -182,7 +172,7 @@ const placeOrder = async (req, res) => {
             if (!wallet) {
                 return res.status(statusCode.OK).json({
                     success: false,
-                    message: "Wallet not found"
+                    message: MESSAGES.SOMETHING_WENT_WRONG 
                 });
             }
             if (wallet.balance < finalAmount) {
@@ -203,19 +193,16 @@ const placeOrder = async (req, res) => {
                 amount: finalAmount,
                 date: new Date(),
                 description: "Payment for order",
-            })
+            });
             await wallet.save();
         }
 
         if (paymentMethod === "Cash on Delivery" && finalAmount > 50000) {
             return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
-                message: 'Orders above ₹50,000 are not eligible for Cash on Delivery. Please select a different payment method.'
-            })
-
-
+                message: MESSAGES.INTERNAL_ERROR 
+            });
         }
-
 
         const newOrder = new Order({
             userId,
@@ -244,7 +231,6 @@ const placeOrder = async (req, res) => {
 
         await newOrder.save();
 
-
         if (appliedCoupon) {
             await Coupon.findByIdAndUpdate(
                 appliedCoupon._id,
@@ -271,7 +257,6 @@ const placeOrder = async (req, res) => {
                 }
             );
         }
-        //("from place order the iorder id is getting or not", newOrder.orderId);
 
         return res.status(statusCode.OK).json({
             success: true,
@@ -289,12 +274,11 @@ const placeOrder = async (req, res) => {
         console.error("Error in placeOrder:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Failed to place order",
+            message: MESSAGES.SERVER_ERROR, 
             error: error.message
         });
     }
 };
-
 const checkoutAddress = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -341,11 +325,9 @@ const orderCancel = async (req, res) => {
         if (!order) {
             return res.status(statusCode.NOT_FOUND).json({
                 success: false,
-                message: "Order not found"
+                message: MESSAGES.SOMETHING_WENT_WRONG 
             });
         }
-
-
 
         if (order.status === 'Pending' || order.status === 'Processing') {
             if (order.couponApplied && order.couponCode) {
@@ -355,12 +337,10 @@ const orderCancel = async (req, res) => {
                 );
             }
 
-
-
             order.status = "Cancelled";
             order.orderIteams.forEach((order) => {
-                order.status = "Cancelled"
-            })
+                order.status = "Cancelled";
+            });
             order.reason = req.body.reason;
 
             await order.save();
@@ -403,9 +383,7 @@ const orderCancel = async (req, res) => {
                     description: `Refund from cancelled order: ${order._id}`
                 });
                 await wallet.save();
-
             }
-
 
             return res.status(statusCode.OK).json({
                 success: true,
@@ -423,7 +401,7 @@ const orderCancel = async (req, res) => {
         console.error("Error cancelling order:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Error in order cancellation",
+            message: MESSAGES.INTERNAL_ERROR, 
             error: error.message
         });
     }
@@ -491,7 +469,6 @@ const requestReturn = async (req, res) => {
 };
 
 const orderSuccess = async (req, res) => {
-    // //("order successsssssssssssssssssssssss");
 
     try {
         const userId = req.session.user;
@@ -538,11 +515,9 @@ const orderDetails = async (req, res) => {
             .populate("orderIteams.product")
             .populate("address");
 
-        //("Found order:", order);
 
         if (!order) {
-            //("No order found with ID:", systemOrderId);
-            // req.flash('error', 'Order not found');
+           
             return res.redirect('/profile');
         } else
 

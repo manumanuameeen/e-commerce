@@ -2,21 +2,18 @@ import Product from "../../models/productSchema.js";
 import Category from "../../models/categorySchema.js";
 import Offer from "../../models/offerScema.js";
 import { postAddAddress } from "../users/profileController.js";
-import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
-
-
-
-
-
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js";
+import MESSAGES from "../../utils/adminConstants.js"
 
 const addOffer = async (req, res) => {
     try {
         const { name, type, discount, productId, categoryId, referralCode, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(statusCode.OK
-).json({ success: false, message: 'Discount must be between 1% and 100%' });
+            return res.status(statusCode.OK).json({ 
+                success: false, 
+                message: MESSAGES.INVALID_DISCOUNT 
+            });
         }
 
         let offerData = new Offer({ 
@@ -31,7 +28,10 @@ const addOffer = async (req, res) => {
         if (type === 'product' && productId) {
             const product = await Product.findOne({ productName: productId });
             if (!product) {
-                return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
+                return res.status(statusCode.NOT_FOUND).json({ 
+                    success: false, 
+                    message: MESSAGES.PRODUCT_NOT_FOUND 
+                });
             }
             
             offerData.productId = product._id;
@@ -49,7 +49,7 @@ const addOffer = async (req, res) => {
 
             return res.status(statusCode.CREATED).json({ 
                 success: true, 
-                message: 'Product offer added successfully', 
+                message: MESSAGES.OFFER_ADDED, 
                 offer: newOffer 
             });
         } 
@@ -57,7 +57,10 @@ const addOffer = async (req, res) => {
         if (type === 'category' && categoryId) {
             const category = await Category.findById(categoryId);
             if (!category) {
-                return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+                return res.status(statusCode.NOT_FOUND).json({ 
+                    success: false, 
+                    message: MESSAGES.CATEGORY_NOT_FOUND 
+                });
             }
 
             offerData.categoryId = categoryId;
@@ -89,24 +92,21 @@ const addOffer = async (req, res) => {
 
             return res.status(statusCode.CREATED).json({ 
                 success: true, 
-                message: 'Category offer added successfully', 
+                message: MESSAGES.OFFER_ADDED, 
                 offer: newOffer 
             });
         }
-       
 
-        return res.status(statusCode.OK
-).json({ 
+        return res.status(statusCode.OK).json({ 
             success: false, 
-            message: 'Invalid offer type or missing required fields' 
+            message: MESSAGES.INVALID_OFFER_TYPE 
         });
 
     } catch (error) {
         console.error('Error in addOffer:', error);
-        return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ 
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
-            message: 'Server Error' 
+            message: MESSAGES.SERVER_ERROR 
         });
     }
 };
@@ -117,10 +117,9 @@ const editOffer = async (req, res) => {
         const { discount, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(statusCode.OK
-).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Discount must be between 1% and 100%'
+                message: MESSAGES.INVALID_DISCOUNT
             });
         }
 
@@ -128,11 +127,10 @@ const editOffer = async (req, res) => {
         if (!existingOffer) {
             return res.status(statusCode.NOT_FOUND).json({
                 success: false,
-                message: 'Offer not found'
+                message: MESSAGES.OFFER_NOT_FOUND
             });
         }
 
-    
         existingOffer.discount = discount;
         existingOffer.startDate = startDate;
         existingOffer.endDate = endDate;
@@ -142,14 +140,13 @@ const editOffer = async (req, res) => {
             if (!product) {
                 return res.status(statusCode.NOT_FOUND).json({
                     success: false,
-                    message: 'Associated product not found'
+                    message: MESSAGES.PRODUCT_NOT_FOUND
                 });
             }
 
             const bestDiscount = Math.max(discount, product.categoryOffer || 0);
             product.productOffer = discount;
             
-          
             const discountedPrice = product.regularPrice - (product.regularPrice * bestDiscount / 100);
             product.salePrice = Number(discountedPrice.toFixed(2));
             
@@ -160,18 +157,16 @@ const editOffer = async (req, res) => {
             if (!category) {
                 return res.status(statusCode.NOT_FOUND).json({
                     success: false,
-                    message: 'Associated category not found'
+                    message: MESSAGES.CATEGORY_NOT_FOUND
                 });
             }
 
             const productsInCategory = await Product.find({ category: existingOffer.categoryId });
             
             for (let product of productsInCategory) {
-              
                 const bestDiscount = Math.max(discount, product.productOffer || 0);
                 product.categoryOffer = discount;
                 
-            
                 const discountedPrice = product.regularPrice - (product.regularPrice * bestDiscount / 100);
                 product.salePrice = Number(discountedPrice.toFixed(2));
                 
@@ -183,16 +178,15 @@ const editOffer = async (req, res) => {
 
         return res.status(statusCode.OK).json({
             success: true,
-            message: `${existingOffer.type.charAt(0).toUpperCase() + existingOffer.type.slice(1)} offer updated successfully`,
+            message: MESSAGES.OFFER_UPDATED,
             offer: updatedOffer
         });
 
     } catch (error) {
         console.error('Error in editOffer:', error);
-        return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: 'Server Error'
+            message: MESSAGES.SERVER_ERROR
         });
     }
 };
@@ -205,7 +199,7 @@ const removeOffer = async (req, res) => {
         if (!offer) {
             return res.status(statusCode.NOT_FOUND).json({
                 success: false,
-                message: "Offer not found"
+                message: MESSAGES.OFFER_NOT_FOUND
             });
         }
 
@@ -214,7 +208,6 @@ const removeOffer = async (req, res) => {
             if (product) {
                 product.productOffer = 0;
                 
-               
                 if (product.categoryOffer > 0) {
                     const discountedPrice = product.regularPrice - (product.regularPrice * product.categoryOffer / 100);
                     product.salePrice = Number(discountedPrice.toFixed(2));
@@ -237,7 +230,6 @@ const removeOffer = async (req, res) => {
             for (let product of productsInCategory) {
                 product.categoryOffer = 0;
                 
-             
                 if (product.productOffer > 0) {
                     const discountedPrice = product.regularPrice - (product.regularPrice * product.productOffer / 100);
                     product.salePrice = Number(discountedPrice.toFixed(2));
@@ -253,15 +245,14 @@ const removeOffer = async (req, res) => {
 
         return res.status(statusCode.OK).json({ 
             success: true, 
-            message: 'Offer removed successfully' 
+            message: MESSAGES.OFFER_REMOVED 
         });
 
     } catch (error) {
         console.error('Error in removeOffer:', error);
-        return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ 
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
-            message: 'Server Error' 
+            message: MESSAGES.SERVER_ERROR 
         });
     }
 };
@@ -276,11 +267,9 @@ const offerList = async (req, res) => {
         const limit = 5;
         const skip = (page - 1) * limit;
 
-        
         const totalOffers = await Offer.countDocuments({ status: true });
         const totalPages = Math.ceil(totalOffers / limit);
 
-      
         const offers = await Offer.find({ status: true })
             .skip(skip)
             .limit(limit);
@@ -300,10 +289,9 @@ const offerList = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in offerList:', error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ 
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
-            message: 'Server Error' 
+            message: MESSAGES.SERVER_ERROR 
         });
     }
 };
@@ -320,15 +308,12 @@ const LoadOffer = async (req, res) => {
         return res.render("offer", { products, categories });
     } catch (error) {
         console.error("Error in LoadOffer:", error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ 
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
-            message: 'Server Error' 
+            message: MESSAGES.SERVER_ERROR 
         });
     }
-}
-
-
+};
 
 export {
     LoadOffer,
@@ -336,4 +321,4 @@ export {
     offerList,
     removeOffer,
     editOffer,
-}
+};

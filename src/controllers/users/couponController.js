@@ -5,57 +5,35 @@ import Order from "../../models/orderSchema.js";
 import Coupon from "../../models/couponSchema.js";
 import Cart from "../../models/cartSchema.js";
 import Wallet from "../../models/wallet.js";
+import MESSAGES from "../../utils/userConstant.js";
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
-
-
-
-
-
 const applyCoupon = async (req, res) => {
-
     try {
-
-
         const { couponCode, orderTotal } = req.body;
-
         console.log(" gettting ", couponCode);
         const userId = req.session.user;
 
         if (!userId) {
-
             return res.status(statusCode.BAD_REQUEST).json({
-
                 success: false,
-
                 message: "Please login to apply coupon"
-
             });
-
         }
 
-
         const coupon = await Coupon.findOne({
-
             name: couponCode,
-
             isList: true
         });
 
         console.log("coupon:", coupon);
 
-
-
         if (!coupon) {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
                 message: "Invalid coupon code"
             });
         }
-
-
-
 
         if (coupon.userBy.includes(userId)) {
             return res.status(statusCode.OK).json({
@@ -66,7 +44,6 @@ const applyCoupon = async (req, res) => {
         coupon.userBy.push(userId)
         await coupon.save()
 
-
         if (orderTotal < coupon.minimumPrice) {
             return res.status(statusCode.OK).json({
                 success: false,
@@ -74,17 +51,12 @@ const applyCoupon = async (req, res) => {
             });
         }
 
-        // Calculate discount
-
+    
         const discountAmount = Math.min(coupon.offerPrice, orderTotal);
         const newTotal = orderTotal - discountAmount;
 
         const cart = await Cart.findOne({ userId: userId })
-
-        const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice)
-
-
-
+        const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
 
         res.json({
             success: true,
@@ -97,7 +69,7 @@ const applyCoupon = async (req, res) => {
         console.error("Error in applyCoupon:", error);
         res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Failed to apply coupon"
+            message: MESSAGES.GENERIC_ERROR
         });
     }
 };
@@ -112,7 +84,7 @@ const removeCoupon = async (req, res) => {
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: "Please login to remove coupon"
+                message: MESSAGES.USER_NOT_FOUND
             });
         }
 
@@ -125,14 +97,10 @@ const removeCoupon = async (req, res) => {
             });
         }
 
-
-
-
         await Coupon.updateOne(
             { _id: coupons._id },
             { $pull: { userBy: userId } }
         );
-
 
         console.log("coupon is gertting", coupons);
 
@@ -147,18 +115,12 @@ const removeCoupon = async (req, res) => {
         console.error("Error in removeCoupon:", error);
         res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Failed to remove coupon"
+            message: MESSAGES.SOMETHING_WENT_WRONG
         });
     }
 };
 
-
-
-
-
-
 export {
     applyCoupon,
     removeCoupon,
-
 }

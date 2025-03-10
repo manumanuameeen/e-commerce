@@ -7,7 +7,7 @@ import Category from "../../models/categorySchema.js"
 import Product from "../../models/productSchema.js"
 import Wallet from "../../models/wallet.js"
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
+import MESSAGES from "../../utils/userConstant.js";
 
 const loadpageNotFound = async (req, res) => {
 
@@ -84,17 +84,16 @@ const signup = async (req, res) => {
         const { name, email, phone, password, cPassword, referralCode } = req.body;
 
         if (password !== cPassword) {
-            return res.render('signup', { message: "Password do not match" });
-        }
+            return res.render('signup', { message: MESSAGES.PASSWORD_MISMATCH });        }
 
         const findUser = await User.findOne({ email });
 
         if (findUser) {
             if (findUser.isBlocked) {
-                return res.render("signup", { message: "User is blocked by admin" });
+                return res.render("signup", { message: MESSAGES.USER_BLOCKED });
             }
-            return res.render("signup", { message: "User already exists" });
-        }
+            return res.render("signup", { message: MESSAGES.USER_EXISTS });
+         }
 
 
         let referrer = null;
@@ -426,117 +425,6 @@ const loadlogout = async (req, res) => {
 }
 
 
-// const loadShopingPage = async (req, res) => {
-//     try {
-//         const user = req.session.user;
-//         const userData = await User.findOne({ _id: user });
-//         const categories = await Category.find({ isListed: true });
-
-//         const categoryId = req.query.category;
-//         const searchQuery = req.query.search;
-//         const priceRange = req.query.price;
-//         const availability = req.query.availability;
-//         const sort = req.query.sort || 'newest';
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 9;
-
-//         let query = {
-//             isBlocked: false,
-//             'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
-//         };
-
-//         if (categoryId) {
-//             query.category = categoryId;
-//         }
-
-//         if (searchQuery) {
-//             query.$or = [
-//                 { productName: { $regex: searchQuery, $options: 'i' } }
-//             ];
-//         }
-
-//         if (priceRange) {
-//             const priceRanges = {
-//                 'below-1500': { $lt: 30000 },
-//                 '1500-2000': { $gte: 30000, $lte: 50000 },
-//                 '2000-2500': { $gte: 50000, $lte: 70000 },
-//                 '2500-3000': { $gte: 70000, $lte: 90000 },
-//                 '3000-4000': { $gte: 90000, $lte: 110000 },
-//                 'Above4000': { $gt: 110000 }
-//             };
-//             if (priceRanges[priceRange]) {
-//                 query.salePrice = priceRanges[priceRange];
-//             }
-//         }
-
-//         if (availability === 'Available') {
-//             query['colorVarients.quantity'] = { $gt: 0 };
-//         } else if (availability === 'Unavailable') {
-//             query['colorVarients.quantity'] = { $lte: 0 };
-//         }
-
-//         const sortOptions = {
-//             'newest': { createdAt: -1 },
-//             'price-asc': { salePrice: 1 },
-//             'price-desc': { salePrice: -1 },
-//             'name-asc': { productName: 1 },
-//             'name-desc': { productName: -1 }
-//         };
-
-//         const skip = (page - 1) * limit;
-
-//         const totalProducts = await Product.countDocuments(query);
-//         const products = await Product.find(query)
-//             .sort(sortOptions[sort] || sortOptions.newest)
-//             .skip(skip)
-//             .limit(limit)
-//             .populate('category')
-//             .lean();
-
-
-
-//         const totalPages = Math.ceil(totalProducts / limit);
-
-//         const isAjaxRequest = req.xhr || (req.headers['x-requested-with'] === 'XMLHttpRequest');
-
-//         if (isAjaxRequest) {
-//             return res.render('shop', {
-//                 user: userData,
-//                 products: products,
-//                 categories: categories,
-//                 currentPage: page,
-//                 totalPages: totalPages,
-//                 totalProducts: totalProducts,
-//                 currentSort: sort,
-//                 price: priceRange,
-//                 searchQuery: searchQuery,
-//                 availability: availability,
-//                 sort: req.query.sort || null,
-//                 query: req.query,
-//                 queryParams: req.query,
-//                 layout: false   });
-//         }
-
-//         res.render('shop', {
-//             user: userData,
-//             products: products,
-//             categories: categories,
-//             currentPage: page,
-//             totalPages: totalPages,
-//             totalProducts: totalProducts,
-//             currentSort: sort,
-//             price: priceRange,
-//             searchQuery: searchQuery,
-//             availability: availability,
-//             sort: req.query.sort || null,
-//             query: req.query,
-//             queryParams: req.query,
-//         });
-//     } catch (error) {
-//         console.error('Error in shop page:', error);
-//         res.redirect('/pageNotFound');
-//     }
-// };
 
 const loadShopingPage = async (req, res) => {
     try {

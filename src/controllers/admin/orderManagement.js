@@ -1,24 +1,13 @@
 import Order from "../../models/orderSchema.js";
-
-
 import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
 import Product from "../../models/productSchema.js";
 import User from "../../models/userSchema.js";
 import Wallet from "../../models/wallet.js";
 import Address from "../../models/addressSchema.js";
-
+import MESSAGES from "../../utils/adminConstants.js"
 
 const loadOrder = async (req, res) => {
     try {
-
-        //     if (!req.session.admin) {
-        //     return res.redirect("/admin/login");
-        // }
-
-
-
-
         const { search, page = 1 } = req.query;
         const limit = 10;
 
@@ -36,18 +25,12 @@ const loadOrder = async (req, res) => {
                 path: 'orderIteams.product',
                 select: 'productName productImage price',
             })
-
             .sort({ createdAt: -1 })
             .limit(limit)
             .skip((page - 1) * limit)
             .lean();
-        console.log("orders with details:", orders);
-        const user = await User.findOne({ _id: orders[0].userId })
 
-
-        if (!user) {
-            console.error("the user is not geting the error")
-        }
+        const user = await User.findOne({ _id: orders[0]?.userId });
 
         const totalOrders = await Order.countDocuments(query);
         const totalPages = Math.ceil(totalOrders / limit);
@@ -68,9 +51,6 @@ const loadOrder = async (req, res) => {
                 day: 'numeric',
             });
 
-        console.log(user);
-
-
         res.render('order', {
             orders,
             currentPage: page,
@@ -83,8 +63,7 @@ const loadOrder = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching order info:', error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR
-        ).send('Internal Server Error');
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send(MESSAGES.SERVER_ERROR);
     }
 };
 
@@ -94,19 +73,17 @@ const updateOrderStatus = async (req, res) => {
         const { status } = req.body;
 
         if (!orderId || !status) {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Order ID and status are required'
+                message: MESSAGES.REQUIRED_FIELD
             });
         }
 
         const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
         if (!validStatuses.includes(status)) {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Invalid status value'
+                message: MESSAGES.INVALID_STATUS
             });
         }
 
@@ -114,55 +91,46 @@ const updateOrderStatus = async (req, res) => {
         if (!order) {
             return res.status(statusCode.NOT_FOUND).json({
                 success: false,
-                message: 'Order not found'
+                message: MESSAGES.ORDER_NOT_FOUND
             });
-        }
-
-        for (const item of order.orderIteams) {
-            console.log("item is getting", item)
         }
 
         if (order.status === "Payment Pending") {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: "Payment Pending cannot be changed"
-            })
+                message: MESSAGES.ORDER_PAYMENT_PENDING
+            });
         }
 
         if (order.status === 'Delivered') {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Delivered orders cannot be changed'
+                message: MESSAGES.ORDER_DELIVERED
             });
         }
+
         if (order.status === 'Cancelled' && status !== 'Cancelled') {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Cannot change status of cancelled order'
+                message: MESSAGES.ORDER_CANCELLED
             });
         }
 
         if (status === 'Cancelled' && order.status !== 'Cancelled') {
             for (const item of order.orderIteams) {
-                const product = item.product;
                 await Product.updateOne(
-                    { _id: product._id, "colorVarients.color": item.color },
+                    { _id: item.product._id, "colorVarients.color": item.color },
                     { $inc: { "colorVarients.$.quantity": item.quantity } }
                 );
-                console.log(`Product quantity saved after cancellation:${item.color}`);
             }
         }
-
 
         order.status = status;
         order.orderIteams.forEach((order) => {
             if (order.status !== 'Cancelled') {
                 order.status = status;
             }
-        })
+        });
         order.statusUpdatedAt = new Date();
 
         if (!order.statusHistory) {
@@ -178,7 +146,7 @@ const updateOrderStatus = async (req, res) => {
 
         res.status(statusCode.OK).json({
             success: true,
-            message: 'Order status updated successfully',
+            message: MESSAGES.ORDER_STATUS_UPDATED,
             data: {
                 orderId: order._id,
                 newStatus: status,
@@ -188,50 +156,56 @@ const updateOrderStatus = async (req, res) => {
 
     } catch (error) {
         console.error('Error updating order:', error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR
-        ).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: 'Error updating order status',
+            message: MESSAGES.SERVER_ERROR,
             error: error.message
         });
     }
 };
 
-
-
 const orderDetails = async (req, res) => {
     try {
-        console.log("here");
+        const { orderId } = req.params;
 
-        const { orderId } = req.params
+        const order = await Order.findOne({ _id: orderId })
+            .populate({
+                path: 'orderIteams.product',
+                select: 'productName productImage price',
+            })
+            .populate({
+                path: 'address', // Populate the address field
+                populate: { path: 'userId', select: 'name email' }, // Optionally populate user info
+            })
+            .lean();
 
-        const order = await Order.findOne({ _id: orderId }).populate({
-            path: 'orderIteams.product',
-            select: 'productName productImage price',
-        }).populate(
-            "address"
+        if (!order) {
+            return res.status(statusCode.NOT_FOUND).json({
+                success: false,
+                message: MESSAGES.ORDER_NOT_FOUND,
+            });
+        }
 
-        ).lean();
-        console.log("order is  getting", order)
-        res.render("orderdetails", { order })
+        res.render("orderdetails", { order });
     } catch (error) {
-        console.log("error is getting h", error);
-
+        console.log("Error retrieving order details:", error);
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: MESSAGES.SERVER_ERROR,
+        });
     }
-}
+};
 
 const handleReturnRequest = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { status, adminNote } = req.body;
 
-
         const validStatuses = ['Approved', 'Rejected'];
         if (!validStatuses.includes(status)) {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Invalid return request status'
+                message: MESSAGES.RETURN_REQUEST_INVALID
             });
         }
 
@@ -241,15 +215,14 @@ const handleReturnRequest = async (req, res) => {
         if (!order) {
             return res.status(statusCode.NOT_FOUND).json({
                 success: false,
-                message: 'Order not found'
+                message: MESSAGES.ORDER_NOT_FOUND
             });
         }
 
         if (!order.returnRequest || order.returnRequest.status !== 'Requested') {
-            return res.status(statusCode.OK
-            ).json({
+            return res.status(statusCode.OK).json({
                 success: false,
-                message: 'Invalid return request state'
+                message: MESSAGES.RETURN_REQUEST_INVALID
             });
         }
 
@@ -261,23 +234,16 @@ const handleReturnRequest = async (req, res) => {
         };
 
         if (status === 'Rejected') {
-            order.status = 'Rejected'
+            order.status = 'Rejected';
         }
         if (status === 'Approved') {
             order.status = 'Returned';
-
 
             for (const item of order.orderIteams) {
                 try {
                     const product = await Product.findById(item.product._id);
                     if (!product) {
                         console.error(`Product not found: ${item.product._id}`);
-                        continue;
-                    }
-
-                    const colorVariant = product.colorVarients.find(cv => cv.color === item.color);
-                    if (!colorVariant) {
-                        console.error(`Color variant not found: ${item.color}`);
                         continue;
                     }
 
@@ -290,21 +256,12 @@ const handleReturnRequest = async (req, res) => {
                             $inc: { "colorVarients.$.quantity": item.quantity }
                         }
                     );
-
-
-
-
-                    console.log(`Updated quantity for product ${item.product._id}, color ${item.color}`);
                 } catch (error) {
                     console.error(`Error updating product quantity: ${error.message}`);
                 }
             }
 
-            const wallet = await Wallet.findOne({
-                userId: order.userId
-            })
-            console.log(wallet);
-
+            const wallet = await Wallet.findOne({ userId: order.userId });
             wallet.balance += order.finalAmount;
             wallet.transactions.push({
                 type: "credit",
@@ -313,9 +270,8 @@ const handleReturnRequest = async (req, res) => {
                 date: new Date(),
             });
 
-            await wallet.save()
+            await wallet.save();
         }
-
 
         if (!order.statusHistory) {
             order.statusHistory = [];
@@ -329,34 +285,24 @@ const handleReturnRequest = async (req, res) => {
 
         await order.save();
 
-
-
-
-
         return res.status(statusCode.OK).json({
             success: true,
-            message: `Return request ${status.toLowerCase()} successfully`,
+            message: status === 'Approved' ? MESSAGES.RETURN_REQUEST_APPROVED : MESSAGES.RETURN_REQUEST_REJECTED,
             order
         });
 
     } catch (error) {
         console.error('Error handling return request:', error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR
-        ).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: 'Error processing return request'
+            message: MESSAGES.SERVER_ERROR
         });
     }
 };
-
 
 export {
     loadOrder,
     updateOrderStatus,
     orderDetails,
     handleReturnRequest,
-
-}
-
-
-
+};

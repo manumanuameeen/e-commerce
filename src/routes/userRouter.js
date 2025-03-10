@@ -201,7 +201,7 @@ router.get('/getOrderDetails/:orderId',userAuth,fetchOrderData)
 
 //wishlist
 router.get('/wishlist',userAuth,getWishlist)
-router.post('/addWishlist', addWishlist);
+router.post('/addWishlist',userAuth, addWishlist);
 router.delete('/removeFromWishlist',userAuth, removeFromWishlist);
 
 

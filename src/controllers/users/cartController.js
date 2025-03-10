@@ -1,10 +1,9 @@
-
 import User from "../../models/userSchema.js";
 import Product from "../../models/productSchema.js";
 import Cart from "../../models/cartSchema.js";
 import Category from "../../models/categorySchema.js";
-import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
-
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js";
+import MESSAGES from "../../utils/userConstant.js"; 
 
 const loadCart = async (req, res) => {
     try {
@@ -30,24 +29,32 @@ const loadCart = async (req, res) => {
     }
 };
 
-
 const addToCart = async (req, res) => {
     try {
         const { colorVariant, quantity = 1 } = req.body;
         const productId = req.body.productId || req.query.productId;
 
         if (!req.session.user) {
-            return res.redirect('/login')
+            return res.status(statusCode.UNAUTHORIZED).json({
+                status: false,
+                loginRequired: true,
+                message: MESSAGES.LOGIN_REQUIRED
+            });
         }
 
         const userId = req.session.user;
 
         const user = await User.findById(userId);
-        if (!user || user.isBlocked) {
+        if (!user) {
+            return res.status(statusCode.NOT_FOUND).json({
+                status: false,
+                message: MESSAGES.USER_NOT_FOUND
+            });
+        }
+        if (user.isBlocked) {
             return res.status(statusCode.UNAUTHORIZED).json({
                 status: false,
-                loginRequired: true,
-                message: "User account is not accessible"
+                message: MESSAGES.USER_BLOCKED
             });
         }
 
@@ -55,19 +62,22 @@ const addToCart = async (req, res) => {
         if (!product) {
             return res.status(statusCode.NOT_FOUND).json({
                 status: false,
-                message: "Product not found"
+                message: MESSAGES.PRODUCT_NOT_FOUND
             });
         }
 
-        const category = await Category.findById(product.category)
-
+        const category = await Category.findById(product.category);
         if (category.isListed === false) {
-            return res.status(statusCode.OK).json({ success: false, message: "admin unlisted the category for some issues thank you " })
+            return res.status(statusCode.OK).json({
+                success: false,
+                message: MESSAGES.CATEGORY_UNLISTED
+            });
         }
+
         if (!colorVariant) {
             return res.status(statusCode.OK).json({
                 status: false,
-                message: "Please select a color before adding the product to the cart"
+                message: MESSAGES.REQUIRED_FIELD
             });
         }
 
@@ -77,14 +87,14 @@ const addToCart = async (req, res) => {
         if (quantity > availableStock) {
             return res.status(statusCode.OK).json({
                 status: false,
-                message: `Only ${availableStock} items are available in ${colorVariant} color`
+                message: `${MESSAGES.INSUFFICIENT_STOCK}: Only ${availableStock} items available in ${colorVariant} color`
             });
         }
 
         if (quantity > 5) {
             return res.status(statusCode.OK).json({
                 status: false,
-                message: "Maximum quantity allowed per product is 5"
+                message: MESSAGES.INVALID_MINIMUM_AMOUNT
             });
         }
 
@@ -106,7 +116,7 @@ const addToCart = async (req, res) => {
             if (newQuantity > 5) {
                 return res.status(statusCode.OK).json({
                     status: false,
-                    message: "Maximum quantity allowed is 5 items"
+                    message: MESSAGES.INVALID_MINIMUM_AMOUNT
                 });
             }
 
@@ -132,14 +142,14 @@ const addToCart = async (req, res) => {
         await cart.save();
         return res.status(statusCode.OK).json({
             status: true,
-            message: "Product added to cart successfully"
+            message: MESSAGES.PRODUCT_ADDED
         });
 
     } catch (error) {
         console.error("Error adding to cart:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             status: false,
-            message: "Internal Server Error"
+            message: MESSAGES.SERVER_ERROR
         });
     }
 };
@@ -149,12 +159,11 @@ const updateCartQuantity = async (req, res) => {
         const { cartItemId } = req.params;
         const { quantity } = req.body;
 
-
         const cart = await Cart.findOne({ userId: req.session.user });
         if (!cart) {
             return res.status(statusCode.NOT_FOUND).json({
                 status: false,
-                message: 'Cart not found'
+                message: MESSAGES.CART_EMPTY
             });
         }
 
@@ -162,10 +171,9 @@ const updateCartQuantity = async (req, res) => {
         if (!cartItem) {
             return res.status(statusCode.NOT_FOUND).json({
                 status: false,
-                message: 'Item not found in cart'
+                message: MESSAGES.NOT_FOUND
             });
         }
-
 
         if (quantity <= 0) {
             cart.items = cart.items.filter(item => item._id.toString() !== cartItemId);
@@ -173,20 +181,17 @@ const updateCartQuantity = async (req, res) => {
             return res.json({
                 status: true,
                 removed: true,
-                message: 'Item removed from cart'
+                message: "Item removed from cart"
             });
         }
-
 
         const product = await Product.findById(cartItem.ProductId);
         if (!product) {
             return res.status(statusCode.NOT_FOUND).json({
                 status: false,
-                message: 'Product not found'
+                message: MESSAGES.PRODUCT_NOT_FOUND
             });
         }
-        // console.log("123456789",product);
-
 
         const colorVariant = product.colorVarients.find(
             variant => variant.color === cartItem.colorVariant
@@ -195,23 +200,21 @@ const updateCartQuantity = async (req, res) => {
         if (!colorVariant) {
             return res.status(statusCode.NOT_FOUND).json({
                 status: false,
-                message: 'Color variant not found'
+                message: MESSAGES.NOT_FOUND
             });
         }
-
 
         if (quantity > colorVariant.quantity) {
             return res.status(statusCode.OK).json({
                 status: false,
-                message: `Only ${colorVariant.quantity} items are available in ${cartItem.colorVariant} color`
+                message: `${MESSAGES.INSUFFICIENT_STOCK}: Only ${colorVariant.quantity} items available in ${cartItem.colorVariant} color`
             });
         }
-
 
         if (quantity > 5) {
             return res.status(statusCode.OK).json({
                 status: false,
-                message: 'Maximum quantity allowed is 5 items'
+                message: MESSAGES.INVALID_MINIMUM_AMOUNT
             });
         }
 
@@ -228,31 +231,42 @@ const updateCartQuantity = async (req, res) => {
         console.error('Update cart error:', error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             status: false,
-            message: 'Error updating cart'
+            message: MESSAGES.SERVER_ERROR
         });
     }
 };
-
 
 const removeFromCart = async (req, res) => {
     try {
         const { cartItemId } = req.params;
         const cart = await Cart.findOne({ userId: req.session.user });
 
+        if (!cart) {
+            return res.status(statusCode.NOT_FOUND).json({
+                status: false,
+                message: MESSAGES.CART_EMPTY
+            });
+        }
+
         cart.items = cart.items.filter(item => item._id.toString() !== cartItemId);
         await cart.save();
-        return res.json({ status: true });
+        return res.json({ 
+            status: true,
+            message: "Item removed from cart successfully"
+        });
 
     } catch (error) {
         console.error(error);
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: 'Error removing item from cart' });
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
+            status: false,
+            message: MESSAGES.SERVER_ERROR
+        });
     }
 };
-
 
 export {
     loadCart,
     addToCart,
     updateCartQuantity,
     removeFromCart
-}
+};

@@ -1,0 +1,33 @@
+const MESSAGES = {
+    INVALID_EMAIL: "Please enter a valid email address",
+    OTP_SEND_FAILED: "Failed to send OTP. Please try again",
+    USER_NOT_FOUND: "User does not exist",
+    GENERIC_ERROR: "An error occurred. Please try again.",
+    INVALID_OTP: "Incorrect OTP. Please try again.",
+    SERVER_ERROR: "Internal Server Error",
+    ADDRESS_NOT_FOUND: "Address not found",
+    ADDRESS_DELETE_ERROR: "Error deleting address",
+    SOMETHING_WENT_WRONG: "Something went wrong",
+    PASSWORD_MISMATCH: "Password do not match",
+    USER_BLOCKED: "User is blocked by admin",
+    USER_EXISTS: "User already exists",
+    INVALID_REFERRAL: "Invalid referral code",
+    REFERRAL_INVALID: "This referral code is no longer valid",
+    EMAIL_NOT_FOUND: "Email not found in session",
+    OTP_RESENT: "OTP Resent successfully",
+    RESEND_FAILED: "Failed to resend OTP. Please try again.",
+    INTERNAL_ERROR: "Internal server error. Please try again.",
+    LOGIN_FAILED: "Login failed. Try again",
+    PASSWORD_INCORRECT: "Password doesn't match. Please try again",
+    LOGIN_REQUIRED: "Please login to access your cart",
+    PRODUCT_NOT_FOUND: "Product not found",
+    CART_EMPTY: "Your cart is empty",
+    REQUIRED_FIELD: "Color variant is required",
+    INSUFFICIENT_STOCK: "Insufficient stock",
+    INVALID_MINIMUM_AMOUNT: "Quantity cannot exceed 5 items",
+    PRODUCT_ADDED: "Product added to cart successfully",
+    NOT_FOUND: "Item not found in cart",
+    CATEGORY_UNLISTED: "This category is currently unavailable"
+};
+
+export default { MESSAGES };

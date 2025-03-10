@@ -2,24 +2,21 @@ import User from "../../models/userSchema.js";
 import Product from "../../models/productSchema.js";
 import Address from "../../models/addressSchema.js";
 import Order from "../../models/orderSchema.js";
-import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js";
+import MESSAGES from "../../utils/userConstant.js";
 
-import nodemailer from "nodemailer"
-
-import env from "dotenv"
-
-import bcrypt from "bcrypt"
-
+import nodemailer from "nodemailer";
+import env from "dotenv";
+import bcrypt from "bcrypt";
 import Wallet from "../../models/wallet.js";
 
 function generateOtp() {
-
-    const digits = "1234567890"
-    let otp = ""
+    const digits = "1234567890";
+    let otp = "";
     for (let i = 0; i < 6; i++) {
-        otp += digits[Math.floor(Math.random() * 10)]
+        otp += digits[Math.floor(Math.random() * 10)];
     }
-    return otp
+    return otp;
 }
 
 const sendVerificationEmail = async (email, otp) => {
@@ -32,47 +29,39 @@ const sendVerificationEmail = async (email, otp) => {
             auth: {
                 user: process.env.NODEMAILER_EMAIL,
                 pass: process.env.NODEMAILER_PASSWORD,
-            }
-        })
+            },
+        });
         const mailOptions = {
             from: process.env.NODEMAILER_EMAIL,
             to: email,
             subject: "Your OTP for password reset",
             text: `Your OTP is ${otp}`,
-            html: `<b><h4>Your OTP:${otp}</h4><br></b>`
-        }
+            html: `<b><h4>Your OTP:${otp}</h4><br></b>`,
+        };
         const info = await transporter.sendMail(mailOptions);
-        // console.log("email sent :",info.messageId);
-
-        return true
-
+        return true;
     } catch (error) {
         console.error("error sending email", error);
-        return false
+        return false;
     }
-}
+};
 
 const securePassword = async (password) => {
     try {
-
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
-
     } catch (error) {
-
+        console.error("Error hashing password", error);
     }
-}
-
+};
 
 const getForgotPassPage = async (req, res) => {
     try {
-
         res.render("forgot-password");
-
     } catch (error) {
-        res.redirect("/pageNotFound")
+        res.redirect("/pageNotFound");
     }
-}
+};
 
 const forgotEmailValid = async (req, res) => {
     try {
@@ -80,7 +69,7 @@ const forgotEmailValid = async (req, res) => {
 
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         if (!email || !emailPattern.test(email)) {
-            return res.render("forgot-password", { message: "Please enter a valid email address" });
+            return res.render("forgot-password", { message: MESSAGES.INVALID_EMAIL });
         }
 
         const findUser = await User.findOne({ email: email });
@@ -93,10 +82,10 @@ const forgotEmailValid = async (req, res) => {
                 console.log("OTP:", otp);
                 return res.render("forgotPass-otp");
             } else {
-                return res.render("forgot-password", { message: "Failed to send OTP. Please try again" });
+                return res.render("forgot-password", { message: MESSAGES.OTP_SEND_FAILED });
             }
         } else {
-            return res.render("forgot-password", { message: "User with this email does not exist" });
+            return res.render("forgot-password", { message: MESSAGES.USER_NOT_FOUND });
         }
     } catch (error) {
         console.error("Error in forgotEmailValid:", error);
@@ -106,38 +95,30 @@ const forgotEmailValid = async (req, res) => {
 
 const verifyForgotPassOtp = async (req, res) => {
     try {
-
         const enteredOtp = req.body.otp;
         if (enteredOtp === req.session.userOtp) {
             return res.json({ success: true, redirectUrl: "/reset-password" });
         } else {
-            res.json({ success: false, message: "OTP not matching" });
+            res.json({ success: false, message: MESSAGES.INVALID_OTP });
         }
-
     } catch (error) {
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured. Please try again" })
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.GENERIC_ERROR });
     }
-}
-
+};
 
 const getResetPassPage = async (req, res) => {
     try {
-
-        return res.render("reset-password")
-
+        return res.render("reset-password");
     } catch (error) {
-
-        return res.redirect("/pageNotFound")
+        return res.redirect("/pageNotFound");
     }
-}
-
+};
 
 const resendOtp = async (req, res) => {
     console.log("Resend otp is working, sending the request");
     try {
-
         const otp = generateOtp();
-        console.log("resend otp generate", otp)
+        console.log("resend otp generate", otp);
         req.session.userOtp = otp;
         const email = req.session.email;
         console.log("Resending OTP to email", email);
@@ -146,42 +127,35 @@ const resendOtp = async (req, res) => {
             console.log("Resend OTP:", otp);
             return res.status(statusCode.OK).json({ success: true, message: "Resend otp successful" });
         } else {
-            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resend OTP. Please try again." });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.OTP_SEND_FAILED });
         }
-
     } catch (error) {
-
-        console.error("Error in resend otp", error)
-        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
+        console.error("Error in resend otp", error);
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: MESSAGES.SERVER_ERROR });
     }
-}
+};
 
 const postNewPassword = async (req, res) => {
     try {
-
         const { newPass1, newPass2 } = req.body;
         const email = req.session.email;
         if (newPass1 === newPass2) {
             const passwordHash = await securePassword(newPass1);
-            await User.updateOne(
-                { email: email }, { $set: { password: passwordHash } }
-            )
-            return res.redirect("/login")
+            await User.updateOne({ email: email }, { $set: { password: passwordHash } });
+            return res.redirect("/login");
         } else {
-            return res.render("reset-password", { message: 'Passwords do not match' });
+            return res.render("reset-password", { message: "Passwords do not match" });
         }
-
     } catch (error) {
-        return res.redirect("/PageNotFound")
+        return res.redirect("/pageNotFound");
     }
-}
-
+};
 
 const userProfile = async (req, res) => {
     try {
         const userId = req.session.user;
         const page = parseInt(req.query.page) || 1;
-        const limit = 5; 
+        const limit = 5;
         const skip = (page - 1) * limit;
 
         const userData = await User.findById(userId);
@@ -193,45 +167,42 @@ const userProfile = async (req, res) => {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-            .populate('orderIteams.product');
+            .populate("orderIteams.product");
 
-        const wallet = await Wallet.find({ userId: userId })
-            .sort({ createdAt: -1 });
+        const wallet = await Wallet.find({ userId: userId }).sort({ createdAt: -1 });
 
-        if (req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+        if (req.xhr || req.headers["x-requested-with"] === "XMLHttpRequest") {
             return res.json({
                 orders,
                 currentPage: page,
                 totalPages,
-                totalOrders
+                totalOrders,
             });
         }
 
-        res.render('userProfile', {
+        res.render("userProfile", {
             user: userData,
             userAddress: addressData,
             orders,
             wallet,
             currentPage: page,
             totalPages,
-            totalOrders
+            totalOrders,
         });
-
     } catch (error) {
         console.error("Error retrieving profile data", error);
         return res.redirect("/pageNotFound");
     }
 };
+
 const changeEmail = async (req, res) => {
     try {
-
-        return res.render("change-email")
-
+        return res.render("change-email");
     } catch (error) {
-
-        return res.redirect("/pageNotFound")
+        return res.redirect("/pageNotFound");
     }
-}
+};
+
 const changeEmailValid = async (req, res) => {
     try {
         const { email } = req.body;
@@ -240,10 +211,10 @@ const changeEmailValid = async (req, res) => {
         const currentUser = await User.findOne({ _id: userId });
 
         if (!currentUser) {
-            return res.render("change-email", { message: "User with this email not exist" });
+            return res.render("change-email", { message: MESSAGES.USER_NOT_FOUND });
         }
         if (currentUser.email != email) {
-            return res.render("change-email", { message: "Please enter your current email address" })
+            return res.render("change-email", { message: "Please enter your current email address" });
         }
         const otp = generateOtp();
         console.log("Generated OTP:", otp);
@@ -261,19 +232,17 @@ const changeEmailValid = async (req, res) => {
             req.session.userData = req.body;
             req.session.email = email;
 
-            console.log("OTP:", otp)
-
+            console.log("OTP:", otp);
             return res.render("change-email-otp");
         } catch (emailError) {
             console.error("Error sending email:", emailError);
-            return res.render("change-email", { message: "Failed to sent OTP. Please try again" })
+            return res.render("change-email", { message: MESSAGES.OTP_SEND_FAILED });
         }
-
     } catch (error) {
         console.error("Change email validation error:", error);
         return res.redirect("/pageNotFound");
     }
-}
+};
 
 const verifyEmailOtp = async (req, res) => {
     try {
@@ -281,7 +250,7 @@ const verifyEmailOtp = async (req, res) => {
         if (!enteredOtp || !req.session.userOtp) {
             return res.json({
                 success: false,
-                message: "Invalid OTP verification attempt"
+                message: "Invalid OTP verification attempt",
             });
         }
 
@@ -289,59 +258,55 @@ const verifyEmailOtp = async (req, res) => {
             req.session.userData = req.body.userData;
             return res.json({
                 success: true,
-                redirectUrl: "/update-email"
+                redirectUrl: "/update-email",
             });
         } else {
             return res.json({
                 success: false,
-                message: "The OTP you entered is incorrect. Please try again."
+                message: MESSAGES.INVALID_OTP,
             });
         }
     } catch (error) {
         console.error("OTP verification error:", error);
         return res.json({
             success: false,
-            message: "An error occurred during verification. Please try again."
+            message: MESSAGES.GENERIC_ERROR,
         });
     }
-}
+};
+
 const getUpdateEmailPage = async (req, res) => {
     try {
         if (!req.session.userOtp) {
-            return res.redirect('/change-email');
+            return res.redirect("/change-email");
         }
-        return res.render('update-email');
+        return res.render("update-email");
     } catch (error) {
         console.error("Error loading update email page:", error);
         return res.redirect("/pageNotFound");
     }
 };
+
 const updateEmail = async (req, res) => {
     try {
-
         const newEmail = req.body.email;
         const userId = req.session.user;
         await User.findByIdAndUpdate(userId, { email: newEmail });
-        return res.redirect("/profile")
-
+        return res.redirect("/profile");
     } catch (error) {
-        console.error("The error is here", error)
-        return res.redirect("/pageNotFound")
+        console.error("The error is here", error);
+        return res.redirect("/pageNotFound");
     }
-}
-
+};
 
 const changePassword = async (req, res) => {
     try {
-        const user = req.session.user
-        return res.render("change-password", { user: user })
-
+        const user = req.session.user;
+        return res.render("change-password", { user: user });
     } catch (error) {
-
-        return res.redirect("/pageNotFound")
-
+        return res.redirect("/pageNotFound");
     }
-}
+};
 
 const changePasswordValid = async (req, res) => {
     try {
@@ -350,26 +315,26 @@ const changePasswordValid = async (req, res) => {
 
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         if (!email || !emailPattern.test(email)) {
-            return res.render("change-password", { 
-                user: userId, 
-                message: "Please enter a valid email address" 
+            return res.render("change-password", {
+                user: userId,
+                message: MESSAGES.INVALID_EMAIL,
             });
         }
 
         const currentUser = await User.findOne({ _id: userId });
         if (!currentUser) {
             console.log("Current user does not exist");
-            return res.render("change-password", { 
-                user: null, 
-                message: "User does not exist" 
+            return res.render("change-password", {
+                user: null,
+                message: MESSAGES.USER_NOT_FOUND,
             });
         }
 
         if (currentUser.email !== email) {
             console.log("Email mismatch");
-            return res.render("change-password", { 
-                user: userId, 
-                message: "Please enter your current email" 
+            return res.render("change-password", {
+                user: userId,
+                message: "Please enter your current email",
             });
         }
 
@@ -385,7 +350,7 @@ const changePasswordValid = async (req, res) => {
         } else {
             return res.json({
                 success: false,
-                message: "Failed to send OTP. Please try again"
+                message: MESSAGES.OTP_SEND_FAILED,
             });
         }
     } catch (error) {
@@ -396,49 +361,41 @@ const changePasswordValid = async (req, res) => {
 
 const verifyChangePassOtp = (req, res) => {
     try {
-
         const enteredOtp = req.body.otp;
 
         if (enteredOtp === req.session.userOtp) {
             req.session.userData = req.body.userData;
             return res.json({
                 success: true,
-                redirectUrl: "/reset-password"
+                redirectUrl: "/reset-password",
             });
         } else {
             return res.json({
                 success: false,
-                message: "The OTP you entered is incorrect. Please try again."
+                message: MESSAGES.INVALID_OTP,
             });
         }
-
     } catch (error) {
-
         return res.json({
             success: false,
-            message: "An error occurred during verification. Please try again."
+            message: MESSAGES.GENERIC_ERROR,
         });
-
     }
-}
+};
 
 const addAddress = async (req, res) => {
     try {
-
         const user = req.session.user;
-        return res.render("add-address", { user: user })
-
+        return res.render("add-address", { user: user });
     } catch (error) {
         console.log("error inloading", error);
-
-        return res.redirect("pageNotFound")
+        return res.redirect("/pageNotFound");
     }
-}
-
+};
 
 const postAddAddress = async (req, res) => {
     try {
-        console.log('now you creating address');
+        console.log("now you creating address");
 
         const userId = req.session.user;
         const userData = await User.findOne({ _id: userId });
@@ -449,57 +406,52 @@ const postAddAddress = async (req, res) => {
         if (!userAddress) {
             const newAddress = new Address({
                 userId: userData._id,
-                address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }]
-            })
+                address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }],
+            });
             await newAddress.save();
         } else {
             userAddress.address.push({ addressType, name, city, landMark, state, pincode, phone, altPhone });
             await userAddress.save();
         }
 
-        return res.redirect("/Profile")
+        return res.redirect("/Profile");
     } catch (error) {
-        console.error("Error adding address:", error)
-        return res.redirect("/pageNotFound")
+        console.error("Error adding address:", error);
+        return res.redirect("/pageNotFound");
     }
-}
+};
 
 const editAddress = async (req, res) => {
     try {
-
         const addressId = req.query.id;
         console.log(addressId);
 
         const user = req.session.user;
-        const currAddress = await Address.findOne({
-            "address._id": addressId
-        }, {
-            "address.$": 1
-        });
+        const currAddress = await Address.findOne(
+            { "address._id": addressId },
+            { "address.$": 1 }
+        );
 
         if (!currAddress) {
-            console.log("current addess not exist")
-            return res.redirect("/pageNotFound")
+            console.log("current address not exist");
+            return res.redirect("/pageNotFound");
         }
 
         const addressData = currAddress.address.find((item) => {
             return item._id.toString() === addressId.toString();
-        })
+        });
 
         if (!addressData) {
             console.log("no addressData");
-
-            return res.redirect("/pageNotFound")
+            return res.redirect("/pageNotFound");
         }
 
-
         return res.render("edit-address", { address: addressData, user: user });
-
     } catch (error) {
-        console.log("Error in edit address", error)
-        return res.redirect("/pageNotFound")
+        console.log("Error in edit address", error);
+        return res.redirect("/pageNotFound");
     }
-}
+};
 
 const postEditAddress = async (req, res) => {
     try {
@@ -509,7 +461,7 @@ const postEditAddress = async (req, res) => {
 
         const findAddress = await Address.findOne({ "address._id": addressId });
         if (!findAddress) {
-            return res.status(404).json({ error: "Address not found" });
+            return res.status(404).json({ error: MESSAGES.ADDRESS_NOT_FOUND });
         }
 
         await Address.updateOne(
@@ -526,16 +478,15 @@ const postEditAddress = async (req, res) => {
                         state: data.state,
                         phone: data.phone,
                         altPhone: data.altPhone,
-                    }
-                }
+                    },
+                },
             }
         );
 
         return res.status(statusCode.OK).json({ message: "Address updated successfully" });
-
     } catch (error) {
         console.error("Error in edit address:", error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ error: MESSAGES.SERVER_ERROR });
     }
 };
 
@@ -543,14 +494,14 @@ const deleteAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
         console.log("address id", addressId);
-        
+
         const findAddress = await Address.findOne({ "address._id": addressId });
         console.log("address ", findAddress);
-        
+
         if (!findAddress) {
             return res.status(404).json({
                 success: false,
-                message: "Address not found"
+                message: MESSAGES.ADDRESS_NOT_FOUND,
             });
         }
 
@@ -559,22 +510,21 @@ const deleteAddress = async (req, res) => {
             {
                 $pull: {
                     address: {
-                        _id: addressId
-                    }
-                }
+                        _id: addressId,
+                    },
+                },
             }
         );
 
         return res.status(statusCode.OK).json({
             success: true,
-            message: "Address deleted successfully"
+            message: "Address deleted successfully",
         });
-
     } catch (error) {
         console.error("Error in delete address:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: "Error deleting address"
+            message: MESSAGES.ADDRESS_DELETE_ERROR,
         });
     }
 };
@@ -582,94 +532,51 @@ const deleteAddress = async (req, res) => {
 // Frontend - JavaScript function
 function confirmDelete(addressId) {
     Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone.',
-        icon: 'warning',
+        title: "Are you sure?",
+        text: "This action cannot be undone.",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
     }).then((result) => {
         if (result.isConfirmed) {
             fetch(`/deleteAddress/${addressId}`, {
-                method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                }
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
             })
-            .then(async (response) => {
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    Swal.fire(
-                        'Deleted!',
-                        'The address has been deleted.',
-                        'success'
-                    ).then(() => {
-                        window.location.href = '/Profile';
-                    });
-                } else {
-                    throw new Error(data.message || 'Failed to delete the address');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire(
-                    'Error!',
-                    error.message || 'An error occurred.',
-                    'error'
-                );
-            });
+                .then(async (response) => {
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        Swal.fire("Deleted!", "The address has been deleted.", "success").then(() => {
+                            window.location.href = "/Profile";
+                        });
+                    } else {
+                        throw new Error(data.message || "Failed to delete the address");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    Swal.fire("Error!", error.message || "An error occurred.", "error");
+                });
         }
     });
 }
 
-
-// const viewOrderDetails = async (req, res) => {
-//     try {
-
-//         const { orderId } = req.params;
-//         const order = await Order.findOne({ orderId })
-//             .populate({
-//                 path: 'orderedItems.product',
-//                 select: 'productName price sizeVariants productImage'
-//             });
-
-
-//         if (!order) {
-//             return res.status(404).json({ message: 'Order not found' })
-//         }
-
-//         return res.json(order);
-
-//     } catch (error) {
-//         console.error('Error fetching order details:', error);
-//         res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching order details' });
-//     }
-// }
-
-
-
-
 const updateName = async (req, res) => {
-
     try {
- 
-        res.render("change-name")
-
-
+        res.render("change-name");
     } catch (error) {
-        res.redirect('/pageNotFound')
+        res.redirect("/pageNotFound");
     }
+};
 
-}
-
-    
 const changeName = async (req, res) => {
-
-
     try {
-        console.log('now edditing the name ');
+        console.log("now editing the name");
 
         const userId = req.session.user;
         console.log(userId);
@@ -678,21 +585,19 @@ const changeName = async (req, res) => {
         console.log(newName);
 
         console.log("user id :", userId);
-        const updateUser = await User.updateOne({ _id: userId }, { name: newName })
+        const updateUser = await User.updateOne({ _id: userId }, { name: newName });
 
         if (!updateUser) {
             console.log("user not found");
-
         } else {
             console.log("updated user");
-
         }
-        res.redirect("/Profile")
+        res.redirect("/Profile");
     } catch (error) {
-        console.error('Error updating user:', error);
-        res.redirect("/pageNotFound")
+        console.error("Error updating user:", error);
+        res.redirect("/pageNotFound");
     }
-}
+};
 
 export {
     getForgotPassPage,
@@ -715,9 +620,6 @@ export {
     editAddress,
     postEditAddress,
     deleteAddress,
-
-
     updateName,
     changeName,
-
-}
+};
