@@ -244,7 +244,7 @@ const editProduct = async (req, res) => {
             updateFields.$push = { productImage: { $each: images } };
         }
 
-        await Product.findByIdAndUpdate(id, updateFields, { new: true });
+        await Product.findByIdAndUpdate(productId, updateFields, { new: true });
         res.redirect(`/admin/edit-Product?id=${id}`);
     } catch (error) {
         console.error("Error in editProduct:", error);
