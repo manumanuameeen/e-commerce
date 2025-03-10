@@ -3,6 +3,10 @@ import Coupon from "../../models/couponSchema.js";
 import mongoose from "mongoose";
 import Product from "../../models/productSchema.js";
 import bcrypt from "bcrypt"
+         
+
+
+
 
 import Order from "../../models/orderSchema.js";
 
@@ -28,8 +32,8 @@ const loadlogin = async (req, res) => {
         return res.render("admin-login", { message: null })
     } catch (error) {
         console.log('Error loading admin login:', error);
-        res.status(500).send('Internal Server Error');
-
+        res.status(500
+).send('Internal Server Error');
     }
 }
 

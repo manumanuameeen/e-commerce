@@ -111,7 +111,7 @@ router.post("/removeCategoryOffer", removeCategoryOffer)
 router.get('/listCategory', adminAuth, getListCategory)
 router.get('/unListCategory', adminAuth, getunListCategory)
 router.get("/edit-Category", adminAuth, getEditcategory)
-router.post("/edit-Category/:id", adminAuth, editCategory);
+router.post("/edit-Category/:categoryId", adminAuth, editCategory);
 //products management
 router.get("/addProducts", adminAuth, getProductAddPage)
 router.post("/addProducts", uploads.any(), adminAuth, addProducts)
@@ -119,7 +119,7 @@ router.get("/products", adminAuth, getAllProduct)
 router.get("/blockProduct",adminAuth,blockProduct)
 router.get("/unBlockProduct",adminAuth,unBlockProduct)
 router.get("/edit-Product",adminAuth,getEditProduct)
-router.post("/edit-Product/:id",adminAuth,uploads.any("images",4),editProduct)
+router.post("/edit-Product/:productId",adminAuth,uploads.any("images",4),editProduct)
 router.post("/deleteImage",adminAuth,deleteSingleImage)
 
 
@@ -127,7 +127,7 @@ router.post("/deleteImage",adminAuth,deleteSingleImage)
 
 router.get("/order", adminAuth, loadOrder);
 router.post("/order/:orderId", adminAuth, updateOrderStatus);
-router.get('/orderDetails/:id',adminAuth,orderDetails)
+router.get('/orderDetails/:orderId',adminAuth,orderDetails)
 router.post('/return-request/:orderId', adminAuth, handleReturnRequest);
  
 //coupon mangement 
@@ -140,7 +140,7 @@ router.put('/coupon/:couponId', editCoupon);
 router.get("/offer",adminAuth,LoadOffer)
 router.post("/offer",adminAuth,addOffer)
 router.get("/offer-list",adminAuth,offerList)
-router.delete("/remove-offer/:Id",adminAuth,removeOffer)
-router.put('/update-offer/:id',editOffer);
+router.delete("/remove-offer/:offerId",adminAuth,removeOffer)
+router.put('/update-offer/:offerId',editOffer);
 export default router;  
 

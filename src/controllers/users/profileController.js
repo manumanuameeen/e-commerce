@@ -171,11 +171,12 @@ const postNewPassword = async (req, res) => {
     }
 }
 
+
 const userProfile = async (req, res) => {
     try {
         const userId = req.session.user;
         const page = parseInt(req.query.page) || 1;
-        const limit = 1; 
+        const limit = 5; 
         const skip = (page - 1) * limit;
 
         const userData = await User.findById(userId);
@@ -216,9 +217,6 @@ const userProfile = async (req, res) => {
         return res.redirect("/pageNotFound");
     }
 };
-
-// router.get("/Profile", userAuth, userProfile);
-
 const changeEmail = async (req, res) => {
     try {
 

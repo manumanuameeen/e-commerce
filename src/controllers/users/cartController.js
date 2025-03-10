@@ -61,10 +61,12 @@ const addToCart = async (req, res) => {
 const category = await Category.findById(product.category)
 
 if(category.isListed === false){
-    return res.status(400).json({success:false,message:"admin unlisted the category for some issues thank you "})
+    return res.status(200
+).json({success:false,message:"admin unlisted the category for some issues thank you "})
 }
         if (!colorVariant) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: false,
                 message: "Please select a color before adding the product to the cart"
             });
@@ -74,14 +76,16 @@ if(category.isListed === false){
         const availableStock = colorData ? colorData.quantity : 0;
 
         if (quantity > availableStock) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: false,
                 message: `Only ${availableStock} items are available in ${colorVariant} color`
             });
         }
 
         if (quantity > 5) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: false,
                 message: "Maximum quantity allowed per product is 5"
             });
@@ -103,7 +107,8 @@ if(category.isListed === false){
         if (itemIndex > -1) {
             const newQuantity = cart.items[itemIndex].quantity + quantity;
             if (newQuantity > 5) {
-                return res.status(400).json({
+                return res.status(200
+).json({
                     status: false,
                     message: "Maximum quantity allowed is 5 items"
                 });
@@ -113,7 +118,8 @@ if(category.isListed === false){
             cart.items[itemIndex].totalPrice = newQuantity * price;
         } else {
             if (cart.items.length >= 5) {
-                return res.status(400).json({
+                return res.status(200
+).json({
                     status: false,
                     message: "Maximum 5 unique items allowed in the cart"
                 });
@@ -200,7 +206,8 @@ const updateCartQuantity = async (req, res) => {
 
       
         if (quantity > colorVariant.quantity) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: false,
                 message: `Only ${colorVariant.quantity} items are available in ${cartItem.colorVariant} color`
             });
@@ -208,7 +215,8 @@ const updateCartQuantity = async (req, res) => {
 
        
         if (quantity > 5) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: false,
                 message: 'Maximum quantity allowed is 5 items'
             });

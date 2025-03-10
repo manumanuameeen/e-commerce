@@ -3,6 +3,9 @@ import User from "../../models/userSchema.js";
 import Category from "../../models/categorySchema.js";
 import Wishlist from "../../models/wishlistSchema.js";
 import mongoose from 'mongoose';
+         
+
+
 
 const productDetails = async (req, res) => {
     try {
@@ -20,7 +23,8 @@ const productDetails = async (req, res) => {
 
 
         if (!product) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 status: true,
                 messsage: "there is no product "
             })

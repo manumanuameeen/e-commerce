@@ -5,6 +5,9 @@ import Order from "../../models/orderSchema.js";
 import Coupon from "../../models/couponSchema.js";
 import Cart from "../../models/cartSchema.js";
 import Wallet from "../../models/wallet.js";
+         
+
+
 
 
     
@@ -43,7 +46,8 @@ console.log( "coupon:",coupon);
 
 
         if (!coupon) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 success: false,
                 message: "Invalid coupon code"
             });
@@ -53,7 +57,8 @@ console.log( "coupon:",coupon);
         
 
         if (coupon.userBy.includes(userId)) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 success: false,
                 message: "You have already used this coupon"
             });
@@ -63,7 +68,8 @@ await coupon.save()
 
 
         if (orderTotal < coupon.minimumPrice) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 success: false,
                 message: `Minimum order amount of ₹${coupon.minimumPrice} required`
             });

@@ -4,6 +4,9 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
+         
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,14 +36,16 @@ console.log(req.body)
         if (!products.productName || !products.category || !products.regularPrice) {
             console.log('here1');
 
-            return res.status(400).json({ success: false, message: "Missing required fields" });
+            return res.status(200
+).json({ success: false, message: "Missing required fields" });
         }
 
         const productExists = await Product.findOne({ productName: products.productName });
         if (productExists) {
             console.log('here2');
             
-            return res.status(400).json({ success: false, message: "Product already exists" });
+            return res.status(200
+).json({ success: false, message: "Product already exists" });
         }
 
         const images = [];
@@ -86,7 +91,8 @@ console.log(req.body)
         const category = await Category.findOne({ _id: products.category });
         if (!category) {
             console.log('here5');
-            return res.status(400).json({ success: false, message: "Invalid category" });
+            return res.status(200
+).json({ success: false, message: "Invalid category" });
         }
 
         const newProduct = new Product({
@@ -106,7 +112,8 @@ console.log(req.body)
     } catch (error) {
         console.log('here6');
         console.error("Error saving product:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        return res.status(500
+).json({ success: false, message: "Internal server error" });
     }
 };
 const getAllProduct = async (req, res) => {
@@ -189,24 +196,26 @@ const productCat = await Category.find({_id:product.category})
 
 const editProduct = async (req, res) => {
     try {
-        const id = req.params.id;
+        const productId = req.params.productId;
         const data = req.body;
 
         const existingProduct = await Product.findOne({
             productName: data.productName,
-            _id: { $ne: id }
+            _id: { $ne: productId }
         });
 
         if (existingProduct) {
-            return res.status(400).json({ error: "Product with this name already exists" });
+            return res.status(200
+).json({ error: "Product with this name already exists" });
         }
 
-        const product = await Product.findById(id);
+        const product = await Product.findById(productId);
         const images = req.files?.map(file => file.filename) || [];
 
         const category = await Category.findOne({ name: data.category });
         if (!category) {
-            return res.status(400).json({ error: "Category not found" });
+            return res.status(200
+).json({ error: "Category not found" });
         }
         const colorVarients = [];
         const colors = Array.isArray(data.colors) ? data.colors : [data.colors];
@@ -227,8 +236,7 @@ const editProduct = async (req, res) => {
             category: category._id,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
-            colorVarients: colorVarients, // Update color variants
-            // ... other fields
+            colorVarients: colorVarients, 
         };
 
         if (images.length > 0) {

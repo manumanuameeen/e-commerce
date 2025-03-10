@@ -2,6 +2,9 @@ import Product from "../../models/productSchema.js";
 import Category from "../../models/categorySchema.js";
 import Offer from "../../models/offerScema.js";
 import { postAddAddress } from "../users/profileController.js";
+         
+
+
 
 
 
@@ -11,7 +14,8 @@ const addOffer = async (req, res) => {
         const { name, type, discount, productId, categoryId, referralCode, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(400).json({ success: false, message: 'Discount must be between 1% and 100%' });
+            return res.status(200
+).json({ success: false, message: 'Discount must be between 1% and 100%' });
         }
 
         let offerData = new Offer({ 
@@ -90,14 +94,16 @@ const addOffer = async (req, res) => {
         }
        
 
-        return res.status(400).json({ 
+        return res.status(200
+).json({ 
             success: false, 
             message: 'Invalid offer type or missing required fields' 
         });
 
     } catch (error) {
         console.error('Error in addOffer:', error);
-        return res.status(500).json({ 
+        return res.status(500
+).json({ 
             success: false, 
             message: 'Server Error' 
         });
@@ -106,11 +112,12 @@ const addOffer = async (req, res) => {
 
 const editOffer = async (req, res) => {
     try {
-        const offerId = req.params.id;
+        const offerId = req.params.offerId;
         const { discount, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(400).json({
+            return res.status(200
+).json({
                 success: false,
                 message: 'Discount must be between 1% and 100%'
             });
@@ -181,7 +188,8 @@ const editOffer = async (req, res) => {
 
     } catch (error) {
         console.error('Error in editOffer:', error);
-        return res.status(500).json({
+        return res.status(500
+).json({
             success: false,
             message: 'Server Error'
         });
@@ -190,7 +198,7 @@ const editOffer = async (req, res) => {
 
 const removeOffer = async (req, res) => {
     try {
-        const offerId = req.params.Id;
+        const offerId = req.params.offerId;
         
         const offer = await Offer.findById(offerId);
         if (!offer) {
@@ -249,7 +257,8 @@ const removeOffer = async (req, res) => {
 
     } catch (error) {
         console.error('Error in removeOffer:', error);
-        return res.status(500).json({ 
+        return res.status(500
+).json({ 
             success: false, 
             message: 'Server Error' 
         });
@@ -290,7 +299,8 @@ const offerList = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in offerList:', error);
-        res.status(500).json({ 
+        res.status(500
+).json({ 
             success: false, 
             message: 'Server Error' 
         });
@@ -309,7 +319,8 @@ const LoadOffer = async (req, res) => {
         return res.render("offer", { products, categories });
     } catch (error) {
         console.error("Error in LoadOffer:", error);
-        res.status(500).json({ 
+        res.status(500
+).json({ 
             success: false, 
             message: 'Server Error' 
         });
