@@ -139,19 +139,32 @@
                                         <div class="mb-4">
                                             <label for="category" class="form-label">Category</label>
                                             <select name="category" class="form-control" id="category">
-                                                <option value="" disabled selected>-- Select a Category --</option> <!-- Placeholder option -->
-                                                <% for(let i = 0; i < cat.length; i++) { %>
+                                                <option value="" disabled>-- Select a Category --</option>
+                                                <% for(let i=0; i < cat.length; i++) { %>
                                                     <option value="<%= cat[i].name %>" 
-                                                        <%= cat[i].name === product.category ? "selected" : "" %>>
+                                                            <%= cat[i].name === currentCategoryName ? "selected" : "" %>>
                                                         <%= cat[i].name %>
                                                     </option>
                                                 <% } %>
                                             </select>
                                             <div id="category-error" class="error-message"></div>
+                                        </div>  <div class="mb-4">
+                                            <label for="category" class="form-label">Category</label>
+                                            <select name="category" class="form-control" id="category">
+                                                <option value="" disabled selected>-- Select a Category --</option>
+                                                <!-- Placeholder option -->
+                                                <% for(let i=0; i < cat.length; i++) { %>
+                                                    <option value="<%= cat[i].name %>" <%=cat[i].name===product.category
+                                                        ? "selected" : "" %>>
+                                                        <%= cat[i].name %>
+                                                    </option>
+                                                    <% } %>
+                                            </select>
+                                            <div id="category-error" class="error-message"></div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
                             <div class="card mb-2">
                                 <div class="card-header">
@@ -328,13 +341,12 @@
                 const category = document.getElementsByName('category')[0].value;
                 console.log(category)
                 const images = document.getElementById('input1')
-                // const quantity = document.getElementsByName('quantity')
                 const colorVariants = document.querySelectorAll("#colorVariantsContainer .variant-row");
 
-if(category.trim()===""){
-    displayErrorMessage('category-error', 'Please select a category .');
-    isValid = false;
-}
+                if (category.trim() === "") {
+                    displayErrorMessage('category-error', 'Please select a category .');
+                    isValid = false;
+                }
                 imageDatas = document.getElementById("imageDatas")?.value;
                 let isValid = true;
                 if (name.trim() === "") {
@@ -459,7 +471,7 @@ if(category.trim()===""){
                         }
 
                         cropper = new Cropper(image, {
-                            aspectRatio: 1, 
+                            aspectRatio: 1,
                             viewMode: 1,
                             guides: true,
                             background: false,

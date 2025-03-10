@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const getProductAddPage = async (req, res) => {
- 
+
     try {
 
         // if (!req.session.admin) {
@@ -33,20 +33,20 @@ const getProductAddPage = async (req, res) => {
 const addProducts = async (req, res) => {
     try {
         const products = req.body;
-console.log(req.body)
+        console.log(req.body)
         if (!products.productName || !products.category || !products.regularPrice) {
             console.log('here1');
 
             return res.status(statusCode.OK
-).json({ success: false, message: "Missing required fields" });
+            ).json({ success: false, message: "Missing required fields" });
         }
 
         const productExists = await Product.findOne({ productName: products.productName });
         if (productExists) {
             console.log('here2');
-            
+
             return res.status(statusCode.OK
-).json({ success: false, message: "Product already exists" });
+            ).json({ success: false, message: "Product already exists" });
         }
 
         const images = [];
@@ -60,13 +60,13 @@ console.log(req.body)
 
                     const fileName = `${Date.now()}-${file.originalname}`;
                     const filePath = path.join(uploadDir, fileName);
-                    
+
                     await sharp(file.path)
                         .resize(440, 440, { fit: 'cover', position: 'center' })
                         .toFile(filePath);
 
                     images.push(fileName);
-                    
+
                 } catch (error) {
                     console.log('here4');
 
@@ -75,7 +75,7 @@ console.log(req.body)
             }
         }
 
-     
+
         let colorVarients = [];
         const colors = Array.isArray(products.colors) ? products.colors : [products.colors];
         const quantities = Array.isArray(products.quantities) ? products.quantities : [products.quantities];
@@ -93,7 +93,7 @@ console.log(req.body)
         if (!category) {
             console.log('here5');
             return res.status(statusCode.OK
-).json({ success: false, message: "Invalid category" });
+            ).json({ success: false, message: "Invalid category" });
         }
 
         const newProduct = new Product({
@@ -105,7 +105,7 @@ console.log(req.body)
             colorVarients: colorVarients,
             productImage: images,
             status: "Available",
-            brand:products.brand
+            brand: products.brand
         });
 
         await newProduct.save();
@@ -114,7 +114,7 @@ console.log(req.body)
         console.log('here6');
         console.error("Error saving product:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ success: false, message: "Internal server error" });
+        ).json({ success: false, message: "Internal server error" });
     }
 };
 const getAllProduct = async (req, res) => {
@@ -126,17 +126,17 @@ const getAllProduct = async (req, res) => {
         const productData = await Product.find({
             productName: { $regex: new RegExp(".*" + search + ".*", "i") }
         })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .populate('category')
-        .lean();
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .populate('category')
+            .lean();
 
         const count = await Product.countDocuments({
             productName: { $regex: new RegExp(".*" + search + ".*", "i") }
         });
 
         const category = await Category.find({ isListed: true }).lean();
-console.log("product data from product page",productData);
+        console.log("product data from product page", productData);
 
         res.render('adminProduct', {
             data: productData,
@@ -182,16 +182,34 @@ const unBlockProduct = async (req, res) => {
     }
 };
 
-const getEditProduct = async (req, res) => {
+// const getEditProduct = async (req, res) => {
+//     try {
+//         const id = req.query.id;
+//         const product = await Product.findById(id).lean();
+//         const categories = await Category.find({ isListed: true }).lean();
+//         const productCat = await Category.find({ _id: product.category })
+//         res.render("edit-product", { product, cat: categories, productCat });
+//     } catch (error) {
+//         console.error("Error in getEditProduct:", error);
+//         res.redirect("/pageerror");
+//     }
+// };
+
+const editProductPage = async (req, res) => {
     try {
-        const id = req.query.id;
-        const product = await Product.findById(id).lean();
-        const categories = await Category.find({ isListed: true }).lean();
-const productCat = await Category.find({_id:product.category})
-        res.render("edit-product", { product, cat: categories,productCat  });
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        const categories = await Category.find();
+        const currentCategory = await Category.findById(product.category);
+        
+        res.render('editProduct', { 
+            product: product,
+            cat: categories,
+            currentCategoryName: currentCategory ? currentCategory.name : ''
+        });
     } catch (error) {
-        console.error("Error in getEditProduct:", error);
-        res.redirect("/pageerror");
+        console.error(error);
+        res.redirect('/pageerror');
     }
 };
 
@@ -207,7 +225,7 @@ const editProduct = async (req, res) => {
 
         if (existingProduct) {
             return res.status(statusCode.OK
-).json({ error: "Product with this name already exists" });
+            ).json({ error: "Product with this name already exists" });
         }
 
         const product = await Product.findById(productId);
@@ -216,12 +234,12 @@ const editProduct = async (req, res) => {
         const category = await Category.findOne({ name: data.category });
         if (!category) {
             return res.status(statusCode.OK
-).json({ error: "Category not found" });
+            ).json({ error: "Category not found" });
         }
         const colorVarients = [];
         const colors = Array.isArray(data.colors) ? data.colors : [data.colors];
         const quantities = Array.isArray(data.quantities) ? data.quantities : [data.quantities];
-        
+
         for (let i = 0; i < colors.length; i++) {
             if (colors[i] && quantities[i]) {
                 colorVarients.push({
@@ -237,7 +255,7 @@ const editProduct = async (req, res) => {
             category: category._id,
             regularPrice: data.regularPrice,
             salePrice: data.salePrice,
-            colorVarients: colorVarients, 
+            colorVarients: colorVarients,
         };
 
         if (images.length > 0) {
@@ -252,7 +270,7 @@ const editProduct = async (req, res) => {
     }
 };
 
- 
+
 const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;
