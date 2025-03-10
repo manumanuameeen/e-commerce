@@ -245,7 +245,7 @@ const editProduct = async (req, res) => {
         }
 
         await Product.findByIdAndUpdate(productId, updateFields, { new: true });
-        res.redirect(`/admin/edit-Product?id=${id}`);
+        res.redirect(`/admin/edit-Product?id=${productId}`);
     } catch (error) {
         console.error("Error in editProduct:", error);
         res.redirect("/pageerror");
