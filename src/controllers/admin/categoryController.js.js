@@ -49,9 +49,9 @@ const addCategory = async (req, res) => {
         if (existingCategory) {
             console.log("Category already exists");
             return res.status(statusCode.OK
-).json({ error: "Category already exists" });
+            ).json({ error: "Category already exists" });
         }
-        
+
 
         const newCategory = new Category({
             name: name.toLowerCase(),
@@ -67,7 +67,7 @@ const addCategory = async (req, res) => {
     } catch (error) {
         console.error("Error adding category:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({
+        ).json({
             success: false,
             error: "Internal server error"
         });
@@ -92,7 +92,7 @@ const addCategoryOffer = async (req, res) => {
         if (!category) {
             console.log("category not found");
 
-            return res.status(statusCode. NOT_FOUND).json({ status: false, message: "category not found " });
+            return res.status(statusCode.NOT_FOUND).json({ status: false, message: "category not found " });
         }
 
 
@@ -116,7 +116,7 @@ const addCategoryOffer = async (req, res) => {
         return res.json({ success: true })
     } catch (error) {
         res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ status: false, message: "Internal Server Error" })
+        ).json({ status: false, message: "Internal Server Error" })
     }
 }
 
@@ -126,7 +126,7 @@ const removeCategoryOffer = async (req, res) => {
         const category = await Category.findById(categoryId);
 
         if (!category) {
-            return res.status(statusCode. NOT_FOUND).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 status: false,
                 message: 'Category not found'
             });
@@ -152,7 +152,7 @@ const removeCategoryOffer = async (req, res) => {
 
         console.error("Error in removeCategoryOffer:", error);
         return res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({
+        ).json({
             status: false,
             message: 'Internal server error'
         });
@@ -231,7 +231,7 @@ const editCategory = async (req, res) => {
 
         if (existingCategory) {
             return res.status(statusCode.OK
-).json({ error: "Category exist please choose another name" })
+            ).json({ error: "Category exist please choose another name" })
         }
         const updateCategory = await Category.findByIdAndUpdate(categoryId, {
             name: categoryName,
@@ -241,13 +241,13 @@ const editCategory = async (req, res) => {
         if (updateCategory) {
             res.redirect("/admin/Category");
         } else {
-            res.status(statusCode. NOT_FOUND).json({ error: "category not found" })
+            res.status(statusCode.NOT_FOUND).json({ error: "category not found" })
         }
 
 
     } catch (error) {
         res.status(statusCode.INTERNAL_SERVER_ERROR
-).json({ error: "INternal server error" })
+        ).json({ error: "INternal server error" })
     }
 }
 
