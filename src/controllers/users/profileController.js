@@ -76,29 +76,33 @@ const getForgotPassPage = async (req, res) => {
 
 const forgotEmailValid = async (req, res) => {
     try {
-
         const { email } = req.body;
-        const findUser = await User.findOne({ email: email })
+
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        if (!email || !emailPattern.test(email)) {
+            return res.render("forgot-password", { message: "Please enter a valid email address" });
+        }
+
+        const findUser = await User.findOne({ email: email });
         if (findUser) {
             const otp = generateOtp();
             const emailSent = await sendVerificationEmail(email, otp);
             if (emailSent) {
                 req.session.userOtp = otp;
                 req.session.email = email;
-                res.render("forgotPass-otp");
-                console.log("OTP:", otp)
+                console.log("OTP:", otp);
+                return res.render("forgotPass-otp");
             } else {
-                return res.json({ success: false, message: "Failed to send otp. Please try again" });
+                return res.render("forgot-password", { message: "Failed to send OTP. Please try again" });
             }
         } else {
             return res.render("forgot-password", { message: "User with this email does not exist" });
         }
-
     } catch (error) {
-        return res.redirect("/pageNotFound")
+        console.error("Error in forgotEmailValid:", error);
+        return res.redirect("/pageNotFound");
     }
-}
-
+};
 
 const verifyForgotPassOtp = async (req, res) => {
     try {
@@ -341,20 +345,32 @@ const changePassword = async (req, res) => {
 
 const changePasswordValid = async (req, res) => {
     try {
-
         const { email } = req.body;
-        const userId = req.session.user
+        const userId = req.session.user;
 
-        const currentUser = await User.findOne({ _id: userId })
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        if (!email || !emailPattern.test(email)) {
+            return res.render("change-password", { 
+                user: userId, 
+                message: "Please enter a valid email address" 
+            });
+        }
 
+        const currentUser = await User.findOne({ _id: userId });
         if (!currentUser) {
-            console.log("current User exist")
-            return res.render("change-password", { message: "User not exist with this email" })
+            console.log("Current user does not exist");
+            return res.render("change-password", { 
+                user: null, 
+                message: "User does not exist" 
+            });
         }
 
         if (currentUser.email !== email) {
-            console.log("Error checking for email")
-            return res.render("change-password", { message: "Please enter current email" })
+            console.log("Email mismatch");
+            return res.render("change-password", { 
+                user: userId, 
+                message: "Please enter your current email" 
+            });
         }
 
         const otp = generateOtp();
@@ -364,21 +380,19 @@ const changePasswordValid = async (req, res) => {
             req.session.userData = req.body;
             req.session.email = email;
 
-            console.log("OTP:", otp)
+            console.log("OTP:", otp);
             return res.render("change-password-otp");
         } else {
             return res.json({
                 success: false,
                 message: "Failed to send OTP. Please try again"
-            })
+            });
         }
-
     } catch (error) {
-
-        console.error("Error in change password validation", error);
-        return res.redirect("/pageNotFound")
+        console.error("Error in change password validation:", error);
+        return res.redirect("/pageNotFound");
     }
-}
+};
 
 const verifyChangePassOtp = (req, res) => {
     try {
