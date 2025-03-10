@@ -2,7 +2,8 @@ import Product from "../../models/productSchema.js";
 import Category from "../../models/categorySchema.js";
 import Offer from "../../models/offerScema.js";
 import { postAddAddress } from "../users/profileController.js";
-         
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
+
 
 
 
@@ -14,7 +15,7 @@ const addOffer = async (req, res) => {
         const { name, type, discount, productId, categoryId, referralCode, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ success: false, message: 'Discount must be between 1% and 100%' });
         }
 
@@ -30,7 +31,7 @@ const addOffer = async (req, res) => {
         if (type === 'product' && productId) {
             const product = await Product.findOne({ productName: productId });
             if (!product) {
-                return res.status(404).json({ success: false, message: 'Product not found' });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
             }
             
             offerData.productId = product._id;
@@ -46,7 +47,7 @@ const addOffer = async (req, res) => {
             
             await product.save();
 
-            return res.status(201).json({ 
+            return res.status(statusCode.CREATED).json({ 
                 success: true, 
                 message: 'Product offer added successfully', 
                 offer: newOffer 
@@ -56,7 +57,7 @@ const addOffer = async (req, res) => {
         if (type === 'category' && categoryId) {
             const category = await Category.findById(categoryId);
             if (!category) {
-                return res.status(404).json({ success: false, message: 'Category not found' });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
             }
 
             offerData.categoryId = categoryId;
@@ -86,7 +87,7 @@ const addOffer = async (req, res) => {
 
             await offerData.save();
 
-            return res.status(201).json({ 
+            return res.status(statusCode.CREATED).json({ 
                 success: true, 
                 message: 'Category offer added successfully', 
                 offer: newOffer 
@@ -94,7 +95,7 @@ const addOffer = async (req, res) => {
         }
        
 
-        return res.status(200
+        return res.status(statusCode.OK
 ).json({ 
             success: false, 
             message: 'Invalid offer type or missing required fields' 
@@ -102,7 +103,7 @@ const addOffer = async (req, res) => {
 
     } catch (error) {
         console.error('Error in addOffer:', error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ 
             success: false, 
             message: 'Server Error' 
@@ -116,7 +117,7 @@ const editOffer = async (req, res) => {
         const { discount, startDate, endDate } = req.body;
 
         if (discount <= 0 || discount > 100) {
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({
                 success: false,
                 message: 'Discount must be between 1% and 100%'
@@ -125,7 +126,7 @@ const editOffer = async (req, res) => {
 
         const existingOffer = await Offer.findById(offerId);
         if (!existingOffer) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 success: false,
                 message: 'Offer not found'
             });
@@ -139,7 +140,7 @@ const editOffer = async (req, res) => {
         if (existingOffer.type === 'product') {
             const product = await Product.findById(existingOffer.productId);
             if (!product) {
-                return res.status(404).json({
+                return res.status(statusCode.NOT_FOUND).json({
                     success: false,
                     message: 'Associated product not found'
                 });
@@ -157,7 +158,7 @@ const editOffer = async (req, res) => {
         } else if (existingOffer.type === 'category') {
             const category = await Category.findById(existingOffer.categoryId);
             if (!category) {
-                return res.status(404).json({
+                return res.status(statusCode.NOT_FOUND).json({
                     success: false,
                     message: 'Associated category not found'
                 });
@@ -180,7 +181,7 @@ const editOffer = async (req, res) => {
 
         const updatedOffer = await existingOffer.save();
 
-        return res.status(200).json({
+        return res.status(statusCode.OK).json({
             success: true,
             message: `${existingOffer.type.charAt(0).toUpperCase() + existingOffer.type.slice(1)} offer updated successfully`,
             offer: updatedOffer
@@ -188,7 +189,7 @@ const editOffer = async (req, res) => {
 
     } catch (error) {
         console.error('Error in editOffer:', error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({
             success: false,
             message: 'Server Error'
@@ -202,7 +203,7 @@ const removeOffer = async (req, res) => {
         
         const offer = await Offer.findById(offerId);
         if (!offer) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 success: false,
                 message: "Offer not found"
             });
@@ -250,14 +251,14 @@ const removeOffer = async (req, res) => {
 
         await Offer.findByIdAndDelete(offerId);
 
-        return res.status(200).json({ 
+        return res.status(statusCode.OK).json({ 
             success: true, 
             message: 'Offer removed successfully' 
         });
 
     } catch (error) {
         console.error('Error in removeOffer:', error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ 
             success: false, 
             message: 'Server Error' 
@@ -299,7 +300,7 @@ const offerList = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in offerList:', error);
-        res.status(500
+        res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ 
             success: false, 
             message: 'Server Error' 
@@ -319,7 +320,7 @@ const LoadOffer = async (req, res) => {
         return res.render("offer", { products, categories });
     } catch (error) {
         console.error("Error in LoadOffer:", error);
-        res.status(500
+        res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ 
             success: false, 
             message: 'Server Error' 

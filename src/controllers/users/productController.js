@@ -3,7 +3,8 @@ import User from "../../models/userSchema.js";
 import Category from "../../models/categorySchema.js";
 import Wishlist from "../../models/wishlistSchema.js";
 import mongoose from 'mongoose';
-         
+
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
 
 
@@ -23,8 +24,7 @@ const productDetails = async (req, res) => {
 
 
         if (!product) {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK).json({
                 status: true,
                 messsage: "there is no product "
             })
@@ -59,16 +59,16 @@ const productDetails = async (req, res) => {
 const getWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
-        
-       
+
+
         const user = await User.findById(userId);
         if (!user) {
             return res.redirect("/login");
         }
 
         const wishlist = await Wishlist.findOne({ userId: userId }).populate("products.productId");
-        
-        
+
+
         const products = wishlist ? wishlist.products : [];
 
         res.render('wishlist', {
@@ -78,7 +78,7 @@ const getWishlist = async (req, res) => {
 
     } catch (error) {
         console.error("Error in getWishlist:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 }
 const addWishlist = async (req, res) => {
@@ -98,7 +98,7 @@ const addWishlist = async (req, res) => {
 
         const productId = req.body.productId;
 
-      
+
 
         console.log("The product ID:", productId);
 
@@ -156,10 +156,10 @@ const removeFromWishlist = async (req, res) => {
         const userId = req.session.user;
         const { productId } = req.body;
 
-       
+
 
         const wishlist = await Wishlist.findOne({ userId });
-        
+
         if (!wishlist) {
             return res.json({
                 status: false,

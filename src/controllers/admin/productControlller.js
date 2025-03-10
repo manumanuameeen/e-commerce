@@ -4,7 +4,8 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
-         
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
+
 
 
 
@@ -36,7 +37,7 @@ console.log(req.body)
         if (!products.productName || !products.category || !products.regularPrice) {
             console.log('here1');
 
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ success: false, message: "Missing required fields" });
         }
 
@@ -44,7 +45,7 @@ console.log(req.body)
         if (productExists) {
             console.log('here2');
             
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ success: false, message: "Product already exists" });
         }
 
@@ -91,7 +92,7 @@ console.log(req.body)
         const category = await Category.findOne({ _id: products.category });
         if (!category) {
             console.log('here5');
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ success: false, message: "Invalid category" });
         }
 
@@ -108,11 +109,11 @@ console.log(req.body)
         });
 
         await newProduct.save();
-        return res.status(200).json({ success: true, message: "Product added successfully" });
+        return res.status(statusCode.OK).json({ success: true, message: "Product added successfully" });
     } catch (error) {
         console.log('here6');
         console.error("Error saving product:", error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ success: false, message: "Internal server error" });
     }
 };
@@ -155,7 +156,7 @@ const blockProduct = async (req, res) => {
         const blockProduct = await Product.updateOne({ _id: id }, { isBlocked: true });
 
         if (!blockProduct) {
-            return res.status(404).json({ success: false, message: "Product not found" });
+            return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
         }
 
         res.redirect("/admin/products");
@@ -171,7 +172,7 @@ const unBlockProduct = async (req, res) => {
         const unBlockProduct = await Product.updateOne({ _id: id }, { isBlocked: false });
 
         if (!unBlockProduct) {
-            return res.status(404).json({ success: false, message: "Product not found" });
+            return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
         }
 
         res.redirect("/admin/products");
@@ -205,7 +206,7 @@ const editProduct = async (req, res) => {
         });
 
         if (existingProduct) {
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ error: "Product with this name already exists" });
         }
 
@@ -214,7 +215,7 @@ const editProduct = async (req, res) => {
 
         const category = await Category.findOne({ name: data.category });
         if (!category) {
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ error: "Category not found" });
         }
         const colorVarients = [];

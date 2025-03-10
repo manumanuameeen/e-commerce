@@ -1,6 +1,7 @@
 import User from "../../models/userSchema.js";
 import Order from "../../models/orderSchema.js";
 import Coupon from "../../models/couponSchema.js";
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
 const loadCoupon = async (req, res) => {
     try {
@@ -30,7 +31,7 @@ const loadCoupon = async (req, res) => {
         });
     } catch (error) {
         console.log("error in load coupon", error);
-        res.status(500).render('error', { message: 'Failed to load coupons' });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).render('error', { message: 'Failed to load coupons' });
     }
 };
 
@@ -39,7 +40,7 @@ const createCoupon = async (req, res) => {
         const { name, offerPrice, minimumPrice, expireOn } = req.body;
 
         if (!name || !offerPrice || !minimumPrice || !expireOn) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "All fields are required!",
             });
@@ -47,13 +48,13 @@ const createCoupon = async (req, res) => {
 
         const existingCoupon = await Coupon.findOne({ name });
         if (existingCoupon) {
-            return res.status(409).json({
+            return res.status(statusCode.CONFLICT).json({
                 status: false,
                 message: "Coupon with this name already exists!",
             });
         }
         if (name.length < 3 || name.length > 50 || !/^[a-zA-Z0-9 ]+$/.test(name)) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Coupon name must be between 3 and 50 characters and contain only alphanumeric characters",
             });
@@ -61,7 +62,7 @@ const createCoupon = async (req, res) => {
 
         const expirationDate = new Date(expireOn);
         if (isNaN(expirationDate) || expirationDate <= new Date()) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Expiration date must be a future date!",
             });
@@ -69,7 +70,7 @@ const createCoupon = async (req, res) => {
 
         const parsedOfferPrice = parseFloat(offerPrice);
         if (isNaN(parsedOfferPrice) || parsedOfferPrice <= 0 || parsedOfferPrice > 10000) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Discount amount must be a positive number and less than ₹10,000",
             });
@@ -77,13 +78,13 @@ const createCoupon = async (req, res) => {
 
         const parsedMinimumPrice = parseFloat(minimumPrice);
         if (isNaN(parsedMinimumPrice) || parsedMinimumPrice <= 0 || parsedMinimumPrice > 100000) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Minimum purchase amount must be a positive number and less than ₹100,000",
             });
         }
         if (parsedOfferPrice >= parsedMinimumPrice) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Discount amount must be less than minimum purchase amount",
             });
@@ -102,7 +103,7 @@ const createCoupon = async (req, res) => {
 
         console.log("Coupon created successfully");
 
-        return res.status(201).json({
+        return res.status(statusCode.CREATED).json({
             status: true,
             message: "Coupon created successfully",
             coupon: newCoupon,
@@ -110,12 +111,12 @@ const createCoupon = async (req, res) => {
     } catch (error) {
         console.error("Error in createCoupon:", error);
         if (error.code === 11000) {
-            return res.status(409).json({
+            return res.status(statusCode.CONFLICT).json({
                 status: false,
                 message: "Coupon with this name already exists!",
             });
         }
-        return res.status(500).json({
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             status: false,
             message: "Internal Server Error",
             error: error.message,
@@ -129,20 +130,20 @@ const deleteCoupon = async (req, res) => {
         const coupon = await Coupon.findByIdAndDelete(couponId);
         
         if (!coupon) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 status: false,
                 message: "Coupon not found"
             });
         }
 
-        res.status(200).json({
+        res.status(statusCode.OK).json({
             status: true,
             message: "Coupon deleted successfully"
         });
 
     } catch (error) {
         console.error("Error in delete coupon", error);
-        res.status(500).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             status: false,
             message: "Something went wrong"
         });
@@ -155,7 +156,7 @@ const editCoupon = async (req, res) => {
         const { offerPrice, minimumPrice, expireOn } = req.body;
 
         if (!offerPrice || !minimumPrice || !expireOn) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "All fields are required!"
             });
@@ -163,7 +164,7 @@ const editCoupon = async (req, res) => {
 
         const parsedOfferPrice = parseFloat(offerPrice);
         if (isNaN(parsedOfferPrice) || parsedOfferPrice <= 0 || parsedOfferPrice > 10000) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Discount amount must be a positive number and less than ₹10,000",
             });
@@ -171,14 +172,14 @@ const editCoupon = async (req, res) => {
 
         const parsedMinimumPrice = parseFloat(minimumPrice);
         if (isNaN(parsedMinimumPrice) || parsedMinimumPrice <= 0 || parsedMinimumPrice > 100000) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Minimum purchase amount must be a positive number and less than ₹100,000",
             });
         }
 
         if (parsedOfferPrice >= parsedMinimumPrice) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Discount amount must be less than minimum purchase amount",
             });
@@ -186,7 +187,7 @@ const editCoupon = async (req, res) => {
 
         const expirationDate = new Date(expireOn);
         if (isNaN(expirationDate) || expirationDate <= new Date()) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: "Expiration date must be a future date!",
             });
@@ -203,13 +204,13 @@ const editCoupon = async (req, res) => {
         );
 
         if (!updatedCoupon) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 status: false,
                 message: "Coupon not found"
             });
         }
 
-        res.status(200).json({
+        res.status(statusCode.OK).json({
             status: true,
             message: "Coupon updated successfully",
             coupon: updatedCoupon
@@ -217,7 +218,7 @@ const editCoupon = async (req, res) => {
 
     } catch (error) {
         console.error("Error in edit coupon:", error);
-        res.status(500).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             status: false,
             message: "Internal Server Error",
             error: error.message

@@ -6,7 +6,7 @@ import bcrypt from "bcrypt"
 import Category from "../../models/categorySchema.js"
 import Product from "../../models/productSchema.js"
 import Wallet from "../../models/wallet.js"
-
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
 
 const loadpageNotFound = async (req, res) => {
@@ -32,7 +32,7 @@ const loadsignup = async (req, res) => {
         return res.redirect('/');
     } catch (error) {
         console.log("sign up page not found");
-        res.status(500).send("service error");
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send("service error");
     }
 }
 
@@ -96,7 +96,7 @@ const signup = async (req, res) => {
             return res.render("signup", { message: "User already exists" });
         }
 
-       
+
         let referrer = null;
         if (referralCode) {
             referrer = await User.findOne({ referalCode: referralCode });
@@ -127,7 +127,7 @@ const signup = async (req, res) => {
             referralCode,
             newUserReferralCode,
             referrerId: referrer ? referrer._id : null,
-            avatar:uniqueAvatar,
+            avatar: uniqueAvatar,
         };
 
         res.render("verify-otp");
@@ -159,7 +159,7 @@ const verifyOtp = async (req, res) => {
             const userData = req.session.userData;
             const passwordHash = await securePassword(userData.password);
 
-          
+
             const newUser = new User({
                 name: userData.name,
                 email: userData.email,
@@ -171,7 +171,7 @@ const verifyOtp = async (req, res) => {
 
             await newUser.save();
 
-       
+
             const newUserWallet = new Wallet({
                 userId: newUser._id,
                 balance: 0,
@@ -180,11 +180,11 @@ const verifyOtp = async (req, res) => {
                 debitHistory: []
             });
 
-        
+
             if (userData.referrerId) {
                 const referrer = await User.findById(userData.referrerId);
 
-              
+
                 let referrerWallet = await Wallet.findOne({ userId: referrer._id });
 
                 if (!referrerWallet) {
@@ -197,7 +197,7 @@ const verifyOtp = async (req, res) => {
                     });
                 }
 
-                
+
                 referrerWallet.balance += 3000;
                 referrerWallet.transactions.push({
                     type: "credit",
@@ -210,7 +210,7 @@ const verifyOtp = async (req, res) => {
                 });
                 await referrerWallet.save();
 
-            
+
                 referrer.wallet = referrerWallet._id;
                 referrer.redeemedUsers = newUser._id;
                 await referrer.save();
@@ -239,14 +239,14 @@ const verifyOtp = async (req, res) => {
             });
         } else {
             return res.status(200
-).json({
+            ).json({
                 success: false,
                 message: "Invalid OTP. Please try again.",
             });
         }
     } catch (error) {
         console.error("Error during OTP verification:", error);
-        return res.status(500).json({
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "An error occurred. Please try again.",
         });
@@ -290,7 +290,7 @@ const resendotp = async (req, res) => {
         const { email } = req.session.userData;
         console.log("eamil is here in resednotp ", email)
         if (!email) {
-            return res.status(500).json({ success: false, message: "Email not found in session" });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Email not found in session" });
         }
 
         const otp = generateOtp();
@@ -303,40 +303,41 @@ const resendotp = async (req, res) => {
         console.log("the email sented successfully", emailSent)
         if (emailSent) {
             console.log("Resend otp :", otp);
-            res.status(200).json({ success: true, message: "OTP Resent successfully" });
+            res.status(statusCode.OK).json({ success: true, message: "OTP Resent successfully" });
         } else {
-            res.status(500).json({ success: false, message: "Failed to resend OTP. Please try again." });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resend OTP. Please try again." });
         }
     } catch (error) {
         console.log("Error sending OTP", error);
-        res.status(500).json({ success: false, message: "Internal server error. Please try again." });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error. Please try again." });
     }
 };
 
 const loadHomepage = async (req, res) => {
+//    console.log(statusCode.OK);
     try {
         const user = req.session.user;
         const categories = await Category.find({ isListed: true });
         const categoryIds = categories.map(category => category._id);
-        const fProducts = await Product.find({isBlocked:false}).sort({createdAt:-1}).limit(4)
+        const fProducts = await Product.find({ isBlocked: false }).sort({ createdAt: -1 }).limit(4)
         const productsB = await Product.find({
             isBlocked: false,
             productImage: { $exists: true, $ne: [] }
         })
-        .limit(10)
-        .select('name productImage')
-        .lean();
-        
-        console.log('Products with images:', JSON.stringify(productsB, null, 2));
-        
+            .limit(10)
+            .select('name productImage')
+            .lean();
+
+        // console.log('Products with images:', JSON.stringify(productsB, null, 2));
+
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categoryIds }
         })
-        .populate('category')
-        .sort({ createdOn: -1 })
-        .limit(4)
-        .lean();
+            .populate('category')
+            .sort({ createdOn: -1 })
+            .limit(4)
+            .lean();
 
         const viewData = {
             products: productData,
@@ -345,11 +346,11 @@ const loadHomepage = async (req, res) => {
             fProducts,
             productsB: productsB
         };
-        
+
         res.render("home", viewData);
     } catch (error) {
         console.log("Error in homepage:", error.message);
-        res.status(500).send("Service error");
+        res.status(statusCode.INTERNAL_SERVER_ERROR).send("Service error");
     }
 };
 
@@ -430,7 +431,7 @@ const loadlogout = async (req, res) => {
 //         const user = req.session.user;
 //         const userData = await User.findOne({ _id: user });
 //         const categories = await Category.find({ isListed: true });
-        
+
 //         const categoryId = req.query.category;
 //         const searchQuery = req.query.search;
 //         const priceRange = req.query.price;
@@ -438,22 +439,22 @@ const loadlogout = async (req, res) => {
 //         const sort = req.query.sort || 'newest';
 //         const page = parseInt(req.query.page) || 1;
 //         const limit = 9;
-        
+
 //         let query = {
 //             isBlocked: false,
 //             'colorVarients': { $elemMatch: { quantity: { $gt: 0 } } }
 //         };
-        
+
 //         if (categoryId) {
 //             query.category = categoryId;
 //         }
-        
+
 //         if (searchQuery) {
 //             query.$or = [
 //                 { productName: { $regex: searchQuery, $options: 'i' } }
 //             ];
 //         }
-        
+
 //         if (priceRange) {
 //             const priceRanges = {
 //                 'below-1500': { $lt: 30000 },
@@ -467,13 +468,13 @@ const loadlogout = async (req, res) => {
 //                 query.salePrice = priceRanges[priceRange];
 //             }
 //         }
-        
+
 //         if (availability === 'Available') {
 //             query['colorVarients.quantity'] = { $gt: 0 };
 //         } else if (availability === 'Unavailable') {
 //             query['colorVarients.quantity'] = { $lte: 0 };
 //         }
-        
+
 //         const sortOptions = {
 //             'newest': { createdAt: -1 },
 //             'price-asc': { salePrice: 1 },
@@ -481,9 +482,9 @@ const loadlogout = async (req, res) => {
 //             'name-asc': { productName: 1 },
 //             'name-desc': { productName: -1 }
 //         };
-        
+
 //         const skip = (page - 1) * limit;
-        
+
 //         const totalProducts = await Product.countDocuments(query);
 //         const products = await Product.find(query)
 //             .sort(sortOptions[sort] || sortOptions.newest)
@@ -491,13 +492,13 @@ const loadlogout = async (req, res) => {
 //             .limit(limit)
 //             .populate('category')
 //             .lean();
-        
 
-            
+
+
 //         const totalPages = Math.ceil(totalProducts / limit);
-        
+
 //         const isAjaxRequest = req.xhr || (req.headers['x-requested-with'] === 'XMLHttpRequest');
-        
+
 //         if (isAjaxRequest) {
 //             return res.render('shop', {
 //                 user: userData,
@@ -515,7 +516,7 @@ const loadlogout = async (req, res) => {
 //                 queryParams: req.query,
 //                 layout: false   });
 //         }
-        
+
 //         res.render('shop', {
 //             user: userData,
 //             products: products,
@@ -594,12 +595,11 @@ const loadShopingPage = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        // Get only categories that are listed
+
         const listedCategories = await Category.find({ isListed: true }).select('_id');
         const listedCategoryIds = listedCategories.map(category => category._id);
 
-        query.category = { $in: listedCategoryIds }; // Ensure only products in listed categories are shown
-
+        query.category = { $in: listedCategoryIds };
         const totalProducts = await Product.countDocuments(query);
         const products = await Product.find(query)
             .sort(sortOptions[sort] || sortOptions.newest)

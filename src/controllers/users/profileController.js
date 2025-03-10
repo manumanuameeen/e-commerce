@@ -2,6 +2,7 @@ import User from "../../models/userSchema.js";
 import Product from "../../models/productSchema.js";
 import Address from "../../models/addressSchema.js";
 import Order from "../../models/orderSchema.js";
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
 import nodemailer from "nodemailer"
 
@@ -110,7 +111,7 @@ const verifyForgotPassOtp = async (req, res) => {
         }
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: "An error occured. Please try again" })
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured. Please try again" })
     }
 }
 
@@ -139,15 +140,15 @@ const resendOtp = async (req, res) => {
         const emailSent = await sendVerificationEmail(email, otp);
         if (emailSent) {
             console.log("Resend OTP:", otp);
-            return res.status(200).json({ success: true, message: "Resend otp successful" });
+            return res.status(statusCode.OK).json({ success: true, message: "Resend otp successful" });
         } else {
-            return res.status(500).json({ success: false, message: "Failed to resend OTP. Please try again." });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resend OTP. Please try again." });
         }
 
     } catch (error) {
 
         console.error("Error in resend otp", error)
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
     }
 }
 
@@ -516,11 +517,11 @@ const postEditAddress = async (req, res) => {
             }
         );
 
-        return res.status(200).json({ message: "Address updated successfully" });
+        return res.status(statusCode.OK).json({ message: "Address updated successfully" });
 
     } catch (error) {
         console.error("Error in edit address:", error);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
     }
 };
 
@@ -550,14 +551,14 @@ const deleteAddress = async (req, res) => {
             }
         );
 
-        return res.status(200).json({
+        return res.status(statusCode.OK).json({
             success: true,
             message: "Address deleted successfully"
         });
 
     } catch (error) {
         console.error("Error in delete address:", error);
-        return res.status(500).json({
+        return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Error deleting address"
         });
@@ -629,7 +630,7 @@ function confirmDelete(addressId) {
 
 //     } catch (error) {
 //         console.error('Error fetching order details:', error);
-//         res.status(500).json({ message: 'Error fetching order details' });
+//         res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching order details' });
 //     }
 // }
 

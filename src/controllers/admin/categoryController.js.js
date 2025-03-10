@@ -1,7 +1,8 @@
 
 import Category from "../../models/categorySchema.js";
 import Product from "../../models/productSchema.js"
-         
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
+
 
 
 
@@ -47,7 +48,7 @@ const addCategory = async (req, res) => {
         const existingCategory = await Category.findOne({ normalizedName })
         if (existingCategory) {
             console.log("Category already exists");
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ error: "Category already exists" });
         }
         
@@ -65,7 +66,7 @@ const addCategory = async (req, res) => {
         });
     } catch (error) {
         console.error("Error adding category:", error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({
             success: false,
             error: "Internal server error"
@@ -114,7 +115,7 @@ const addCategoryOffer = async (req, res) => {
         }
         return res.json({ success: true })
     } catch (error) {
-        res.status(500
+        res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ status: false, message: "Internal Server Error" })
     }
 }
@@ -150,7 +151,7 @@ const removeCategoryOffer = async (req, res) => {
     } catch (error) {
 
         console.error("Error in removeCategoryOffer:", error);
-        return res.status(500
+        return res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({
             status: false,
             message: 'Internal server error'
@@ -229,7 +230,7 @@ const editCategory = async (req, res) => {
         // console.log("exsits:", existingCategory);
 
         if (existingCategory) {
-            return res.status(200
+            return res.status(statusCode.OK
 ).json({ error: "Category exist please choose another name" })
         }
         const updateCategory = await Category.findByIdAndUpdate(categoryId, {
@@ -245,7 +246,7 @@ const editCategory = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500
+        res.status(statusCode.INTERNAL_SERVER_ERROR
 ).json({ error: "INternal server error" })
     }
 }

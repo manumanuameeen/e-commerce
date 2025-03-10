@@ -1,10 +1,11 @@
 import Order from "../../models/orderSchema.js";
-         
 
 
 
 
 
+
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
 
 import Product from "../../models/productSchema.js";
 import User from "../../models/userSchema.js";
@@ -86,8 +87,8 @@ const loadOrder = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching order info:', error);
-        res.status(500
-).send('Internal Server Error');
+        res.status(statusCode.INTERNAL_SERVER_ERROR
+        ).send('Internal Server Error');
     }
 };
 
@@ -97,8 +98,8 @@ const updateOrderStatus = async (req, res) => {
         const { status } = req.body;
 
         if (!orderId || !status) {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Order ID and status are required'
             });
@@ -106,8 +107,8 @@ const updateOrderStatus = async (req, res) => {
 
         const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
         if (!validStatuses.includes(status)) {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Invalid status value'
             });
@@ -115,7 +116,7 @@ const updateOrderStatus = async (req, res) => {
 
         const order = await Order.findById(orderId);
         if (!order) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 success: false,
                 message: 'Order not found'
             });
@@ -125,24 +126,24 @@ const updateOrderStatus = async (req, res) => {
             console.log("item is getting", item)
         }
 
-if(order.status==="Payment Pending"){
-    return res.status(200
-).json({
-        success:false,
-        message:"Payment Pending cannot be changed"
-    })
-}
+        if (order.status === "Payment Pending") {
+            return res.status(statusCode.OK
+            ).json({
+                success: false,
+                message: "Payment Pending cannot be changed"
+            })
+        }
 
         if (order.status === 'Delivered') {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Delivered orders cannot be changed'
             });
         }
         if (order.status === 'Cancelled' && status !== 'Cancelled') {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Cannot change status of cancelled order'
             });
@@ -179,7 +180,7 @@ if(order.status==="Payment Pending"){
 
         await order.save();
 
-        res.status(200).json({
+        res.status(statusCode.OK).json({
             success: true,
             message: 'Order status updated successfully',
             data: {
@@ -191,8 +192,8 @@ if(order.status==="Payment Pending"){
 
     } catch (error) {
         console.error('Error updating order:', error);
-        res.status(500
-).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR
+        ).json({
             success: false,
             message: 'Error updating order status',
             error: error.message
@@ -231,8 +232,8 @@ const handleReturnRequest = async (req, res) => {
 
         const validStatuses = ['Approved', 'Rejected'];
         if (!validStatuses.includes(status)) {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Invalid return request status'
             });
@@ -242,15 +243,15 @@ const handleReturnRequest = async (req, res) => {
             .populate('orderIteams.product');
 
         if (!order) {
-            return res.status(404).json({
+            return res.status(statusCode.NOT_FOUND).json({
                 success: false,
                 message: 'Order not found'
             });
         }
 
         if (!order.returnRequest || order.returnRequest.status !== 'Requested') {
-            return res.status(200
-).json({
+            return res.status(statusCode.OK
+            ).json({
                 success: false,
                 message: 'Invalid return request state'
             });
@@ -336,7 +337,7 @@ const handleReturnRequest = async (req, res) => {
 
 
 
-        return res.status(200).json({
+        return res.status(statusCode.OK).json({
             success: true,
             message: `Return request ${status.toLowerCase()} successfully`,
             order
@@ -344,8 +345,8 @@ const handleReturnRequest = async (req, res) => {
 
     } catch (error) {
         console.error('Error handling return request:', error);
-        res.status(500
-).json({
+        res.status(statusCode.INTERNAL_SERVER_ERROR
+        ).json({
             success: false,
             message: 'Error processing return request'
         });

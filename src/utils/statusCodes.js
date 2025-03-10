@@ -1,4 +1,4 @@
-const statusCode = {
+export const statusCode = Object.freeze({
     OK: 200,
     BAD_REQUEST: 400,
     NOT_FOUND: 404,
@@ -8,10 +8,8 @@ const statusCode = {
     FORBIDDEN: 403,
     CONFLICT: 409,
     UNPROCESSABLE_ENTITY: 422,
-} 
-
-Object.freeze(statusCode);
+});
 
 export const isValidStatusCode = (code) => {
     return Object.values(statusCode).includes(code);
-  };
+};
