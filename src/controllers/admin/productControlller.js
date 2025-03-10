@@ -195,7 +195,7 @@ const unBlockProduct = async (req, res) => {
 //     }
 // };
 
-const editProductPage = async (req, res) => {
+const getEditProduct = async (req, res) => {
     try {
         const productId = req.query.id;
         const product = await Product.findById(productId);
