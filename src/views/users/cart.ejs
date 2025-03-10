@@ -671,14 +671,14 @@ const updateCartQuantity = async (req, res) => {
         }
 
         if (quantity > colorVariant.quantity) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: `Only ${colorVariant.quantity} items are available in ${cartItem.colorVariant} color`
             });
         }
 
         if (quantity > 5) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: 'Maximum quantity allowed is 5 items'
             });
@@ -692,7 +692,7 @@ const updateCartQuantity = async (req, res) => {
         }, 0);
 
         if (totalCartItems > 10) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 status: false,
                 message: 'Maximum 10 items allowed in cart'
             });

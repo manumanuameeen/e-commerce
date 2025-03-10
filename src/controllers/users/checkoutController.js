@@ -15,6 +15,8 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { console } from "inspector";
+import { statusCode, isValidStatusCode } from "../../utils/statusCodes.js"
+
 // import { updateOrderStatus } from "../admin/orderManagement.js";
 dotenv.config();
 
@@ -721,7 +723,7 @@ const verifyRazorpayPayment = async (req, res) => {
 
         const userId = req.session.user;
         if (!userId) {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({ success: false, message: "User session expired or invalid" });
         }
 
@@ -731,14 +733,14 @@ const verifyRazorpayPayment = async (req, res) => {
             .digest("hex");
 
         // if (expectedSignature !== razorpaySignature) {
-        //     return res.status(200
+        //     return res.status(statusCode.OK
         // ).json({ success: false, message: "Invalid payment signature" });
         // }
 
         if (orderId) {
             const order = await Order.findById(orderId).populate("orderIteams.product");
             if (!order) {
-                return res.status(200
+                return res.status(statusCode.OK
                 ).json({ success: false, message: "Order not found in razorpay" });
             }
 
@@ -746,7 +748,7 @@ const verifyRazorpayPayment = async (req, res) => {
                 const product = await Product.findById(item.product);
 
                 if (!product) {
-                    return res.status(200
+                    return res.status(statusCode.OK
                     ).json({
                         success: false,
                         message: `Product not found: ${item.productName}`
@@ -758,7 +760,7 @@ const verifyRazorpayPayment = async (req, res) => {
                 );
 
                 if (!colorVariant) {
-                    return res.status(200
+                    return res.status(statusCode.OK
                     ).json({
                         success: false,
                         message: `Color variant ${item.color} not found for product: ${item.productName}`
@@ -766,7 +768,7 @@ const verifyRazorpayPayment = async (req, res) => {
                 }
 
                 if (colorVariant.quantity < item.quantity) {
-                    return res.status(200
+                    return res.status(statusCode.OK
                     ).json({
                         success: false,
                         message: `Insufficient stock for ${item.productName} (color: ${item.color}). Only ${colorVariant.quantity} available.`
@@ -810,7 +812,7 @@ const verifyRazorpayPayment = async (req, res) => {
                 orderId: updatedOrder._id
             });
         } else {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({
                 success: false,
                 message: "Order ID is required"
@@ -835,7 +837,7 @@ const handlePaymentDismissal = async (req, res) => {
         const userId = req.session.user;
 
         if (!userId) {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({ success: false, message: "User session expired" });
         }
 
@@ -856,7 +858,7 @@ const handlePaymentDismissal = async (req, res) => {
 
         const cart = await Cart.findOne({ userId }).populate("items.ProductId");
         if (!cart || cart.items.length === 0) {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({ success: false, message: "Cart is empty" });
         }
 
@@ -939,7 +941,7 @@ const cancelOrderItem = async (req, res) => {
         }
 
         if (!['Pending', 'Processing'].includes(orderItem.status)) {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({ success: false, message: "This item cannot be cancelled in its current status" });
         }
 

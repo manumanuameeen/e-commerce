@@ -47,7 +47,7 @@ const applyCoupon = async (req, res) => {
 
 
         if (!coupon) {
-            return res.status(200
+            return res.status(statusCode.OK
             ).json({
                 success: false,
                 message: "Invalid coupon code"
