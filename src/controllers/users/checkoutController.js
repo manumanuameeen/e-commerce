@@ -1005,11 +1005,7 @@ const cancelOrderItem = async (req, res) => {
         console.log(`Final check before saving: Order final amount = ${order.finalAmount}`);
         await order.save();
 
-        // Alternative approach using direct update if the above doesn't work
-        // await Order.updateOne(
-        //     { orderId: orderId },
-        //     { $set: { finalAmount: order.finalAmount } }
-        // );
+    //    \
 
         return res.status(statusCode.OK).json({
             success: true,
