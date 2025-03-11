@@ -370,7 +370,7 @@ const orderCancel = async (req, res) => {
             }
 
             if (order.paymentMethod !== 'Cash on Delivery' || order.status !== "Payment Pending") {
-                wallet.balance += order.totalPrice;
+                wallet.balance += order.finalAmount;
                 wallet.transactions.push({
                     type: "credit",
                     amount: order.finalAmount,
@@ -904,7 +904,6 @@ const cancelOrderItem = async (req, res) => {
             userId: userId
         });
 
-
         if (!order) {
             return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
         }
@@ -916,11 +915,11 @@ const cancelOrderItem = async (req, res) => {
         }
 
         if (!['Pending', 'Processing'].includes(orderItem.status)) {
-            return res.status(statusCode.OK
-            ).json({ success: false, message: "This item cannot be cancelled in its current status" });
+            return res.status(statusCode.OK).json({ success: false, message: "This item cannot be cancelled in its current status" });
         }
 
         let refundAmount = orderItem.price * orderItem.quantity;
+        let originalRefundAmount = refundAmount;
 
         if (order.couponApplied && order.couponCode) {
             const originalOrderTotal = order.orderIteams.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -931,8 +930,6 @@ const cancelOrderItem = async (req, res) => {
                 refundAmount = refundAmount * (1 - discountPercentage);
             }
 
-            order.finalAmount -= refundAmount;
-
             const remainingTotal = order.orderIteams.reduce((sum, item) => {
                 return item._id.toString() !== itemId && item.status !== "Cancelled"
                     ? sum + (item.price * item.quantity)
@@ -940,17 +937,16 @@ const cancelOrderItem = async (req, res) => {
             }, 0);
 
             if (remainingTotal < (coupon?.minimumPrice || 0)) {
-                await Order.updateOne(
-                    { orderId: orderId },
-                    {
-                        $set: {
-                            couponApplied: false,
-                            couponCode: null
-                        }
-                    }
-                );
+                order.couponApplied = false;
+                order.couponCode = null;
             }
         }
+
+        console.log(`Before update: Order final amount: ${order.finalAmount}, Refund amount: ${refundAmount}`);
+        
+        order.finalAmount -= refundAmount;
+        
+        console.log(`After update: New final amount: ${order.finalAmount}`);
 
         orderItem.status = "Cancelled";
         orderItem.cancelReason = reason;
@@ -971,11 +967,7 @@ const cancelOrderItem = async (req, res) => {
             });
         }
 
-
         if (order.status !== "Payment Pending") {
-            //("now in wallet credition time the order i", order.status);
-
-
             wallet.balance += refundAmount;
             wallet.transactions.push({
                 type: "credit",
@@ -989,9 +981,8 @@ const cancelOrderItem = async (req, res) => {
                 date: new Date(),
                 description: `Refund for cancelled item in order: ${orderId}`
             });
-            await wallet.save()
+            await wallet.save();
         }
-
 
         const activeItems = order.orderIteams.filter(item => item.status !== "Cancelled");
         if (activeItems.length === 0) {
@@ -1011,8 +1002,14 @@ const cancelOrderItem = async (req, res) => {
             note: `Item ${orderItem.productName} cancelled: ${reason}. Refund amount: ₹${refundAmount.toFixed(2)}`
         });
 
-        await order.save()
+        console.log(`Final check before saving: Order final amount = ${order.finalAmount}`);
+        await order.save();
 
+        // Alternative approach using direct update if the above doesn't work
+        // await Order.updateOne(
+        //     { orderId: orderId },
+        //     { $set: { finalAmount: order.finalAmount } }
+        // );
 
         return res.status(statusCode.OK).json({
             success: true,
