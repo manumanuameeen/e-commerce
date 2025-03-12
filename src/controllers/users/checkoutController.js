@@ -877,7 +877,6 @@ const handlePaymentDismissal = async (req, res) => {
 
         await newOrder.save();
         await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
-        //()
         res.json({
             success: true,
             message: 'Order created with pending status',
@@ -1005,7 +1004,7 @@ const cancelOrderItem = async (req, res) => {
         console.log(`Final check before saving: Order final amount = ${order.finalAmount}`);
         await order.save();
 
-    //    \
+
 
         return res.status(statusCode.OK).json({
             success: true,

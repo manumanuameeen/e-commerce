@@ -362,7 +362,6 @@
                     <% } %>
 
                     <% 
-                        // Show only the current page and adjacent pages (up to totalPages)
                         const startPage = Math.max(1, currentPage - 1);
                         const endPage = Math.min(totalPages, currentPage + 1);
                     %>
@@ -563,82 +562,6 @@
         </div>
     </section>
 
-    // <script>
-    //     function copyReferralCode() {
-    //         let referralInput = document.getElementById("referralCode");
-
-    //         if (!referralInput.value) {
-    //             Swal.fire({
-    //                 icon: "warning",
-    //                 title: "No Referral Code",
-    //                 text: "There is no referral code available to copy.",
-    //             });
-    //             return;
-    //         }
-
-    //         referralInput.select();
-    //         document.execCommand("copy");
-
-    //         Swal.fire({
-    //             icon: "success",
-    //             title: "Copied!",
-    //             text: "Referral Code has been copied to clipboard.",
-    //             showConfirmButton: false,
-    //             timer: 1500
-    //         });
-    //     }
-
-    //     function confirmDelete(addressId) {
-    //         Swal.fire({
-    //             title: 'Are you sure?',
-    //             text: 'This action cannot be undone.',
-    //             icon: 'warning',
-    //             showCancelButton: true,
-    //             confirmButtonColor: '#000',
-    //             cancelButtonColor: '#6c757d',
-    //             confirmButtonText: 'Yes, delete it!'
-    //         }).then((result) => {
-    //             if (result.isConfirmed) {
-    //                 fetch(`/deleteAddress/${addressId}`, {
-    //                     method: 'DELETE',
-    //                     headers: {
-    //                         'Content-Type': 'application/json',
-    //                     }
-    //                 })
-    //                 .then(response => {
-    //                     if (response.ok) {
-    //                         Swal.fire(
-    //                             'Deleted!',
-    //                             'The address has been deleted.',
-    //                             'success'
-    //                         ).then(() => {
-    //                             window.location.href = '/Profile';
-    //                         });
-    //                     } else {
-    //                         Swal.fire(
-    //                             'Error!',
-    //                             'Failed to delete the address.',
-    //                             'error'
-    //                         );
-    //                     }
-    //                 })
-    //                 .catch(error => {
-    //                     console.error('Error:', error);
-    //                     Swal.fire(
-    //                         'Error!',
-    //                         error.message||'An error occurred.',
-    //                         'error'
-    //                     );
-    //                 });
-    //             }
-    //         });
-    //     }
-
-    //     function viewOrderDetails(orderId) {
-    //         window.location.href = `/order-details/${orderId}`;
-    //     }
-    // </script>
-
 
 
     <script>
@@ -700,7 +623,6 @@
                     paginationHtml += `<button class="btn btn-sm btn_2 mr-2" onclick="loadOrders(${data.currentPage - 1})">« Previous</button>`;
                 }
 
-                // Show only the current page and adjacent pages (up to totalPages)
                 const startPage = Math.max(1, data.currentPage - 1);
                 const endPage = Math.min(data.totalPages, data.currentPage + 1);
                 for (let i = startPage; i <= endPage; i++) {

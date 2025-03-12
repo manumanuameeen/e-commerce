@@ -529,42 +529,6 @@ const deleteAddress = async (req, res) => {
     }
 };
 
-// Frontend - JavaScript function
-function confirmDelete(addressId) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "This action cannot be undone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/deleteAddress/${addressId}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-                .then(async (response) => {
-                    const data = await response.json();
-
-                    if (response.ok && data.success) {
-                        Swal.fire("Deleted!", "The address has been deleted.", "success").then(() => {
-                            window.location.href = "/Profile";
-                        });
-                    } else {
-                        throw new Error(data.message || "Failed to delete the address");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire("Error!", error.message || "An error occurred.", "error");
-                });
-        }
-    });
-}
 
 const updateName = async (req, res) => {
     try {

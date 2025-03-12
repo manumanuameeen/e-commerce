@@ -174,8 +174,8 @@ const orderDetails = async (req, res) => {
                 select: 'productName productImage price',
             })
             .populate({
-                path: 'address', // Populate the address field
-                populate: { path: 'userId', select: 'name email' }, // Optionally populate user info
+                path: 'address', 
+                populate: { path: 'userId', select: 'name email' }, 
             })
             .lean();
 
